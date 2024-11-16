@@ -49,7 +49,7 @@ const Resultado = sequelize.define('Resultado', {
   },
 }, {
   timestamps: true,
-  tableName: 'resultado',
+  tableName: 'Resultado',
 });
 
 export default Resultado;
