@@ -8,6 +8,7 @@ import Rutina from "./models/rutina_model.js";
 import express from 'express';
 import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
 import dotenv from 'dotenv';
+import usuarioRoutes from './routes/usuarioRoutes.js'
 
 
 dotenv.config();
@@ -31,8 +32,13 @@ Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
 
 const app = express();
 
+app.use(express.json()) //Para usar JSON
+
 // Configurar Swagger
 swaggerSetup(app);
+
+// Rutas
+app.use('/api', usuarioRoutes);
 
 //Sincronizacion Base de Datos
 sequelize
