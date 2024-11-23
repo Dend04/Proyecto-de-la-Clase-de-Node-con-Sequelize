@@ -54,5 +54,8 @@ sequelize
   });
 
   app.listen(process.env.PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
+    // Cambiar el color del texto a verde
+    const blueColor = '\x1b[34m';
+    const resetColor = '\x1b[0m';
+    console.log(`${blueColor}Servidor corriendo en http://localhost:${process.env.PORT}${resetColor}`);
   });
