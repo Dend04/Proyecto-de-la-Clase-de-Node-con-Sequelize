@@ -15,7 +15,11 @@
     "swagger-ui-express": "^5.0.1"
   },
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
 }

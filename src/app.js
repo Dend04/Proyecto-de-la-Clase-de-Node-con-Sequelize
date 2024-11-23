@@ -8,7 +8,9 @@ import Rutina from "./models/rutina_model.js";
 import express from 'express';
 import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
 import dotenv from 'dotenv';
-import usuarioRoutes from './routes/usuarioRoutes.js'
+import usuarioRoutes from './routes/usuarioRoutes.js';
+import preguntaRoutes from './routes/preguntaRoutes.js';
+import testRoutes from './routes/testRoutes.js';
 
 
 dotenv.config();
@@ -23,12 +25,11 @@ Respuesta.belongsTo(Pregunta, { foreignKey: "preguntaId" });
 Usuario.hasMany(Resultado, { foreignKey: "usuarioId" });
 Resultado.belongsTo(Usuario, { foreignKey: "usuarioId" });
 
-Test.hasMany(Resultado, { foreignKey: "testId" });
-Resultado.belongsTo(Test, { foreignKey: "testId" });
-
 Resultado.hasOne(Rutina, { foreignKey: "resultadoId" });
 Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
 
+Usuario.hasOne(Rutina, { foreignKey: "usuarioId" });
+Rutina.belongsTo(Usuario, { foreignKey: "usuarioId" });
 
 const app = express();
 
@@ -39,6 +40,8 @@ swaggerSetup(app);
 
 // Rutas
 app.use('/api', usuarioRoutes);
+app.use('/api', preguntaRoutes);
+app.use('/api', testRoutes);
 
 //Sincronizacion Base de Datos
 sequelize
