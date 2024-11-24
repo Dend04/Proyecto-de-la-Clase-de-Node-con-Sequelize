@@ -60,7 +60,7 @@ router.get('/preguntas/:id', getPreguntaById);
 
 /**
  * @swagger
- * /preguntas:
+ * /crearPregunta:
  *   post:
  *     summary: Crea una nueva pregunta
  *     tags: [Preguntas]

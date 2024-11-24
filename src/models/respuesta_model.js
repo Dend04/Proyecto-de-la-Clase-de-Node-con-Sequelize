@@ -8,10 +8,6 @@ const Respuesta = sequelize.define('Respuesta', {
     primaryKey: true,
     autoIncrement: true,
   },
-  texto: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   respuesta_boolean: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

@@ -11,6 +11,9 @@ import dotenv from 'dotenv';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import preguntaRoutes from './routes/preguntaRoutes.js';
 import testRoutes from './routes/testRoutes.js';
+import rutinaRoutes from './routes/rutinaRoutes.js';
+import resultadoRoutes from './routes/resultadoRoutes.js';
+import respuestaRoutes from './routes/respuestaRoutes.js';
 
 
 dotenv.config();
@@ -42,6 +45,9 @@ swaggerSetup(app);
 app.use('/api', usuarioRoutes);
 app.use('/api', preguntaRoutes);
 app.use('/api', testRoutes);
+app.use('/api', resultadoRoutes);
+app.use('/api', rutinaRoutes);
+app.use('/api', respuestaRoutes);
 
 //Sincronizacion Base de Datos
 sequelize
@@ -54,7 +60,7 @@ sequelize
   });
 
   app.listen(process.env.PORT, () => {
-    // Cambiar el color del texto a verde
+    // Cambiar el color del texto a azul
     const blueColor = '\x1b[34m';
     const resetColor = '\x1b[0m';
     console.log(`${blueColor}Servidor corriendo en http://localhost:${process.env.PORT}${resetColor}`);

@@ -4,7 +4,9 @@ import {
   getRutinaById,
   createRutina,
   updateRutina,
-  deleteRutina
+  deleteRutina,
+  getRutinasByUsuarioId,
+  asignarRutina
 } from '../controllers/rutinaController.js';
 
 const router = express.Router();
@@ -124,5 +126,8 @@ router.delete('/rutinas/:id', deleteRutina);
  *       200:
  *         description: Lista de rutinas del usuario
  */
-router.get('/rutinas/usuario/:usuarioId', getRutinasByUsuarioId);
+router.get('/rutina/usuario/:usuarioId', getRutinasByUsuarioId);
+
+router.get('/rutina/:usuarioId', asignarRutina);
+
 export default router;

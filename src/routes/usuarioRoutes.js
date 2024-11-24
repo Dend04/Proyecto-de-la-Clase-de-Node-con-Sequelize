@@ -128,6 +128,6 @@ router.put("/usuarios/:id", actualizarUsuario);
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete("/usuarios/:id", borrarUsuario);
+router.delete("/usuarioBorrar/:id", borrarUsuario);
 
 export default router;

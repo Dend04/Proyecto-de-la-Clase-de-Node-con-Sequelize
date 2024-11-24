@@ -30,56 +30,6 @@ export const getResultadoById = async (req, res) => {
   }
 };
 
-// Crear un nuevo resultado vinculado a un test y usuario
-export const createResultado = async (req, res) => {
-  try {
-    const { testId, usuarioId, ...rest } = req.body;
-    const test = await Test.findByPk(testId);
-    const usuario = await Usuario.findByPk(usuarioId);
-
-    if (!test || !usuario) {
-      return res.status(404).json({ error: 'Test o Usuario no encontrado' });
-    }
-
-    const nuevoResultado = await Resultado.create({ testId, usuarioId, ...rest });
-    res.status(201).json(nuevoResultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Actualizar un resultado existente
-export const updateResultado = async (req, res) => {
-  try {
-    const [updated] = await Resultado.update(req.body, {
-      where: { id: req.params.id }
-    });
-    if (updated) {
-      const updatedResultado = await Resultado.findByPk(req.params.id);
-      res.json(updatedResultado);
-    } else {
-      res.status(404).json({ error: 'Resultado no encontrado' });
-    }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Eliminar un resultado
-export const deleteResultado = async (req, res) => {
-  try {
-    const deleted = await Resultado.destroy({
-      where: { id: req.params.id }
-    });
-    if (deleted) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ error: 'Resultado no encontrado' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 // Obtener resultados por usuario ID
 export const getResultadosByUsuarioId = async (req, res) => {
@@ -93,3 +43,84 @@ export const getResultadosByUsuarioId = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+// Crear un nuevo resultado basado en las respuestas del test
+export const createResultadoFromTest = async (req, res) => {
+  try {
+    const { usuarioId, respuestas } = req.body;
+
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
+
+    const nuevoResultado = await Resultado.create({
+      usuarioId,
+      estado,
+      deficiencias: deficiencias.join(', '), // Guardar deficiencias como una cadena
+      planchas: respuestas.planchas,
+      abdominales: respuestas.abdominales,
+      flexibilidad: respuestas.flexibilidad,
+      velocidad: respuestas.velocidad,
+      resistencia: respuestas.resistencia,
+      tiempoDescanso: respuestas.tiempoDescanso
+    });
+
+    res.status(201).json(nuevoResultado);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+// Función para determinar el estado físico y deficiencias basado en las respuestas
+const determinarEstadoFisicoYDeficiencias = (respuestas) => {
+  let puntaje = 0;
+  let deficiencias = [];
+
+  const { planchas, abdominales, flexibilidad, velocidad, resistencia, tiempoDescanso } = respuestas;
+
+  // Evaluar cada característica y asignar puntos
+  if (planchas >= 30) puntaje += 2;
+  else if (planchas >= 20) puntaje += 1;
+  else deficiencias.push('planchas');
+
+  if (abdominales >= 50) puntaje += 2;
+  else if (abdominales >= 30) puntaje += 1;
+  else deficiencias.push('abdominales');
+
+  if (flexibilidad >= 9) puntaje += 2;
+  else if (flexibilidad >= 7) puntaje += 1;
+  else deficiencias.push('flexibilidad');
+
+  if (velocidad >= 9) puntaje += 2;
+  else if (velocidad >= 7) puntaje += 1;
+  else deficiencias.push('velocidad');
+
+  if (resistencia >= 9) puntaje += 2;
+  else if (resistencia >= 7) puntaje += 1;
+  else deficiencias.push('resistencia');
+
+  if (tiempoDescanso >= 9) puntaje += 2;
+  else if (tiempoDescanso >= 8) puntaje += 1;
+  else deficiencias.push('tiempo de descanso');
+
+  // Determinar el estado basado en el puntaje total
+  let estado;
+  if (puntaje >= 10) {
+    estado = 'Excelente estado físico';
+  } else if (puntaje >= 7) {
+    estado = 'Buen estado físico';
+  } else if (puntaje >= 4) {
+    estado = 'Saludable';
+  } else if (puntaje >= 2) {
+    estado = 'Estado normal';
+  } else {
+    estado = 'Poco saludable';
+  }
+
+  return { estado, deficiencias };
+};

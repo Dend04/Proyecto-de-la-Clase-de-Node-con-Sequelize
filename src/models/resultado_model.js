@@ -43,10 +43,18 @@ const Resultado = sequelize.define('Resultado', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  estado: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   tiempo_descanso: {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  deficiencias: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  }
 }, {
   timestamps: true,
   tableName: 'Resultado',

@@ -96,3 +96,46 @@ export const getRutinasByUsuarioId = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+ // Controlador para asignar rutina
+ export const asignarRutina = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const resultado = await Resultado.findOne({ where: { usuarioId } });
+    const usuario = await Usuario.findOne({ where: { id: usuarioId } });
+
+    if (!resultado || !usuario) {
+      return res.status(404).json({ message: "Datos del usuario o resultado no encontrados" });
+    }
+
+    let rutina = [];
+    const deficiencias = resultado.deficiencias.split(', ');
+
+    // Priorizar deficiencias
+    if (deficiencias.includes('planchas')) {
+      rutina.push("5 planchas por día");
+    }
+    if (deficiencias.includes('abdominales')) {
+      rutina.push("5 abdominales por día");
+    }
+    if (deficiencias.includes('flexibilidad')) {
+      rutina.push("Ejercicios de estiramiento diarios");
+    }
+    if (deficiencias.includes('velocidad')) {
+      rutina.push("Sprints cortos 3 veces por semana");
+    }
+    if (deficiencias.includes('resistencia')) {
+      rutina.push("Correr 20 minutos 3 veces por semana");
+    }
+    if (deficiencias.includes('tiempo de descanso')) {
+      rutina.push("Asegurar al menos 7 horas de sueño");
+    }
+
+    // Crear o actualizar la rutina
+    await Rutina.upsert({ usuarioId, descripcion: rutina.join(", ") });
+
+    res.json({ message: "Rutina asignada", rutina });
+  } catch (error) {
+    res.status(500).json({ message: "Error al asignar rutina", error });
+  }
+};
