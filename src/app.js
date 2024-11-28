@@ -14,6 +14,11 @@ import testRoutes from './routes/testRoutes.js';
 import rutinaRoutes from './routes/rutinaRoutes.js';
 import resultadoRoutes from './routes/resultadoRoutes.js';
 import respuestaRoutes from './routes/respuestaRoutes.js';
+import { middleware } from "./middleware/middleware.js";
+import logger from "./loggers/logger.js";
+import errorMiddleware from "./middleware/errorMiddleware.js";
+import morgan from 'morgan';
+import cors from 'cors';
 
 
 dotenv.config();
@@ -36,10 +41,23 @@ Rutina.belongsTo(Usuario, { foreignKey: "usuarioId" });
 
 const app = express();
 
+// Usa Morgan con el stream de Winston
+app.use(morgan('informacion_combinada', { stream: logger.stream }));
+
 app.use(express.json()) //Para usar JSON
 
 // Configurar Swagger
 swaggerSetup(app);
+
+// Usa el middleware
+app.use(middleware);
+
+// logger
+logger.info('Información de inicio');
+/* logger.error('Error detectado'); */ //Para probar el funcionamiento de deteccion de errores
+
+// CORS
+app.use(cors());
 
 // Rutas
 app.use('/api', usuarioRoutes);
@@ -48,6 +66,9 @@ app.use('/api', testRoutes);
 app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
+
+// Usa el middleware de manejo de errores
+app.use(errorMiddleware);
 
 //Sincronizacion Base de Datos
 sequelize

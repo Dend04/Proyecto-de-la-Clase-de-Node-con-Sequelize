@@ -11,6 +11,19 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  apellidos: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  segundoNombre: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  nombreUsuario: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -37,7 +50,7 @@ const Usuario = sequelize.define('Usuario', {
   },
 }, {
   timestamps: true, // Esto añade automáticamente los campos createdAt y updatedAt
-  tableName: 'usuario', // Nombre de la tabla en la base de datos
+  tableName: 'Usuario', // Nombre de la tabla en la base de datos
 });
 
 export default Usuario;

@@ -7,7 +7,7 @@ export const getRespuestas = async (req, res) => {
       const respuestas = await Respuesta.findAll({
         include: [{
           model: Pregunta,
-          attributes: ['texto'], // Incluye el texto de la pregunta relacionada
+          attributes: ['texto'], // Incluye el texto de la pregunta relacionada add req y res en las rutas
         }],
       });
       res.status(200).json(respuestas);
