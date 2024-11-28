@@ -53,7 +53,7 @@ swaggerSetup(app);
 app.use(middleware);
 
 // logger
-logger.info('Información de inicio');
+/* logger.info('Información de inicio'); */
 /* logger.error('Error detectado'); */ //Para probar el funcionamiento de deteccion de errores
 
 // CORS

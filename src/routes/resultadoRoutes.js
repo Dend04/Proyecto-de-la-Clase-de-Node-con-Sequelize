@@ -56,16 +56,27 @@ router.get('/resultado/:id', getResultadoById);
  * /api/resultados/usuario/{usuarioId}:
  *   get:
  *     summary: Obtiene resultados por usuario ID
+ *     tags: [Resultado]
  *     parameters:
  *       - in: path
  *         name: usuarioId
- *         required: true
- *         description: ID del usuario
  *         schema:
  *           type: integer
+ *         required: true
+ *         description: ID del usuario
  *     responses:
  *       200:
  *         description: Lista de resultados del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Resultado'
+ *       404:
+ *         description: Resultados no encontrados para el usuario
+ *       500:
+ *         description: Error interno del servidor
  */
 router.get('/resultados/usuario/:usuarioId', getResultadosByUsuarioId);
 
