@@ -55,6 +55,8 @@ app.use(middleware);
 // logger
 /* logger.info('Información de inicio'); */
 /* logger.error('Error detectado'); */ //Para probar el funcionamiento de deteccion de errores
+//Morgan
+app.use(morgan('combined', { stream: logger.stream }));
 
 // CORS
 app.use(cors());

@@ -20,24 +20,57 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nombre:
- *                 type: string
- *               email:
- *                 type: string
- *               peso:
- *                 type: number
- *               altura:
- *                 type: number
+ *             $ref: '#/components/schemas/Usuario'
+ *           example:
+ *             nombre: "Juan"
+ *             apellidos: "Pérez García"
+ *             segundoNombre: "Antonio"
+ *             nombreUsuario: "juanperez123"
+ *             email: "juan.perez@ejemplo.com"
+ *             peso: 75.5
+ *             altura: 175.5
+ *             enfermedadCronica: "Ninguna"
+ *             estadoFisicoActual: "Activo"
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Usuario'
+ *             example:
+ *               id: 1
+ *               nombre: "Juan"
+ *               apellidos: "Pérez García"
+ *               segundoNombre: "Antonio"
+ *               nombreUsuario: "juanperez123"
+ *               email: "juan.perez@ejemplo.com"
+ *               peso: 75.5
+ *               altura: 175.5
+ *               enfermedadCronica: "Ninguna"
+ *               estadoFisicoActual: "Activo"
+ *               createdAt: "2024-03-11T15:00:00.000Z"
+ *               updatedAt: "2024-03-11T15:00:00.000Z"
  *       400:
  *         description: Error en la creación del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "El email ya está registrado"
  */
-router.post("/crearUsuario", crearUsuario);
-
+router.post('/crearUsuario', async (req, res) => {
+  try {
+    const usuario = await crearUsuario(req.body);
+    res.status(201).json(usuario);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 /**
  * @swagger
  * /api/usuarios:
@@ -47,14 +80,27 @@ router.post("/crearUsuario", crearUsuario);
  *     responses:
  *       200:
  *         description: Lista de usuarios
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Usuario'
  *       500:
- *         description: Error al obtener los usuarios
+ *         description: Error del servidor
  */
-router.get("/usuarios", obtenerUsuarios);
+router.get('/usuarios', async (req, res) => {
+  try {
+    const usuarios = await obtenerUsuarios();
+    res.status(200).json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 /**
  * @swagger
- * /api/usuarios/{id}:
+ * /api/usuario/{id}:
  *   get:
  *     summary: Obtiene un usuario por ID
  *     tags: [Usuarios]
@@ -68,14 +114,29 @@ router.get("/usuarios", obtenerUsuarios);
  *     responses:
  *       200:
  *         description: Usuario encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Usuario'
  *       404:
  *         description: Usuario no encontrado
  */
-router.get("/usuario/:id", obtenerUsuarioPorId);
+router.get('/usuario/:id', async (req, res) => {
+  try {
+    const usuario = await obtenerUsuarioPorId(req.params.id);
+    res.status(200).json(usuario);
+  } catch (error) {
+    if (error.message === "Usuario no encontrado") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
 
 /**
  * @swagger
- * /api/usuarios/{id}:
+ * /api/usuario/{id}:
  *   put:
  *     summary: Actualiza un usuario
  *     tags: [Usuarios]
@@ -91,29 +152,66 @@ router.get("/usuario/:id", obtenerUsuarioPorId);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nombre:
- *                 type: string
- *               email:
- *                 type: string
- *               peso:
- *                 type: number
- *               altura:
- *                 type: number
+ *             $ref: '#/components/schemas/Usuario'
+ *           example:
+ *             nombre: "Juan"
+ *             apellidos: "Pérez López"
+ *             segundoNombre: "Antonio"
+ *             nombreUsuario: "juanperez123"
+ *             email: "juan.perez@ejemplo.com"
+ *             peso: 80.5
+ *             altura: 175.5
+ *             enfermedadCronica: "Ninguna"
+ *             estadoFisicoActual: "Muy Activo"
  *     responses:
  *       200:
  *         description: Usuario actualizado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Usuario'
+ *             example:
+ *               id: 1
+ *               nombre: "Juan"
+ *               apellidos: "Pérez López"
+ *               segundoNombre: "Antonio"
+ *               nombreUsuario: "juanperez123"
+ *               email: "juan.perez@ejemplo.com"
+ *               peso: 80.5
+ *               altura: 175.5
+ *               enfermedadCronica: "Ninguna"
+ *               estadoFisicoActual: "Muy Activo"
+ *               createdAt: "2024-03-11T15:00:00.000Z"
+ *               updatedAt: "2024-03-11T15:30:00.000Z"
  *       404:
  *         description: Usuario no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Usuario no encontrado"
  */
-router.put("/usuarios/:id", actualizarUsuario);
-
+router.put('/usuario/:id', async (req, res) => {
+  try {
+    const usuario = await actualizarUsuario(req.params.id, req.body);
+    res.status(200).json(usuario);
+  } catch (error) {
+    if (error.message === "Usuario no encontrado") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
 /**
  * @swagger
- * /api/usuarios/{id}:
+ * /api/usuario/{id}:
  *   delete:
- *     summary: Borra un usuario
+ *     summary: Elimina un usuario
  *     tags: [Usuarios]
  *     parameters:
  *       - in: path
@@ -123,11 +221,30 @@ router.put("/usuarios/:id", actualizarUsuario);
  *           type: integer
  *         description: ID del usuario
  *     responses:
- *       204:
- *         description: Usuario borrado exitosamente
+ *       200:
+ *         description: Usuario eliminado satisfactoriamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuario eliminado satisfactoriamente
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete("/usuarioBorrar/:id", borrarUsuario);
+router.delete('/usuario/:id', async (req, res) => {
+  try {
+    await borrarUsuario(req.params.id);
+    res.status(200).json({ message: "Usuario eliminado satisfactoriamente" });
+  } catch (error) {
+    if (error.message === "Usuario no encontrado") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
 
 export default router;

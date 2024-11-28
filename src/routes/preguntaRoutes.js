@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import {
   getPreguntas,
   getPreguntaById,
@@ -6,17 +6,16 @@ import {
   updatePregunta,
   deletePregunta,
   getPreguntasByTestId,
-  getPreguntasByTestName
-} from '../controllers/preguntaController.js';
+  getPreguntasByTestName,
+} from "../controllers/preguntaController.js";
 
 const router = express.Router();
 
 // Rutas para las preguntas
 
-
 /**
  * @swagger
- * /preguntas:
+ * /api/preguntas:
  *   get:
  *     summary: Obtiene todas las preguntas
  *     tags: [Preguntas]
@@ -29,9 +28,30 @@ const router = express.Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               - id: 1
+ *                 texto: "¿Cuál es la capital de Francia?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
+ *               - id: 2
+ *                 texto: "¿Cuál es la fórmula química del agua?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Error interno del servidor"
  */
-
-router.get('/preguntas', async (req, res, next) => {
+router.get("/preguntas", async (req, res, next) => {
   try {
     const preguntas = await getPreguntas();
     res.json(preguntas);
@@ -42,17 +62,17 @@ router.get('/preguntas', async (req, res, next) => {
 
 /**
  * @swagger
- * /preguntas/{id}:
+ * /api/pregunta/{id}:
  *   get:
  *     summary: Obtiene una pregunta por ID
  *     tags: [Preguntas]
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
  *         description: ID de la pregunta
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Pregunta encontrada
@@ -60,24 +80,51 @@ router.get('/preguntas', async (req, res, next) => {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               id: 1
+ *               texto: "¿Cuál es la capital de Francia?"
+ *               testId: 1
+ *               createdAt: "2024-03-11T15:00:00.000Z"
+ *               updatedAt: "2024-03-11T15:00:00.000Z"
  *       404:
  *         description: Pregunta no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Pregunta no encontrada"
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Error interno del servidor"
  */
-router.get('/preguntas/:id', async (req, res, next) => {
+router.get("/pregunta/:id", async (req, res, next) => {
   try {
     const pregunta = await getPreguntaById(req.params.id);
     if (pregunta) {
       res.json(pregunta);
     } else {
-      res.status(404).json({ error: 'Pregunta no encontrada' });
+      res.status(404).json({ error: "Pregunta no encontrada" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 /**
  * @swagger
- * /crearPregunta:
+ * /api/crearPregunta:
  *   post:
  *     summary: Crea una nueva pregunta
  *     tags: [Preguntas]
@@ -87,13 +134,35 @@ router.get('/preguntas/:id', async (req, res, next) => {
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Pregunta'
+ *           example:
+ *             texto: "¿Cuál es la capital de Francia?"
+ *             testId: 1
  *     responses:
  *       201:
  *         description: Pregunta creada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               id: 1
+ *               texto: "¿Cuál es la capital de Francia?"
+ *               testId: 1
+ *               createdAt: "2024-03-11T15:00:00.000Z"
+ *               updatedAt: "2024-03-11T15:00:00.000Z"
  *       400:
  *         description: Error en la creación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "El campo 'texto' es obligatorio"
  */
-router.post('/crearPregunta', async (req, res, next) => {
+router.post("/crearPregunta", async (req, res, next) => {
   try {
     const nuevaPregunta = await createPregunta(req.body);
     res.status(201).json(nuevaPregunta);
@@ -104,30 +173,52 @@ router.post('/crearPregunta', async (req, res, next) => {
 
 /**
  * @swagger
- * /preguntas/{id}:
+ * /api/pregunta/{id}:
  *   put:
  *     summary: Actualiza una pregunta existente
  *     tags: [Preguntas]
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
  *         description: ID de la pregunta
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Pregunta'
+ *           example:
+ *             texto: "¿Cuál es la capital de Alemania?"
+ *             testId: 1
  *     responses:
  *       200:
  *         description: Pregunta actualizada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               id: 1
+ *               texto: "¿Cuál es la capital de Alemania?"
+ *               testId: 1
+ *               createdAt: "2024-03-11T15:00:00.000Z"
+ *               updatedAt: "2024-03-12T15:00:00.000Z"
  *       404:
  *         description: Pregunta no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Pregunta no encontrada"
  */
-router.put('/preguntas/:id', async (req, res, next) => {
+router.put("/pregunta/:id", async (req, res, next) => {
   try {
     const updatedPregunta = await updatePregunta(req.params.id, req.body);
     res.json(updatedPregunta);
@@ -138,83 +229,179 @@ router.put('/preguntas/:id', async (req, res, next) => {
 
 /**
  * @swagger
- * /preguntas/{id}:
+ * /api/pregunta/{id}:
  *   delete:
  *     summary: Elimina una pregunta
  *     tags: [Preguntas]
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
  *         description: ID de la pregunta
+ *         schema:
+ *           type: integer
  *     responses:
- *       204:
- *         description: Pregunta eliminada
+ *       200:
+ *         description: Pregunta eliminada satisfactoriamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Pregunta eliminada satisfactoriamente"
  *       404:
  *         description: Pregunta no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Pregunta no encontrada"
  */
-router.delete('/preguntas/:id', async (req, res, next) => {
+router.delete("/pregunta/:id", async (req, res, next) => {
   try {
     await deletePregunta(req.params.id);
-    res.status(204).send();
+    res.status(200).json({ message: "Pregunta eliminada satisfactoriamente" });
   } catch (error) {
     res.status(404).json({ error: error.message });
   }
 });
-
 // Rutas para obtener preguntas por test
 
 /**
  * @swagger
- * /preguntas/test/id/{testId}:
+ * /api/preguntas/test/id/{testId}:
  *   get:
  *     summary: Obtiene todas las preguntas de un test por ID de test
  *     tags: [Preguntas]
  *     parameters:
  *       - in: path
  *         name: testId
- *         schema:
- *           type: integer
  *         required: true
  *         description: ID del test
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Lista de preguntas del test
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               - id: 1
+ *                 texto: "¿Cuál es la capital de Francia?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
+ *               - id: 2
+ *                 texto: "¿Cuál es la fórmula química del agua?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
  *       404:
  *         description: No se encontraron preguntas para el test
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "No se encontraron preguntas para el test con el ID proporcionado"
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Error interno del servidor"
  */
-router.get('/preguntas/test/id/:testId', async (req, res, next) => {
+router.get("/preguntas/test/id/:testId", async (req, res, next) => {
   try {
     const preguntas = await getPreguntasByTestId(req.params.testId);
     if (preguntas.length > 0) {
       res.json(preguntas);
     } else {
-      res.status(404).json({ error: 'No se encontraron preguntas para el test con el ID proporcionado' });
+      res
+        .status(404)
+        .json({
+          error:
+            "No se encontraron preguntas para el test con el ID proporcionado",
+        });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 /**
  * @swagger
- * /preguntas/test/name/{testName}:
+ * /api/preguntas/test/name/{testName}:
  *   get:
  *     summary: Obtiene todas las preguntas de un test por nombre de test
  *     tags: [Preguntas]
  *     parameters:
  *       - in: path
  *         name: testName
- *         schema:
- *           type: string
  *         required: true
  *         description: Nombre del test
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Lista de preguntas del test
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Pregunta'
+ *             example:
+ *               - id: 1
+ *                 texto: "¿Cuál es la capital de Francia?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
+ *               - id: 2
+ *                 texto: "¿Cuál es la fórmula química del agua?"
+ *                 testId: 1
+ *                 createdAt: "2024-03-11T15:00:00.000Z"
+ *                 updatedAt: "2024-03-11T15:00:00.000Z"
  *       404:
  *         description: No se encontraron preguntas para el test
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "No se encontraron preguntas para el test con el nombre proporcionado"
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Error interno del servidor"
  */
 router.get('/preguntas/test/name/:testName', async (req, res, next) => {
   try {

@@ -3,87 +3,55 @@ import Test from '../models/test_model.js';
 import Usuario from '../models/usuario_model.js';
 
 // Obtener todos los resultados
-export const getResultados = async (req, res) => {
-  try {
-    const resultados = await Resultado.findAll({
-      include: [Test, Usuario] // Incluye Test y Usuario relacionados
-    });
-    res.json(resultados);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+export const getResultados = async () => {
+  return await Resultado.findAll({
+    include: [Test, Usuario]
+  });
 };
 
 // Obtener un resultado por ID
-export const getResultadoById = async (req, res) => {
-  try {
-    const resultado = await Resultado.findByPk(req.params.id, {
-      include: [Test, Usuario]
-    });
-    if (resultado) {
-      res.json(resultado);
-    } else {
-      res.status(404).json({ error: 'Resultado no encontrado' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+export const getResultadoById = async (id) => {
+  return await Resultado.findByPk(id, {
+    include: [Test, Usuario]
+  });
 };
-
 
 // Obtener resultados por usuario ID
-export const getResultadosByUsuarioId = async (req, res) => {
-    try {
-      const resultados = await Resultado.findAll({
-        where: { usuarioId: req.params.usuarioId },
-        include: [Test]
-      });
-      res.json(resultados);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-
-
-// Crear un nuevo resultado basado en las respuestas del test
-export const createResultadoFromTest = async (req, res) => {
-  try {
-    const { usuarioId, respuestas } = req.body;
-
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-
-    const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
-
-    const nuevoResultado = await Resultado.create({
-      usuarioId,
-      estado,
-      deficiencias: deficiencias.join(', '), // Guardar deficiencias como una cadena
-      planchas: respuestas.planchas,
-      abdominales: respuestas.abdominales,
-      flexibilidad: respuestas.flexibilidad,
-      velocidad: respuestas.velocidad,
-      resistencia: respuestas.resistencia,
-      tiempoDescanso: respuestas.tiempoDescanso
-    });
-
-    res.status(201).json(nuevoResultado);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+export const getResultadosByUsuarioId = async (usuarioId) => {
+  return await Resultado.findAll({
+    where: { usuarioId },
+    include: [Test]
+  });
 };
 
+// Crear un nuevo resultado
+export const createResultadoFromTest = async (resultadoData) => {
+  const { usuarioId, respuestas } = resultadoData;
+  
+  const usuario = await Usuario.findByPk(usuarioId);
+  if (!usuario) throw new Error('Usuario no encontrado');
 
-// Función para determinar el estado físico y deficiencias basado en las respuestas
+  const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
+
+  return await Resultado.create({
+    usuarioId,
+    estado,
+    deficiencias: deficiencias.join(', '),
+    planchas: respuestas.planchas,
+    abdominales: respuestas.abdominales,
+    flexibilidad: respuestas.flexibilidad,
+    velocidad: respuestas.velocidad,
+    resistencia: respuestas.resistencia,
+    tiempoDescanso: respuestas.tiempoDescanso
+  });
+};
+
+// Función auxiliar para determinar estado físico
 const determinarEstadoFisicoYDeficiencias = (respuestas) => {
   let puntaje = 0;
   let deficiencias = [];
-
   const { planchas, abdominales, flexibilidad, velocidad, resistencia, tiempoDescanso } = respuestas;
 
-  // Evaluar cada característica y asignar puntos
   if (planchas >= 30) puntaje += 2;
   else if (planchas >= 20) puntaje += 1;
   else deficiencias.push('planchas');
@@ -108,19 +76,12 @@ const determinarEstadoFisicoYDeficiencias = (respuestas) => {
   else if (tiempoDescanso >= 8) puntaje += 1;
   else deficiencias.push('tiempo de descanso');
 
-  // Determinar el estado basado en el puntaje total
   let estado;
-  if (puntaje >= 10) {
-    estado = 'Excelente estado físico';
-  } else if (puntaje >= 7) {
-    estado = 'Buen estado físico';
-  } else if (puntaje >= 4) {
-    estado = 'Saludable';
-  } else if (puntaje >= 2) {
-    estado = 'Estado normal';
-  } else {
-    estado = 'Poco saludable';
-  }
+  if (puntaje >= 10) estado = 'Excelente estado físico';
+  else if (puntaje >= 7) estado = 'Buen estado físico';
+  else if (puntaje >= 4) estado = 'Saludable';
+  else if (puntaje >= 2) estado = 'Estado normal';
+  else estado = 'Poco saludable';
 
   return { estado, deficiencias };
 };
