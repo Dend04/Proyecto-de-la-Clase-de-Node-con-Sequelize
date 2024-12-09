@@ -9,9 +9,6 @@ dist
 # Node dependencies
 node_modules
 
-# ignorar carpetas 
-image
- 
 # Logs
 logs
 *.log
