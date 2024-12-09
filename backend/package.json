@@ -1,0 +1,29 @@
+{
+  "name": "Proyecto-de-la-Clase-de-Node-con-Sequelize",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Dend04/Proyecto-de-la-Clase-de-Node-con-Sequelize.git",
+  "author": "Dend04 <enamoradodairon@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
