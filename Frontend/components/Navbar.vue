@@ -15,17 +15,17 @@
         <span v-if="isNavbarOpen">Health Testing</span>
         <MenuIcon v-else class="h-6 w-6" />
       </button>
-      <!-- Lista de enlaces del Navbar, visible solo cuando está abierto -->
-      <ul v-if="isNavbarOpen" class="flex flex-col space-y-5">
+      <!-- Lista de enlaces del Navbar -->
+      <ul class="flex flex-col space-y-5">
         <!-- Enlace a Home -->
         <li>
           <NuxtLink
-            to="/home"
+            to="/"
             class="text-white no-underline flex items-center"
             title="Home"
           >
             <HomeIcon class="h-5 w-5 mr-2" />
-            <span class="hidden md:inline">Home</span>
+            <span v-if="isNavbarOpen" class="hidden md:inline">Home</span>
           </NuxtLink>
         </li>
         <!-- Enlace a Test -->
@@ -36,7 +36,18 @@
             title="Test"
           >
             <BeakerIcon class="h-5 w-5 mr-2" />
-            <span class="hidden md:inline">Test</span>
+            <span v-if="isNavbarOpen" class="hidden md:inline">Test</span>
+          </NuxtLink>
+        </li>
+        <!-- Enlace a Usuarios -->
+        <li>
+          <NuxtLink
+            to="/usuarios"
+            class="text-white no-underline flex items-center"
+            title="Usuarios"
+          >
+            <UserIcon class="h-5 w-5 mr-2" />
+            <span v-if="isNavbarOpen" class="hidden md:inline">Usuarios</span>
           </NuxtLink>
         </li>
         <!-- Enlace a Config -->
@@ -47,7 +58,7 @@
             title="Config"
           >
             <CogIcon class="h-5 w-5 mr-2" />
-            <span class="hidden md:inline">Config</span>
+            <span v-if="isNavbarOpen" class="hidden md:inline">Config</span>
           </NuxtLink>
         </li>
       </ul>
@@ -62,6 +73,7 @@ import {
   BeakerIcon,
   CogIcon,
   MenuIcon,
+  UserIcon,
 } from "@heroicons/vue/outline";
 
 // Estado para controlar la visibilidad del Navbar

@@ -7,13 +7,8 @@
     <div
       class="hidden md:flex items-center gap-2 text-xs rounded-full ring-1.5 ring-gray-300 px-2 ml-auto"
     >
-      <NuxtImg
-        src="/search.png"
-        alt="Buscar"
-        width="14"
-        height="14"
-        format="webp"
-      />
+      <SearchIcon class="h-5 w-5 text-gray-500" />
+
       <input
         type="text"
         placeholder="Buscar..."
@@ -25,24 +20,26 @@
       <div
         class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
       >
-        <NuxtImg
+        <!--  <NuxtImg
           src="/message.png"
           alt="Mensajes"
           width="20"
           height="20"
           format="webp"
-        />
+        /> -->
+        <ChatIcon class="h-5 w-5 text-gray-500" />
       </div>
       <div
         class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative"
       >
-        <NuxtImg
+        <!--   <NuxtImg
           src="/announcement.png"
           alt="Anuncios"
           width="20"
           height="20"
           format="webp"
-        />
+        /> -->
+        <BellIcon class="h-5 w-5 text-gray-500" />
         <div
           class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs"
         >
@@ -53,26 +50,26 @@
         <span class="text-xs leading-3 font-medium">Dairon Enamorado</span>
         <span class="text-[10px] text-gray-500 text-right">Admin</span>
       </div>
-      <NuxtImg
+       <NuxtImg
         src="/avatar.png"
         alt="Avatar"
         width="36"
         height="36"
         class="rounded-full"
         format="webp"
-      />
+      /> 
+      <!-- <UserIcon class="h-7 w-7 text-gray-500" /> --> 
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import {
-  HomeIcon,
-  BeakerIcon,
-  CogIcon,
-  MenuIcon,
-} from "@heroicons/vue/outline";
+import { 
+  SearchIcon, 
+  BellIcon, 
+  ChatIcon,
+  UserIcon } from "@heroicons/vue/outline";
 
 // Estado para controlar la visibilidad del Navbar
 const isNavbarOpen = ref(true);
