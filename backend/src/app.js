@@ -74,7 +74,7 @@ app.use(errorMiddleware);
 
 //Sincronizacion Base de Datos
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     console.log("Base de datos sincronizada");
   })

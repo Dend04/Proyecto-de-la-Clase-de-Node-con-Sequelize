@@ -74,21 +74,62 @@ router.get('/test/:id', async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Test'
- *           example:
- *             titulo: "Prueba de Matemáticas"
- *             descripcion: "Este es un test para evaluar conocimientos básicos de matemáticas."
+ *             type: object
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *                 description: El título del test
+ *                 example: "Prueba de Matemáticas"
+ *               descripcion:
+ *                 type: string
+ *                 description: La descripción del test
+ *                 example: "Este es un test para evaluar conocimientos básicos de matemáticas."
+ *               duracion:
+ *                 type: integer
+ *                 description: La duración del test en minutos (opcional)
+ *                 example: 30
+ *               dificultad:
+ *                 type: string
+ *                 description: La dificultad del test (opcional)
+ *                 enum: [facil, medio, dificil]
+ *                 example: "medio"
+ *               etiqueta:
+ *                 type: string
+ *                 description: La etiqueta del test (opcional)
+ *                 example: "Salud"
  *     responses:
  *       201:
  *         description: Test creado
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Test'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 titulo:
+ *                   type: string
+ *                 descripcion:
+ *                   type: string
+ *                 duracion:
+ *                   type: integer
+ *                 dificultad:
+ *                   type: string
+ *                 etiqueta:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
  *             example:
  *               id: 1
  *               titulo: "Test de Salud"
  *               descripcion: "Este es un test para evaluar el estado actual de salud."
+ *               duracion: null
+ *               dificultad: null
+ *               etiqueta: "Salud"
  *               createdAt: "2024-03-11T15:00:00.000Z"
  *               updatedAt: "2024-03-11T15:00:00.000Z"
  *       400:
@@ -104,13 +145,13 @@ router.get('/test/:id', async (req, res) => {
  *               error: "El título del test es obligatorio"
  */
 router.post('/crearTest', async (req, res) => {
-    try {
-      const test = await createTest(req.body);
-      res.status(201).json(test);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  });
+  try {
+    const test = await createTest(req.body);
+    res.status(201).json(test);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 /**
  * @swagger

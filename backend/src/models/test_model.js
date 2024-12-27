@@ -15,6 +15,18 @@ const Test = sequelize.define('Test', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  duracion: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // Permitir que sea nulo
+  },
+  dificultad: {
+    type: DataTypes.ENUM('facil', 'medio', 'dificil'),
+    allowNull: true, // Permitir que sea nulo
+  },
+  etiqueta: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 }, {
   timestamps: true,
   tableName: 'Test',
