@@ -201,13 +201,13 @@ router.post('/crearTest', async (req, res) => {
  *               error: "Test no encontrado"
  */
 router.put('/test/:id', async (req, res) => {
-    try {
-      const test = await updateTest(req.params.id, req.body);
-      res.status(200).json(test);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  });
+  try {
+    const test = await updateTest(req.params.id, req.body);
+    res.status(200).json(test);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 /**
  * @swagger
