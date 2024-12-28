@@ -85,33 +85,13 @@
       <ExclamationCircleIcon v-if="mensajeClase === 'bg-red-100 text-red-700'" class="h-6 w-6 mr-2" />
       <span>{{ mensaje }}</span>
     </div>
-
-    <!-- Modal para preguntar si desea agregar preguntas -->
-    <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">¿Desea agregar preguntas al test?</h2>
-          <button @click="cerrarModal" class="text-gray-500 hover:text-gray-700">
-            <XIcon class="h-6 w-6" />
-          </button>
-        </div>
-        <div class="flex justify-end space-x-4">
-          <button @click="redirigirPreguntas" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Sí
-          </button>
-          <button @click="redirigirTests" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            No
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { PencilIcon, DocumentTextIcon, ClockIcon, AdjustmentsIcon, TagIcon, CheckCircleIcon, ExclamationCircleIcon, XIcon } from '@heroicons/vue/outline';
+import { PencilIcon, DocumentTextIcon, ClockIcon, AdjustmentsIcon, TagIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/outline';
 
 const router = useRouter();
 
@@ -122,7 +102,6 @@ const dificultad = ref('');
 const etiqueta = ref('');
 const mensaje = ref('');
 const mensajeClase = ref('');
-const mostrarModal = ref(false);
 const testId = ref(null);
 
 const submitForm = async () => {
@@ -146,31 +125,14 @@ const submitForm = async () => {
     mensaje.value = 'Test creado con éxito.';
     mensajeClase.value = 'bg-green-100 text-green-700';
     testId.value = response.id;
-    mostrarModal.value = true;
     console.log('Test creado:', response);
-    // Vaciar los campos del formulario
-    titulo.value = '';
-    descripcion.value = '';
-    duracion.value = '';
-    dificultad.value = '';
-    etiqueta.value = '';
+    // Redirigir a la página de agregar preguntas
+    router.push(`/test/agregarPreguntas/${testId.value}`);
   } catch (error) {
     mensaje.value = 'Algo salió mal al crear el test.';
     mensajeClase.value = 'bg-red-100 text-red-700';
     console.error('Error al crear el test:', error);
   }
-};
-
-const cerrarModal = () => {
-  mostrarModal.value = false;
-};
-
-const redirigirPreguntas = () => {
-  router.push(`/test/${testId.value}`);
-};
-
-const redirigirTests = () => {
-  router.push('/test');
 };
 </script>
 

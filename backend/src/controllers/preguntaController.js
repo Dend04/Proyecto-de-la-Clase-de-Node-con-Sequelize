@@ -12,10 +12,10 @@ export const getPreguntaById = async (id) => {
 };
 
 // Crear una nueva pregunta vinculada a un test por su ID
-export const createPregunta = async (preguntaData) => {
-  const { testId, ...data } = preguntaData;
+export const createPregunta = async (testId, data) => {
   const test = await Test.findByPk(testId);
   if (!test) throw new Error('Test no encontrado');
+  if (!data.texto) throw new Error('El campo "texto" es obligatorio');
   return await Pregunta.create({ ...data, testId });
 };
 

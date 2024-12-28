@@ -415,4 +415,15 @@ router.get('/preguntas/test/name/:testName', async (req, res, next) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Ruta para crear una nueva pregunta para un test específico
+router.post('/preguntas/test/id/:testId', async (req, res) => {
+  try {
+    const nuevaPregunta = await createPregunta(req.params.testId, req.body);
+    res.status(201).json(nuevaPregunta);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 export default router;

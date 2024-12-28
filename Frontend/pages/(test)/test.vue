@@ -88,7 +88,7 @@
                   <button @click="borrarTest(test.id)" class="text-red-500 hover:text-red-700">
                     <TrashIcon class="h-5 w-5" />
                   </button>
-                  <NuxtLink :to="`/test/${test.id}/preguntas`" class="text-green-500 hover:text-green-700">
+                  <NuxtLink :to="`/visualizarPreguntas/${test.id}`" class="text-green-500 hover:text-green-700">
                     <EyeIcon class="h-5 w-5" />
                   </NuxtLink>
                 </div>
