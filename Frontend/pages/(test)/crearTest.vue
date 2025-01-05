@@ -127,7 +127,7 @@ const submitForm = async () => {
     testId.value = response.id;
     console.log('Test creado:', response);
     // Redirigir a la página de agregar preguntas
-    router.push(`/test/agregarPreguntas/${testId.value}`);
+    router.push(`/agregarPreguntas/${testId.value}`);
   } catch (error) {
     mensaje.value = 'Algo salió mal al crear el test.';
     mensajeClase.value = 'bg-red-100 text-red-700';

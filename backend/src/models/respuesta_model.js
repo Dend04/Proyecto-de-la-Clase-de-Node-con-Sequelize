@@ -8,14 +8,22 @@ const Respuesta = sequelize.define('Respuesta', {
     primaryKey: true,
     autoIncrement: true,
   },
+  tipo: {
+    type: DataTypes.ENUM('multiple', 'unica', 'texto', 'numero'),
+    allowNull: false,
+  },
   respuesta_boolean: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: true,
     defaultValue: false,
   },
   respuesta_textual: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+  },
+  respuesta_numerica: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
   },
   preguntaId: {
     type: DataTypes.INTEGER,
@@ -28,5 +36,6 @@ const Respuesta = sequelize.define('Respuesta', {
   timestamps: true,
   tableName: 'Respuesta',
 });
+
 
 export default Respuesta;

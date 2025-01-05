@@ -54,4 +54,19 @@ router.delete('/respuesta/:id', async (req, res) => {
   }
 });
 
+// Ruta para obtener respuestas por pregunta
+router.get('/respuestas/pregunta/:preguntaId', async (req, res) => {
+  try {
+    const respuestas = await getRespuestasByPreguntaId(req.params.preguntaId);
+    if (respuestas.length > 0) {
+      res.json(respuestas);
+    } else {
+      res.status(404).json({ error: 'No se encontraron respuestas para la pregunta con el ID proporcionado' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 export default router;

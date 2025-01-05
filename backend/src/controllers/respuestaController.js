@@ -22,12 +22,15 @@ export const getRespuestaById = async (id) => {
 };
 
 // Crear una nueva respuesta vinculada a una pregunta por su ID
-export const createRespuesta = async (respuestaData) => {
-  const { preguntaId, ...data } = respuestaData;
-  const pregunta = await Pregunta.findByPk(preguntaId);
-  if (!pregunta) throw new Error('Pregunta no encontrada');
-  return await Respuesta.create({ ...data, preguntaId });
-};
+export const createRespuesta = async (data) => {
+  try {
+    const pregunta = await Pregunta.findByPk(data.preguntaId);
+    if (!pregunta) throw new Error('Pregunta no encontrada');
+    return await Respuesta.create(data);
+  } catch (error) {
+    throw new Error('Error al crear la respuesta: ' + error.message);
+  }
+}; 
 
 // Actualizar una respuesta existente
 export const updateRespuesta = async (id, respuestaData) => {
@@ -41,3 +44,13 @@ export const deleteRespuesta = async (id) => {
   const deleted = await Respuesta.destroy({ where: { id } });
   if (!deleted) throw new Error('Respuesta no encontrada');
 };
+
+// Obtener todas las respuestas de una pregunta por ID de pregunta
+export const getRespuestasByPreguntaId = async (preguntaId) => {
+  try {
+    const respuestas = await Respuesta.findAll({ where: { preguntaId } });
+    return respuestas;
+  } catch (error) {
+    throw new Error('Error al obtener las respuestas por pregunta');
+  }
+};  
