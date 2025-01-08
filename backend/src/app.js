@@ -1,13 +1,9 @@
-import sequelize from "./config/database.js";
-import Usuario from "./models/usuario_model.js";
-import Test from "./models/test_model.js";
-import Pregunta from "./models/pregunta_model.js";
-import Respuesta from "./models/respuesta_model.js";
-import Resultado from "./models/resultado_model.js";
-import Rutina from "./models/rutina_model.js";
 import express from 'express';
-import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
 import dotenv from 'dotenv';
+import morgan from 'morgan';
+import cors from 'cors';
+import sequelize from "./config/database.js";
+import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import preguntaRoutes from './routes/preguntaRoutes.js';
 import testRoutes from './routes/testRoutes.js';
@@ -17,13 +13,16 @@ import respuestaRoutes from './routes/respuestaRoutes.js';
 import { middleware } from "./middleware/middleware.js";
 import logger from "./loggers/logger.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
-import morgan from 'morgan';
-import cors from 'cors';
-
+import Usuario from "./models/usuario_model.js";
+import Test from "./models/test_model.js";
+import Pregunta from "./models/pregunta_model.js";
+import Respuesta from "./models/respuesta_model.js";
+import Resultado from "./models/resultado_model.js";
+import Rutina from "./models/rutina_model.js";
 
 dotenv.config();
 
-//Relaciones
+// Relaciones
 Test.hasMany(Pregunta, { foreignKey: "testId" });
 Pregunta.belongsTo(Test, { foreignKey: "testId" });
 
@@ -44,7 +43,7 @@ const app = express();
 // Usa Morgan con el stream de Winston
 app.use(morgan('informacion_combinada', { stream: logger.stream }));
 
-app.use(express.json()) //Para usar JSON
+app.use(express.json()); // Para usar JSON
 
 // Configurar Swagger
 swaggerSetup(app);
@@ -52,10 +51,11 @@ swaggerSetup(app);
 // Usa el middleware
 app.use(middleware);
 
-// logger
+// Logger
 /* logger.info('Información de inicio'); */
-/* logger.error('Error detectado'); */ //Para probar el funcionamiento de deteccion de errores
-//Morgan
+/* logger.error('Error detectado'); */ // Para probar el funcionamiento de detección de errores
+
+// Morgan
 app.use(morgan('combined', { stream: logger.stream }));
 
 // CORS
@@ -72,7 +72,7 @@ app.use('/api', respuestaRoutes);
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);
 
-//Sincronizacion Base de Datos
+// Sincronización Base de Datos
 sequelize
   .sync({ force: true })
   .then(() => {
@@ -82,9 +82,9 @@ sequelize
     console.error("Error al sincronizar la base de datos:", error);
   });
 
-  app.listen(process.env.PORT, () => {
-    // Cambiar el color del texto a azul
-    const blueColor = '\x1b[34m';
-    const resetColor = '\x1b[0m';
-    console.log(`${blueColor}Servidor corriendo en http://localhost:${process.env.PORT}${resetColor}`);
-  });
+app.listen(process.env.PORT, () => {
+  // Cambiar el color del texto a azul
+  const blueColor = '\x1b[34m';
+  const resetColor = '\x1b[0m';
+  console.log(`${blueColor}Servidor corriendo en http://localhost:${process.env.PORT}${resetColor}`);
+});

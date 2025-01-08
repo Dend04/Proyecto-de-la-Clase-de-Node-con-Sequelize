@@ -417,6 +417,65 @@ router.get('/preguntas/test/name/:testName', async (req, res, next) => {
 });
 
 // Ruta para crear una nueva pregunta para un test específico
+/**
+ * @swagger
+ * /preguntas/test/id/{testId}:
+ *   post:
+ *     summary: Crear una nueva pregunta para un test específico
+ *     tags: [Preguntas]
+ *     parameters:
+ *       - in: path
+ *         name: testId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del test
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               texto:
+ *                 type: string
+ *                 example: "¿Cuál es la capital de Francia?"
+ *               tipo:
+ *                 type: string
+ *                 example: "multiple"
+ *               opciones:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["París", "Londres", "Madrid"]
+ *     responses:
+ *       201:
+ *         description: Pregunta creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 texto:
+ *                   type: string
+ *                 tipo:
+ *                   type: string
+ *                 opciones:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       400:
+ *         description: Error al crear la pregunta
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 router.post('/preguntas/test/id/:testId', async (req, res) => {
   try {
     const nuevaPregunta = await createPregunta(req.params.testId, req.body);
