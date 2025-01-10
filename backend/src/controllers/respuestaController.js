@@ -20,7 +20,7 @@ export const getRespuestaById = async (id) => {
     }],
   });
 };
-
+  
 // Crear una nueva respuesta vinculada a una pregunta por su ID
 export const createRespuesta = async (data) => {
   try {

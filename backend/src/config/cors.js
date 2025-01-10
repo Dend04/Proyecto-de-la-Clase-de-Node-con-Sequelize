@@ -1,4 +1,4 @@
-import cors from 'cors';
+ import cors from 'cors';
 import dotenv from 'dotenv';
 
 dotenv.config(); // Cargar variables de entorno desde el archivo .env
@@ -24,4 +24,4 @@ const corsOptions = {
   credentials: true, // Permite el envío de credenciales (cookies, encabezados de autorización, etc.)
 };
 
-export default cors(corsOptions);v
+export default cors(corsOptions); 

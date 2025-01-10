@@ -252,7 +252,7 @@ router.put('/respuesta/:id', async (req, res) => {
 
 /**
  * @swagger
- * /respuesta/{id}:
+ * /borrarRespuesta/{id}:
  *   delete:
  *     summary: Eliminar una respuesta por ID
  *     tags: [Respuestas]
@@ -276,7 +276,7 @@ router.put('/respuesta/:id', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.delete('/respuesta/:id', async (req, res) => {
+router.delete('/borrarRespuesta/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await deleteRespuesta(id);
