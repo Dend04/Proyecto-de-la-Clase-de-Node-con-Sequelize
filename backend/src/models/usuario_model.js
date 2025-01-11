@@ -1,5 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
+import bcrypt from 'bcrypt';
+  
 
 const Usuario = sequelize.define('Usuario', {
   id: {
@@ -48,9 +50,27 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 }, {
   timestamps: true, // Esto añade automáticamente los campos createdAt y updatedAt
   tableName: 'Usuario', // Nombre de la tabla en la base de datos
+  hooks: {
+    beforeCreate: async (usuario) => {
+      if (usuario.password) {
+        const salt = await bcrypt.genSalt(10);
+        usuario.password = await bcrypt.hash(usuario.password, salt);
+      }
+    },
+    beforeUpdate: async (usuario) => {
+      if (usuario.password) {
+        const salt = await bcrypt.genSalt(10);
+        usuario.password = await bcrypt.hash(usuario.password, salt);
+      }
+    },
+  },
 });
 
 export default Usuario;
