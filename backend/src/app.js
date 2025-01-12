@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
-import cors from 'cors';
+import cors from './config/cors.js'; // Asegúrate de importar la configuración de CORS correctamente
 import sequelize from "./config/database.js";
 import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
 import usuarioRoutes from './routes/usuarioRoutes.js';
@@ -59,7 +59,7 @@ app.use(middleware);
 app.use(morgan('combined', { stream: logger.stream }));
 
 // CORS
- app.use(cors());
+/*  app.use(cors()); */
 
 // Rutas
 app.use('/api', usuarioRoutes);
