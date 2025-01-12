@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, actualizarUsername, buscarUsuarios, iniciarSesion, obtenerPerfil, refrescarToken } from '../controllers/usuarioController.js';
+import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, iniciarSesion, obtenerPerfil, refrescarToken, actualizarNombreUsuario } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
 
 
@@ -229,7 +229,7 @@ router.delete('/usuario/:id', async (req, res) => {
  */
 router.put('/usuario/:id/username', async (req, res) => {
   try {
-    const usuario = await actualizarUsername(req.params.id, req.body.username);
+    const usuario = await actualizarNombreUsuario(req.params.id, req.body.username);
     res.status(200).json(usuario);
   } catch (error) {
     res.status(400).json({ error: error.message });

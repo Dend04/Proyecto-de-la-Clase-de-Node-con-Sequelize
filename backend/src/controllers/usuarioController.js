@@ -45,15 +45,15 @@ export const borrarUsuario = async (id) => {
 };
 
 // Actualizar el nombre de usuario
-export const actualizarUsername = async (id, nuevoUsername) => {
+export const actualizarNombreUsuario = async (id, nuevoNombreUsuario) => {
   const usuario = await Usuario.findByPk(id);
   if (!usuario) throw new Error("Usuario no encontrado");
 
   // Verificar si el nuevo nombre de usuario ya existe
-  const usuarioExistente = await Usuario.findOne({ where: { username: nuevoUsername } });
+  const usuarioExistente = await Usuario.findOne({ where: { nombreUsuario: nuevoNombreUsuario } });
   if (usuarioExistente) throw new Error("El nombre de usuario ya está en uso");
 
-  usuario.username = nuevoUsername;
+  usuario.nombreUsuario = nuevoNombreUsuario;
   return await usuario.save();
 };
 
@@ -64,7 +64,7 @@ export const buscarUsuarios = async (query) => {
       [Op.or]: [
         { nombre: { [Op.like]: `%${query}%` } },
         { apellidos: { [Op.like]: `%${query}%` } },
-        { username: { [Op.like]: `%${query}%` } },
+        { nombreUsuario: { [Op.like]: `%${query}%` } },
       ],
     },
   });
@@ -98,7 +98,7 @@ export const iniciarSesion = async (identificador, password) => {
     const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-    return { token, refreshToken, usuario };
+    return { token, refreshToken, usuario: { nombreUsuario: usuario.nombreUsuario, rol: usuario.rol , id: usuario.id} };
   } catch (error) {
     console.error("Error en iniciarSesion:", error);
     throw error;
