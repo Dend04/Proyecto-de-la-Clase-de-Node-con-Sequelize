@@ -467,4 +467,13 @@ router.post('/refrescarToken', async (req, res) => {
   }
 });
 
+router.post('cerrarSesion', async (req, res) => {
+  try {
+    await cerrarSesion(req);
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 export default router;

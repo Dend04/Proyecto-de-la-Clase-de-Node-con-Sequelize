@@ -59,7 +59,7 @@ app.use(middleware);
 app.use(morgan('combined', { stream: logger.stream }));
 
 // CORS
-/*  app.use(cors()); */
+app.use(cors);
 
 // Rutas
 app.use('/api', usuarioRoutes);

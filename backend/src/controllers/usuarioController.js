@@ -118,3 +118,24 @@ export const refrescarToken = async (refreshToken) => {
     throw new Error("Refresh token no válido");
   }
 };
+
+// Cerrar sesión
+export const cerrarSesion = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+      return res.status(400).json({ error: 'Token no proporcionado' });
+    }
+
+    // Decodificar el token para obtener la información del usuario
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Agregar el token a la lista negra
+    await Blacklist.create({ token });
+
+    res.status(200).json({ message: 'Cierre de sesión exitoso' });
+  } catch (error) {
+    console.error('Error en cerrarSesion:', error);
+    res.status(500).json({ error: 'Error al cerrar sesión' });
+  }
+};

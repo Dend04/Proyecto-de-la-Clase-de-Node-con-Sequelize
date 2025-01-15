@@ -5,8 +5,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "@nuxt/image",
-    "@nuxtjs/axios",
-    "@nuxtjs/auth-next"
+    "@sidebase/nuxt-auth"
   ],
   css: ["@/assets/css/tailwind.css"],
   postcss: {
@@ -15,10 +14,14 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  axios: {
-    baseURL: 'http://localhost:3000' // Reemplaza con la URL de tu API
+  runtimeConfig: {
+    public: {
+      baseURL: 'http://localhost:3000', // Reemplaza con la URL de tu API
+      auth: {
+    }
   },
-  auth: {
+    origin: 'http://localhost:3000', // Reemplaza con la URL de tu API
+    enableGlobalAppMiddleware: true,
     strategies: {
       local: {
         token: {

@@ -17,6 +17,7 @@
     "@nuxtjs/auth-next": "^5.0.0-1667386184.dfbbb54",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/tailwindcss": "^6.12.2",
+    "@sidebase/nuxt-auth": "^0.10.0",
     "nuxt": "^3.14.1592",
     "tailwindcss": "^3.4.16",
     "vue": "latest",

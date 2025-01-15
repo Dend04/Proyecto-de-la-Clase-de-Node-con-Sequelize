@@ -6,6 +6,8 @@
   "author": "Dend04 <enamoradodairon@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@nuxtjs/auth-next": "^5.0.0-1667386184.dfbbb54",
+    "@sidebase/nuxt-auth": "^0.10.0",
     "bcrypt": "^5.1.1",
     "chalk": "^5.3.0",
     "cors": "^2.8.5",
