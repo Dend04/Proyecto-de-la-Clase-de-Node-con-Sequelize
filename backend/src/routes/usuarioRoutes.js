@@ -476,4 +476,13 @@ router.post('cerrarSesion', async (req, res) => {
   }
 });
 
+router.get('/auth/estado', async (req, res) => {
+  try {
+    const usuario = await obtenerEstadoUsuario(req);
+    res.status(200).json({ usuario });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 export default router;

@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 
-
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
   return await Usuario.create(userData);
@@ -137,5 +136,28 @@ export const cerrarSesion = async (req, res) => {
   } catch (error) {
     console.error('Error en cerrarSesion:', error);
     res.status(500).json({ error: 'Error al cerrar sesión' });
+  }
+};
+
+// Obtener estado del usuario
+export const obtenerEstadoUsuario = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+      return res.status(400).json({ error: 'Token no proporcionado' });
+    }
+
+    // Decodificar el token para obtener la información del usuario
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const usuario = await Usuario.findByPk(decoded.id);
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ usuario });
+  } catch (error) {
+    console.error('Error en obtenerEstadoUsuario:', error);
+    res.status(500).json({ error: 'Error al obtener estado del usuario' });
   }
 };
