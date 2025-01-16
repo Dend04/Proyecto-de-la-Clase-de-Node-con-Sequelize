@@ -393,30 +393,9 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/perfil:
- *   get:
- *     summary: Obtiene el perfil del usuario autenticado
- *     tags: [Usuarios]
- *     responses:
- *       200:
- *         description: Perfil del usuario autenticado
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Usuario'
- *       401:
- *         description: No autorizado
- */
-router.get('/perfil', verificarToken, async (req, res) => {
-  try {
-    const usuario = await obtenerPerfil(req.usuario.id);
-    res.status(200).json(usuario);
-  } catch (error) {
-    res.status(401).json({ error: error.message });
-  }
-});
+// Proteger la ruta /perfil
+router.get('/perfil', verificarToken, obtenerPerfil);
+
 
 /**
  * @swagger

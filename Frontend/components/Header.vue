@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="flex flex-col">
-        <span class="text-xs leading-3 font-medium">{{ usuario.nombre }}</span>
+        <span class="text-xs leading-3 font-medium">{{ usuario.nombreUsuario }}</span>
         <span class="text-[10px] text-gray-500 text-right">{{ usuario.rol }}</span>
         <div v-if="isAuthenticated" class="w-2 h-2 bg-green-500 rounded-full"></div>
       </div>
@@ -20,10 +20,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useAuth } from '@sidebase/nuxt-auth'; // Importar directamente desde el módulo principal
+import { useAuth } from '@sidebase/nuxt-auth';
 
 const auth = useAuth();
-const usuario = ref({ nombre: '', rol: '' });
+const usuario = ref({ nombreUsuario: '', rol: '' });
 const isAuthenticated = ref(false);
 
 // Función para obtener el estado del usuario

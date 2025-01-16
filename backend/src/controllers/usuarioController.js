@@ -20,13 +20,21 @@ export const obtenerUsuarioPorId = async (id) => {
   return usuario;
 };
 
-// Obtener el perfil del usuario autenticado
-export const obtenerPerfil = async (id) => {
-  const usuario = await Usuario.findByPk(id, {
-    attributes: { exclude: ['password'] } // Excluir el campo de la contraseña
-  });
-  if (!usuario) throw new Error("Usuario no encontrado");
-  return usuario;
+// Obtener perfil del usuario autenticado
+export const obtenerPerfil = async (req, res) => {
+  try {
+    const usuario = await Usuario.findByPk(req.usuario.id, {
+      attributes: ['id', 'nombreUsuario', 'rol'],
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ usuario });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener perfil del usuario', error });
+  }
 };
 
 // Actualizar un usuario
@@ -71,36 +79,23 @@ export const buscarUsuarios = async (query) => {
 };
 
 // Iniciar sesión
-export const iniciarSesion = async (identificador, password) => {
+export const iniciarSesion = async (req, res) => {
+  const { identificador, password } = req.body;
+
   try {
-    console.log("Identificador en controlador:", identificador);
-    console.log("Password en controlador:", password);
+    const usuario = await Usuario.findOne({ where: { nombreUsuario: identificador } });
 
-    if (!identificador || !password) {
-      throw new Error("identificador y password son requeridos");
+    if (!usuario || !(await usuario.validarPassword(password))) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
-    let usuario;
-    if (identificador.includes('@')) {
-      // Buscar por email
-      usuario = await Usuario.findOne({ where: { email: identificador } });
-    } else {
-      // Buscar por nombre de usuario
-      usuario = await Usuario.findOne({ where: { nombreUsuario: identificador } });
-    }
+    const token = jwt.sign({ id: usuario.id, nombreUsuario: usuario.nombreUsuario }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
 
-    if (!usuario) throw new Error("Usuario no encontrado");
-
-    const esValido = await bcrypt.compare(password, usuario.password);
-    if (!esValido) throw new Error("Contraseña incorrecta");
-
-    const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const refreshToken = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
-
-    return { token, refreshToken, usuario: { nombreUsuario: usuario.nombreUsuario, rol: usuario.rol , id: usuario.id} };
+    res.json({ token });
   } catch (error) {
-    console.error("Error en iniciarSesion:", error);
-    throw error;
+    res.status(500).json({ message: 'Error al iniciar sesión', error });
   }
 };
 
@@ -118,46 +113,24 @@ export const refrescarToken = async (refreshToken) => {
   }
 };
 
-// Cerrar sesión
 export const cerrarSesion = async (req, res) => {
-  try {
-    const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-      return res.status(400).json({ error: 'Token no proporcionado' });
-    }
-
-    // Decodificar el token para obtener la información del usuario
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Agregar el token a la lista negra
-    await Blacklist.create({ token });
-
-    res.status(200).json({ message: 'Cierre de sesión exitoso' });
-  } catch (error) {
-    console.error('Error en cerrarSesion:', error);
-    res.status(500).json({ error: 'Error al cerrar sesión' });
-  }
+  // Aquí puedes implementar la lógica para manejar el cierre de sesión si es necesario
+  res.json({ message: 'Cierre de sesión exitoso' });
 };
 
 // Obtener estado del usuario
 export const obtenerEstadoUsuario = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-      return res.status(400).json({ error: 'Token no proporcionado' });
-    }
-
-    // Decodificar el token para obtener la información del usuario
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const usuario = await Usuario.findByPk(decoded.id);
+    const usuario = await Usuario.findByPk(req.usuario.id, {
+      attributes: ['id', 'nombreUsuario', 'rol'],
+    });
 
     if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    res.status(200).json({ usuario });
+    res.json({ usuario });
   } catch (error) {
-    console.error('Error en obtenerEstadoUsuario:', error);
-    res.status(500).json({ error: 'Error al obtener estado del usuario' });
+    res.status(500).json({ message: 'Error al obtener estado del usuario', error });
   }
 };
