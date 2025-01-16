@@ -20,7 +20,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useAuth } from '@sidebase/nuxt-auth';
+import { useAuth } from '@sidebase/nuxt-auth'; // Importar directamente desde el módulo principal
 
 const auth = useAuth();
 const usuario = ref({ nombre: '', rol: '' });
