@@ -25,22 +25,23 @@ export default defineNuxtConfig({
       endpoints: {
         signIn: { path: '/api/iniciarSesion', method: 'post' },
         signOut: { path: '/api/cerrarSesion', method: 'post' },
-        signUp: { path: '/api/registro', method: 'post' },
+        signUp: { path: '/api/crearUsuario', method: 'post' },
         getSession: { path: '/api/perfil', method: 'get' }
       },
       token: {
         signInResponseTokenPointer: 'token',
       },
-      sessionDataType:{
+      /* sessionDataType:{
         id: "integer",
         email: "string",
         nombreUsuario: "string",
         createdAt: "string",
         updateAt: "string"
-      },
-    },
+      }, */
+    },  
     globalAppMiddleware:{
       isEnabled: true
-    }
+    },
+    
   },
 });
