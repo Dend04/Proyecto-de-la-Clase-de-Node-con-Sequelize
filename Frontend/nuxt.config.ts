@@ -19,19 +19,28 @@ export default defineNuxtConfig({
     }
   },
   auth: {
-    globalAppMiddleware: true,
+    baseURL: 'http://localhost:3000',
     provider: {
       type: 'local',
-      token: {
-        signInResponseTokenPointer: 'token',
-        // required: true,
-        // type: 'Bearer'
-      },
       endpoints: {
         signIn: { path: '/api/iniciarSesion', method: 'post' },
-        signOut: { path: '/api/auth/logout', method: 'post' },
-        getSession: { path: '/api/auth/user', method: 'get' }
-      }
+        signOut: { path: '/api/cerrarSesion', method: 'post' },
+        signUp: { path: '/api/registro', method: 'post' },
+        getSession: { path: '/api/perfil', method: 'get' }
+      },
+      token: {
+        signInResponseTokenPointer: 'token',
+      },
+      sessionDataType:{
+        id: "integer",
+        email: "string",
+        nombreUsuario: "string",
+        createdAt: "string",
+        updateAt: "string"
+      },
+    },
+    globalAppMiddleware:{
+      isEnabled: true
     }
-  }
+  },
 });

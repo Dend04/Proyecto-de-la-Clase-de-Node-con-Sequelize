@@ -1,5 +1,6 @@
 import express from 'express';
 import { getTests, getTestById, createTest, updateTest, deleteTest } from '../controllers/testController.js';
+import { verificarToken } from '../middleware/middleware.js';
 
 const router = express.Router();
 
@@ -51,7 +52,7 @@ router.get('/tests', async (req, res) => {
  *       404:
  *         description: Test no encontrado
  */
-router.get('/test/:id', async (req, res) => {
+router.get('/test/:id',verificarToken, async (req, res) => {
     try {
       const test = await getTestById(req.params.id);
       if (!test) {
@@ -144,7 +145,7 @@ router.get('/test/:id', async (req, res) => {
  *             example:
  *               error: "El título del test es obligatorio"
  */
-router.post('/crearTest', async (req, res) => {
+router.post('/crearTest',verificarToken, async (req, res) => {
   try {
     const test = await createTest(req.body);
     res.status(201).json(test);
@@ -200,7 +201,7 @@ router.post('/crearTest', async (req, res) => {
  *             example:
  *               error: "Test no encontrado"
  */
-router.put('/test/:id', async (req, res) => {
+router.put('/test/:id',verificarToken, async (req, res) => {
   try {
     const test = await updateTest(req.params.id, req.body);
     res.status(200).json(test);
@@ -245,7 +246,7 @@ router.put('/test/:id', async (req, res) => {
  *             example:
  *               error: "Test no encontrado"
  */
-router.delete('/test/:id', async (req, res) => {
+router.delete('/test/:id',verificarToken, async (req, res) => {
   try {
     await deleteTest(req.params.id);
     res.status(200).json({ message: "Test eliminado satisfactoriamente" });

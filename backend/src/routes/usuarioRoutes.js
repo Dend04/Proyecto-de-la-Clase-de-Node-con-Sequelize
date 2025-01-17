@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, iniciarSesion, obtenerPerfil, refrescarToken, actualizarNombreUsuario } from '../controllers/usuarioController.js';
+import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, iniciarSesion, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
 
 
@@ -60,7 +60,7 @@ const router = express.Router();
  *             example:
  *               error: "El email ya está registrado"
  */
-router.post('/crearUsuario', async (req, res) => {
+router.post('/crearUsuario',  async (req, res) => {
   try {
     const usuario = await crearUsuario(req.body);
     res.status(201).json(usuario);
@@ -87,7 +87,7 @@ router.post('/crearUsuario', async (req, res) => {
  *       500:
  *         description: Error del servidor
  */
-router.get('/usuarios', async (req, res) => {
+router.get('/usuarios',verificarToken, async (req, res) => {
   try {
     const usuarios = await obtenerUsuarios();
     res.status(200).json(usuarios);
@@ -119,7 +119,7 @@ router.get('/usuarios', async (req, res) => {
  *       404:
  *         description: Usuario no encontrado
  */
-router.get('/usuario/:id', async (req, res) => {
+router.get('/usuario/:id', verificarToken, async (req, res) => {
   try {
     const usuario = await obtenerUsuarioPorId(req.params.id);
     res.status(200).json(usuario);
@@ -157,7 +157,7 @@ router.get('/usuario/:id', async (req, res) => {
  *       400:
  *         description: Error en la actualización del usuario
  */
-router.put('/usuario/:id', async (req, res) => {
+router.put('/usuario/:id', verificarToken, async (req, res) => {
   try {
     const usuario = await actualizarUsuario(req.params.id, req.body);
     res.status(200).json(usuario);
@@ -185,7 +185,7 @@ router.put('/usuario/:id', async (req, res) => {
  *       400:
  *         description: Error en la eliminación del usuario
  */
-router.delete('/usuario/:id', async (req, res) => {
+router.delete('/usuario/:id',verificarToken, async (req, res) => {
   try {
     await borrarUsuario(req.params.id);
     res.status(204).send();
@@ -227,7 +227,7 @@ router.delete('/usuario/:id', async (req, res) => {
  *       400:
  *         description: Error en la actualización del nombre de usuario
  */
-router.put('/usuario/:id/username', async (req, res) => {
+router.put('/usuario/:id/username',verificarToken, async (req, res) => {
   try {
     const usuario = await actualizarNombreUsuario(req.params.id, req.body.username);
     res.status(200).json(usuario);
@@ -261,7 +261,7 @@ router.put('/usuario/:id/username', async (req, res) => {
  *       400:
  *         description: Error en la búsqueda de usuarios
  */
-router.get('/usuarios/buscar/:query', async (req, res) => {
+router.get('/usuarios/buscar/:query',verificarToken, async (req, res) => {
   try {
     const usuarios = await buscarUsuarios(req.params.query);
     res.status(200).json(usuarios);
@@ -384,7 +384,7 @@ router.post('/iniciarSesion', async (req, res) => {
  *             example:
  *               error: "El email ya está registrado"
  */
-router.post('/registro', async (req, res) => {
+router.post('/registro', verificarToken, async (req, res) => {
   try {
     const usuario = await crearUsuario(req.body);
     res.status(201).json(usuario);
@@ -393,9 +393,48 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-// Proteger la ruta /perfil
-router.get('/perfil', verificarToken, obtenerPerfil);
-
+/**
+ * @swagger
+ * /perfil:
+ *   get:
+ *     summary: Obtiene el perfil del usuario autenticado
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfil del usuario obtenido exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     nombreUsuario:
+ *                       type: string
+ *                     rol:
+ *                       type: string
+ *       401:
+ *         description: Token no válido
+ *       403:
+ *         description: No se proporcionó un token
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error al obtener perfil del usuario
+ */
+router.get('/perfil', verificarToken, async (req, res) => {
+  try {
+    const usuario = await obtenerPerfil(req, res);
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 /**
  * @swagger
@@ -446,7 +485,7 @@ router.post('/refrescarToken', async (req, res) => {
   }
 });
 
-router.post('cerrarSesion', async (req, res) => {
+router.post('/cerrarSesion',verificarToken , async (req, res) => {
   try {
     await cerrarSesion(req);
     res.status(200).json({ message: 'Logout successful' });
@@ -455,7 +494,7 @@ router.post('cerrarSesion', async (req, res) => {
   }
 });
 
-router.get('/auth/estado', async (req, res) => {
+router.get('/auth/estado', verificarToken, async (req, res) => {
   try {
     const usuario = await obtenerEstadoUsuario(req);
     res.status(200).json({ usuario });

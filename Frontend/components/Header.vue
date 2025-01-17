@@ -1,71 +1,94 @@
 <template>
-  <header class="header flex items-center justify-between p-4 bg-gray-100">
-    <div class="flex items-center space-x-4">
-      <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
+  <!-- Header -->
+  <div
+    class="fixed top-0 left-0 w-full flex items-center justify-between p-4 bg-gradient-to-r from-[#eaebef] to-[#aab2b5] shadow-md z-10 transition-all duration-300"
+  >
+    <!-- Barra de búsqueda -->
+    <div
+      class="hidden md:flex items-center gap-2 text-xs rounded-full ring-1.5 ring-gray-300 px-2 ml-auto"
+    >
+      <SearchIcon class="h-5 w-5 text-gray-500" />
+
+      <input
+        type="text"
+        placeholder="Buscar..."
+        class="w-48 p-2 bg-transparent outline-none"
+      />
+    </div>
+    <!-- Usuarios e iconos -->
+    <div class="flex items-center gap-6 ml-auto">
+      <div
+        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
+      >
+        <!--  <NuxtImg
+          src="/message.png"
+          alt="Mensajes"
+          width="20"
+          height="20"
+          format="webp"
+        /> -->
+        <ChatIcon class="h-5 w-5 text-gray-500" />
+      </div>
+      <div
+        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative"
+      >
+        <!--   <NuxtImg
+          src="/announcement.png"
+          alt="Anuncios"
+          width="20"
+          height="20"
+          format="webp"
+        /> -->
         <BellIcon class="h-5 w-5 text-gray-500" />
-        <div class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs">
+        <div
+          class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs"
+        >
           1
         </div>
       </div>
       <div class="flex flex-col">
-        <span class="text-xs leading-3 font-medium">{{ usuario.nombreUsuario }}</span>
-        <span class="text-[10px] text-gray-500 text-right">{{ usuario.rol }}</span>
-        <div v-if="isAuthenticated" class="w-2 h-2 bg-green-500 rounded-full"></div>
+        <span class="text-xs leading-3 font-medium">Dairon Enamorado</span>
+        <span class="text-[10px] text-gray-500 text-right">Admin</span>
       </div>
-      <NuxtImg src="/avatar.png" alt="Avatar" class="w-8 h-8 rounded-full" />
+       <NuxtImg
+        src="/avatar.png"
+        alt="Avatar"
+        width="36"
+        height="36"
+        class="rounded-full"
+        format="webp"
+      /> 
+      <!-- <UserIcon class="h-7 w-7 text-gray-500" /> --> 
     </div>
-    <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded">Cerrar Sesión</button>
-  </header>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useAuth } from '@sidebase/nuxt-auth';
+import { ref, onMounted } from "vue";
+import { 
+  SearchIcon, 
+  BellIcon, 
+  ChatIcon,
+  UserIcon } from "@heroicons/vue/outline";
 
-const auth = useAuth();
-const usuario = ref({ nombreUsuario: '', rol: '' });
-const isAuthenticated = ref(false);
+// Estado para controlar la visibilidad del Navbar
+const isNavbarOpen = ref(true);
 
-// Función para obtener el estado del usuario
-const fetchUsuario = async () => {
-  try {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch('/api/auth/estado', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    const data = await response.json();
-    usuario.value = data.usuario;
-    isAuthenticated.value = true;
-  } catch (error) {
-    console.error('Error al obtener estado del usuario:', error);
-  }
-};
+// Función para alternar la visibilidad del Navbar
+function toggleNavbar() {
+  isNavbarOpen.value = !isNavbarOpen.value;
+}
 
-// Función para cerrar sesión
-const logout = async () => {
-  try {
-    await auth.logout();
-    localStorage.removeItem('authToken'); // Eliminar el token de localStorage
-    window.location.href = '/login';
-  } catch (error) {
-    console.error('Error al cerrar sesión:', error);
-  }
-};
-
-// Obtener el estado del usuario cuando el componente se monta
+// Ajustar la visibilidad del Navbar según el tamaño de la pantalla
 onMounted(() => {
-  if (localStorage.getItem('authToken')) {
-    fetchUsuario();
-  }
+  const updateNavbarVisibility = () => {
+    if (window.innerWidth < 768) {
+      isNavbarOpen.value = false;
+    } else {
+      isNavbarOpen.value = true;
+    }
+  };
+  window.addEventListener("resize", updateNavbarVisibility);
+  updateNavbarVisibility();
 });
 </script>
-
-<style scoped>
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-</style>

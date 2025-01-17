@@ -17,26 +17,15 @@
   
   <script setup>
   import { ref } from 'vue';
-  import { useAuth } from '@sidebase/nuxt-auth';
+  import { useAuth } from '#imports';
   
   const username = ref('');
   const password = ref('');
-  const auth = useAuth();
   
-  const login = async () => {
-    try {
-      const response = await auth.loginWith('local', {
-        data: {
-          identificador: username.value,
-          password: password.value
-        }
-      });
-      const { token } = response.data;
-      localStorage.setItem('authToken', token); // Guardar el token en localStorage
-      // Redirigir al usuario a la página de inicio después de iniciar sesión
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-    }
-  };
+  definePageMeta({
+    auth: {
+      unauthenticatedOnly: true,
+      navigateAuthenticatedTo: '/',
+    },
+  })
   </script>

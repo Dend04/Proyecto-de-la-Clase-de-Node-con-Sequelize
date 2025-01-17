@@ -5,7 +5,39 @@ import { Op } from 'sequelize';
 
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
-  return await Usuario.create(userData);
+  try {
+    // Intentar crear el usuario
+    const nuevoUsuario = await Usuario.create(userData);
+    return {
+      success: true,
+      message: 'Usuario creado exitosamente',
+      data: nuevoUsuario,
+    };
+  } catch (error) {
+    // Manejo de errores específicos
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      // Error de restricción única (por ejemplo, email o nombre de usuario duplicado)
+      return {
+        success: false,
+        message: 'El correo electrónico o nombre de usuario ya está en uso',
+        error: error.errors.map(e => e.message),
+      };
+    } else if (error.name === 'SequelizeValidationError') {
+      // Error de validación (por ejemplo, formato de correo electrónico incorrecto)
+      return {
+        success: false,
+        message: 'Error de validación de datos',
+        error: error.errors.map(e => e.message),
+      };
+    } else {
+      // Otros errores
+      return {
+        success: false,
+        message: 'Error al crear el usuario',
+        error: error.message,
+      };
+    }
+  }
 };
 
 // Obtener todos los usuarios
@@ -79,23 +111,54 @@ export const buscarUsuarios = async (query) => {
 };
 
 // Iniciar sesión
-export const iniciarSesion = async (req, res) => {
-  const { identificador, password } = req.body;
-
+export const iniciarSesion = async (identificador, password) => {
   try {
-    const usuario = await Usuario.findOne({ where: { nombreUsuario: identificador } });
+    console.log("Identificador en controlador:", identificador);
+    console.log("Password en controlador:", password);
 
-    if (!usuario || !(await usuario.validarPassword(password))) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    if (!identificador || !password) {
+      throw new Error("identificador y password son requeridos");
     }
 
-    const token = jwt.sign({ id: usuario.id, nombreUsuario: usuario.nombreUsuario }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
+    let usuario;
+    if (identificador.includes('@')) {
+      // Buscar por email
+      usuario = await Usuario.findOne({ where: { email: identificador } });
+    } else {
+      // Buscar por nombre de usuario
+      usuario = await Usuario.findOne({ where: { nombreUsuario: identificador } });
+    }
 
-    res.json({ token });
+    if (!usuario) throw new Error("Usuario no encontrado");
+
+    const esValido = await bcrypt.compare(password, usuario.password);
+    if (!esValido) throw new Error("Contraseña incorrecta");
+
+    // Generar los tokens JWT con información adicional
+    const tokenPayload = {
+      id: usuario.id,
+      nombreUsuario: usuario.nombreUsuario,
+      email: usuario.email,
+      rol: usuario.rol // Asegúrate de que el modelo Usuario tenga un campo 'rol'
+    };
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const refreshToken = jwt.sign(tokenPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+    // Retornar los tokens y la información del usuario
+    return {
+      token,
+      refreshToken,
+      usuario: {
+        id: usuario.id,
+        nombreUsuario: usuario.nombreUsuario,
+        email: usuario.email,
+        rol: usuario.rol
+      }
+    };
   } catch (error) {
-    res.status(500).json({ message: 'Error al iniciar sesión', error });
+    console.error("Error en iniciarSesion:", error);
+    throw error;
   }
 };
 
@@ -114,8 +177,26 @@ export const refrescarToken = async (refreshToken) => {
 };
 
 export const cerrarSesion = async (req, res) => {
-  // Aquí puedes implementar la lógica para manejar el cierre de sesión si es necesario
-  res.json({ message: 'Cierre de sesión exitoso' });
+  try {
+    // Supongamos que estás usando una lista de revocación de tokens
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      return res.status(400).json({ error: 'Token no proporcionado' });
+    }
+
+    // Aquí podrías agregar el token a una lista de revocación
+    await revocarToken(token);
+
+    res.json({ message: 'Cierre de sesión exitoso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al cerrar sesión' });
+  }
+};
+
+// Función ficticia para revocar un token
+const revocarToken = async (token) => {
+  // Implementa la lógica para almacenar el token en una lista de revocación
+  // Esto podría ser una base de datos o un almacenamiento en memoria
 };
 
 // Obtener estado del usuario

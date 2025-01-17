@@ -63,8 +63,10 @@ const Usuario = sequelize.define('Usuario', {
   tableName: 'Usuario', // Nombre de la tabla en la base de datos
   hooks: {
     beforeCreate: async (usuario) => {
-      // Generar nombre de usuario
-      await generateUniqueUsername(usuario);
+      // Generar nombre de usuario si no se proporciona
+      if (!usuario.nombreUsuario) {
+        await generateUniqueUsername(usuario);
+      }
 
       // Hashear la contraseña
       if (usuario.password) {
@@ -88,14 +90,14 @@ async function generateUniqueUsername(usuario) {
 
   // Definir posibles combinaciones de nombres y apellidos
   const posiblesCombinaciones = [
-    () => `${nombres[0][0]}${apellidos[0]}`.toLowerCase(), // Primera letra del primer nombre + primer apellido
-    () => nombres[1] ? `${nombres[1][0]}${apellidos[0]}`.toLowerCase() : null, // Primera letra del segundo nombre + primer apellido
-    () => apellidos[1] ? `${nombres[0][0]}${apellidos[1]}`.toLowerCase() : null, // Primera letra del primer nombre + segundo apellido
-    () => nombres[1] && apellidos[1] ? `${nombres[1][0]}${apellidos[1]}`.toLowerCase() : null, // Primera letra del segundo nombre + segundo apellido
-    () => `${nombres[0]}${apellidos[0]}`.toLowerCase(), // Primer nombre completo + primer apellido
-    () => nombres[1] ? `${nombres[1]}${apellidos[0]}`.toLowerCase() : null, // Segundo nombre completo + primer apellido
-    () => apellidos[1] ? `${nombres[0]}${apellidos[1]}`.toLowerCase() : null, // Primer nombre completo + segundo apellido
-    () => nombres[1] && apellidos[1] ? `${nombres[1]}${apellidos[1]}`.toLowerCase() : null, // Segundo nombre completo + segundo apellido
+    () => `${nombres[0][0]}${apellidos[0]}`.toLowerCase(),
+    () => nombres[1] ? `${nombres[1][0]}${apellidos[0]}`.toLowerCase() : null,
+    () => apellidos[1] ? `${nombres[0][0]}${apellidos[1]}`.toLowerCase() : null,
+    () => nombres[1] && apellidos[1] ? `${nombres[1][0]}${apellidos[1]}`.toLowerCase() : null,
+    () => `${nombres[0]}${apellidos[0]}`.toLowerCase(),
+    () => nombres[1] ? `${nombres[1]}${apellidos[0]}`.toLowerCase() : null,
+    () => apellidos[1] ? `${nombres[0]}${apellidos[1]}`.toLowerCase() : null,
+    () => nombres[1] && apellidos[1] ? `${nombres[1]}${apellidos[1]}`.toLowerCase() : null,
   ];
 
   let username;
@@ -103,14 +105,11 @@ async function generateUniqueUsername(usuario) {
 
   while (true) {
     if (attempts < posiblesCombinaciones.length) {
-      // Intentar con las combinaciones predefinidas
       username = posiblesCombinaciones[attempts]();
     } else {
-      // Añadir un número al final si todas las combinaciones fallan
       username = `${nombres[0][0]}${apellidos[0]}${attempts - posiblesCombinaciones.length + 1}`.toLowerCase();
     }
 
-    // Verificar si el nombre de usuario es único
     if (username && !(await Usuario.findOne({ where: { nombreUsuario: username } }))) {
       break;
     }
