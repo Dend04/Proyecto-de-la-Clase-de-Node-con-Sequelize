@@ -20,4 +20,4 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const isAuthPage = route.path === '/login' || route.path === '/crearUsuario';
-</script>v
+</script>

@@ -39,7 +39,8 @@
         </button>
       </form>
       <p class="mt-4 text-center text-sm text-gray-600">
-        ¿No tiene cuenta? <a href="/crearUsuario" class="text-indigo-600 hover:text-indigo-500">Toque aquí para crear una</a>
+        ¿No tiene cuenta?
+        <NuxtLink to="/crearUsuario" class="text-indigo-600 hover:text-indigo-500">Toque aquí para crear una</NuxtLink>
       </p>
     </div>
   </div>
@@ -48,7 +49,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { UserIcon, LockClosedIcon } from '@heroicons/vue/solid';
+import { UserIcon, LockClosedIcon } from "@heroicons/vue/solid";
 
 const router = useRouter();
 const username = ref("");
@@ -56,26 +57,44 @@ const password = ref("");
 
 const login = async () => {
   try {
-    const response = await $fetch('http://localhost:3000/api/iniciarSesion', {
-      method: 'POST',
+    console.log("Intentando iniciar sesión con:", username.value, password.value);
+
+    const response = await fetch("http://localhost:3000/api/iniciarSesion", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ identificador: username.value, password: password.value })
+      body: JSON.stringify({
+        identificador: username.value,
+        password: password.value,
+      }),
     });
 
-   
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al iniciar sesión');
+      throw new Error(errorData.error || "Error al iniciar sesión");
     }
 
     const data = await response.json();
-    console.log("Inicio de sesión exitoso", data);
-    router.push('/'); // Redirige al usuario después de un inicio de sesión exitoso
+
+    if (data.token) {
+      localStorage.setItem("authToken", data.token);
+      console.log("Token guardado en localStorage");
+      console.log("Inicio de sesión exitoso", data);
+
+      // Intentar redirigir y verificar el éxito
+      try {
+        await router.push("/home");
+        console.log("Redirección exitosa a /home");
+      } catch (redirectError) {
+        throw new Error("Error al redirigir a /home: " + redirectError.message);
+      }
+    } else {
+      throw new Error("Token no encontrado en la respuesta");
+    }
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
-    alert("Error al iniciar sesión: " + error.message); // Muestra un mensaje de error al usuario
+    alert("Error al iniciar sesión: " + error.message);
   }
 };
-</script>
+</script> 

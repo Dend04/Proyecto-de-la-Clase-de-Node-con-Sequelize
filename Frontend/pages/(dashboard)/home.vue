@@ -6,6 +6,8 @@
   </div>
 </template>
 
-<script setup></script>
-
-<style scoped></style>
+<script setup>
+definePageMeta({
+  middleware: 'auth'
+});
+</script>
