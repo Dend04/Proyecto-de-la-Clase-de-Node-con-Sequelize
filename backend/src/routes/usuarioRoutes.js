@@ -297,7 +297,7 @@ router.get('/usuarios/buscar/:query',verificarToken, async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 accessToken:
  *                   type: string
  *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *                 refreshToken:
@@ -320,10 +320,8 @@ router.get('/usuarios/buscar/:query',verificarToken, async (req, res) => {
 router.post('/iniciarSesion', async (req, res) => {
   try {
     const { identificador, password } = req.body;
-    console.log("Identificador:", identificador);
-    console.log("Password:", password);
     const { token, refreshToken, usuario } = await iniciarSesion(identificador, password);
-    res.status(200).json({ token, refreshToken, usuario });
+    res.status(200).json({ accessToken: token, refreshToken, usuario });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
