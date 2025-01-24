@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseURL: 'http://localhost:3000' // Reemplaza con la URL de tu API
+      BACKEND_URL:'http://localhost:3000' // Reemplaza con la URL de tu API
     }
   },
   auth: {
@@ -55,10 +55,10 @@ export default defineNuxtConfig({
         dataResponsePointer: "/" // Ajustar si la estructura de respuesta lo requiere
       },
       token: {
-        signInResponseTokenPointer: "/iniciarSesion", // Ruta al token en la respuesta del login
-        maxAgeInSeconds: 3600, // Tiempo de vida del access token
-        type: "Bearer", // Tipo de token en el encabezado
-        headerName: "Authorization" // Nombre del encabezado para el token
+        signInResponseTokenPointer: "/accessToken", // Asegúrate de que esta ruta coincida con la estructura de la respuesta
+        maxAgeInSeconds: 3600,
+        type: "Bearer",
+        headerName: "Authorization"
       },
       refresh: {
         isEnabled: true, // Habilitar el refresco de token
@@ -68,8 +68,8 @@ export default defineNuxtConfig({
         },
         refreshOnlyToken: true,
         token: {
-          signInResponseRefreshTokenPointer: '/refrescarToken', // Ruta al refresh token en la respuesta
-          refreshRequestTokenPointer: '/refrescarToken', // Ruta al token enviado para renovar
+          signInResponseRefreshTokenPointer: '/refreshToken', // Ruta al refresh token en la respuesta
+          refreshRequestTokenPointer: '/refreshToken', // Ruta al token enviado para renovar
           maxAgeInSeconds: 86400, // Tiempo de vida del refresh token (1 días)
           cookieName: 'refresh_token' // Nombre de la cookie para almacenar el refresh token (opcional)
         }

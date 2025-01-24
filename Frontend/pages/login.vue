@@ -1,100 +1,85 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gradient-to-tr from-[#aab2b5] to-[#eaebef]">
-    <div class="bg-white bg-opacity-80 backdrop-blur-md shadow-xl rounded-lg p-8 max-w-md w-full relative z-10">
-      <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h1>
-      <form @submit.prevent="login" class="space-y-6">
-        <div class="relative">
-          <label for="username" class="block text-sm font-medium text-gray-700">Usuario:</label>
-          <div class="mt-1 flex items-center">
-            <UserIcon class="h-5 w-5 text-gray-400 absolute left-3" />
-            <input
-              type="text"
-              v-model="username"
-              id="username"
-              placeholder="Nombre de usuario o correo"
-              required
-              class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        </div>
-        <div class="relative">
-          <label for="password" class="block text-sm font-medium text-gray-700">Contraseña:</label>
-          <div class="mt-1 flex items-center">
-            <LockClosedIcon class="h-5 w-5 text-gray-400 absolute left-3" />
-            <input
-              type="password"
-              v-model="password"
-              id="password"
-              placeholder="Contraseña"
-              required
-              class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Iniciar Sesión
-        </button>
-      </form>
-      <p class="mt-4 text-center text-sm text-gray-600">
-        ¿No tiene cuenta?
-        <NuxtLink to="/crearUsuario" class="text-indigo-600 hover:text-indigo-500">Toque aquí para crear una</NuxtLink>
-      </p>
-    </div>
+  <div class="container mx-auto p-6 flex flex-col items-center">
+    <h1 class="text-3xl font-bold mb-6 text-red-600">Iniciar Sesión</h1>
+    <form @submit.prevent="login" class="w-full max-w-sm">
+      <!-- Campo para el Nombre de Usuario -->
+      <label class="block mb-2 text-white">Nombre de Usuario</label>
+      <input
+        v-model="nombre_usuario"
+        type="text"
+        required
+        class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
+        placeholder="Ingresa tu usuario"
+      />
+
+      <!-- Campo para la Contraseña -->
+      <label class="block mb-2 text-white">Contraseña</label>
+      <input
+        v-model="password"
+        type="password"
+        required
+        class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
+        placeholder="Ingresa tu contraseña"
+      />
+
+      <!-- Botón de Inicio de Sesión -->
+      <button
+        type="submit"
+        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+      >
+        Iniciar Sesión
+      </button>
+    </form>
+    <!-- Mostrar Errores -->
+    <p v-if="error" class="text-red-500 mt-4">{{ error }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { UserIcon, LockClosedIcon } from "@heroicons/vue/solid";
+import { useRouter } from 'vue-router';
+import { definePageMeta } from "#imports";
 
-const router = useRouter();
-const username = ref("");
+const nombre_usuario = ref("");
 const password = ref("");
+const error = ref("");
+const router = useRouter();
+const { signIn } = useAuth();
 
 const login = async () => {
   try {
-    console.log("Intentando iniciar sesión con:", username.value, password.value);
-
-    const response = await fetch("http://localhost:3000/api/iniciarSesion", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identificador: username.value,
-        password: password.value,
-      }),
+    const response = await signIn({
+      redirect: false, // Cambia a false para manejar la redirección manualmente
+      identificador: nombre_usuario.value,
+      password: password.value,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error al iniciar sesión");
-    }
-
-    const data = await response.json();
-
-    if (data.token) {
-      localStorage.setItem("authToken", data.token);
-      console.log("Token guardado en localStorage");
-      console.log("Inicio de sesión exitoso", data);
-
-      // Intentar redirigir y verificar el éxito
-      try {
-        await router.push("/home");
-        console.log("Redirección exitosa a /home");
-      } catch (redirectError) {
-        throw new Error("Error al redirigir a /home: " + redirectError.message);
-      }
+    // Verifica si la respuesta es válida y contiene la información esperada
+    if (response && response.ok) {
+      console.log("Inicio de sesión exitoso:", response);
+      // Redirige al usuario a la página de inicio
+      router.push('/');
     } else {
-      throw new Error("Token no encontrado en la respuesta");
+      console.warn("Respuesta inesperada:", response);
+      error.value = response?.error || "Error desconocido. Por favor, intenta nuevamente.";
     }
-  } catch (error) {
-    console.error("Error al iniciar sesión:", error);
-    alert("Error al iniciar sesión: " + error.message);
+  } catch (err) {
+    console.error("Error durante el inicio de sesión:", err);
+    if (err.response) {
+      error.value = err.response.data?.error || "Solicitud incorrecta. Verifica tus datos.";
+    } else if (err.request) {
+      error.value = "No se recibió respuesta del servidor. Verifica tu conexión a internet.";
+    } else {
+      error.value = "Error al configurar la solicitud. Por favor, intenta nuevamente.";
+    }
   }
 };
-</script> 
+
+// Metadatos de la página para manejar autenticación
+definePageMeta({
+  auth: {
+    unauthenticatedOnly: true, // Permitir solo a usuarios no autenticados
+    navigateAuthenticatedTo: "/", // Redirigir si ya están autenticados
+  },
+});
+</script>

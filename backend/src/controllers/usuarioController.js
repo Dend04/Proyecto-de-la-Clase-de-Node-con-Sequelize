@@ -53,19 +53,15 @@ export const obtenerUsuarioPorId = async (id) => {
 };
 
 // Obtener perfil del usuario autenticado
-export const obtenerPerfil = async (req, res) => {
+export const obtenerPerfil = async (req) => {
   try {
     const usuario = await Usuario.findByPk(req.usuario.id, {
-      attributes: ['id', 'nombreUsuario', 'rol'],
+      attributes: ['id', 'nombreUsuario', 'rol','peso','altura','email','nombre','apellidos'],
     });
 
-    if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-
-    res.json({ usuario });
+    return usuario || null;
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener perfil del usuario', error });
+    throw new Error('Error al obtener perfil del usuario');
   }
 };
 
@@ -139,22 +135,16 @@ export const iniciarSesion = async (identificador, password) => {
       id: usuario.id,
       nombreUsuario: usuario.nombreUsuario,
       email: usuario.email,
-      rol: usuario.rol // Asegúrate de que el modelo Usuario tenga un campo 'rol'
+      rol: usuario.rol 
     };
 
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
     const refreshToken = jwt.sign(tokenPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     // Retornar los tokens y la información del usuario
     return {
-      token,
+      accessToken,
       refreshToken,
-      usuario: {
-        id: usuario.id,
-        nombreUsuario: usuario.nombreUsuario,
-        email: usuario.email,
-        rol: usuario.rol
-      }
     };
   } catch (error) {
     console.error("Error en iniciarSesion:", error);
@@ -214,4 +204,6 @@ export const obtenerEstadoUsuario = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener estado del usuario', error });
   }
+
+ 
 };

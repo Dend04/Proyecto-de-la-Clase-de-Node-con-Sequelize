@@ -320,10 +320,24 @@ router.get('/usuarios/buscar/:query',verificarToken, async (req, res) => {
 router.post('/iniciarSesion', async (req, res) => {
   try {
     const { identificador, password } = req.body;
-    const { token, refreshToken, usuario } = await iniciarSesion(identificador, password);
-    res.status(200).json({ accessToken: token, refreshToken, usuario });
+
+    // Verificar que los datos de entrada no estén vacíos
+    if (!identificador || !password) {
+      return res.status(400).json({ error: "Identificador y contraseña son requeridos" });
+    }
+
+    // Intentar iniciar sesión
+    const { accessToken, refreshToken } = await iniciarSesion(identificador, password);
+
+    // Enviar respuesta exitosa
+    return res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Error durante el inicio de sesión:", error);
+
+    // Verificar si ya se ha enviado una respuesta
+    if (!res.headersSent) {
+      return res.status(400).json({ error: error.message });
+    }
   }
 });
 
@@ -428,9 +442,21 @@ router.post('/registro', verificarToken, async (req, res) => {
 router.get('/perfil', verificarToken, async (req, res) => {
   try {
     const usuario = await obtenerPerfil(req, res);
-    res.status(200).json(usuario);
+    
+    // Asegúrate de que obtenerPerfil devuelva el usuario sin enviar una respuesta
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    
+    // Envía la respuesta solo si obtenerPerfil no lo hace
+    return res.status(200).json(usuario);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Maneja el error solo si no se ha enviado una respuesta
+    if (!res.headersSent) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      console.error("Error después de enviar la respuesta:", error);
+    }
   }
 });
 
