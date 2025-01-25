@@ -3,7 +3,7 @@
     <!-- Navbar Desplegable -->
     <div
       :class="[
-        'bg-[#3c9a7d] h-screen fixed top-0 left-0 flex flex-col items-center p-5 transition-all duration-300 z-50',
+        'bg-[#3c9a7d] h-screen fixed top-0 left-0 flex flex-col items-center p-5 transition-all duration-300 z-20',
         isNavbarOpen ? 'w-20 md:w-52' : 'w-5 md:w-13',
       ]"
     >

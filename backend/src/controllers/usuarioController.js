@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 
+
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
   try {
@@ -56,7 +57,7 @@ export const obtenerUsuarioPorId = async (id) => {
 export const obtenerPerfil = async (req) => {
   try {
     const usuario = await Usuario.findByPk(req.usuario.id, {
-      attributes: ['id', 'nombreUsuario', 'rol','peso','altura','email','nombre','apellidos'],
+      attributes: ['id', 'nombreUsuario', 'rol','peso','altura','email','nombre','segundoNombre','apellidos','enfermedadCronica','estadoFisicoActual'],
     });
 
     return usuario || null;

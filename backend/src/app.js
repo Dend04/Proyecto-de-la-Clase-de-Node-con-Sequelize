@@ -19,6 +19,7 @@ import Pregunta from "./models/pregunta_model.js";
 import Respuesta from "./models/respuesta_model.js";
 import Resultado from "./models/resultado_model.js";
 import Rutina from "./models/rutina_model.js";
+import faRoutes from './routes/faRoutes.js';
 
 dotenv.config();
 
@@ -68,6 +69,7 @@ app.use('/api', testRoutes);
 app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
+app.use('/api/auth', faRoutes);
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);

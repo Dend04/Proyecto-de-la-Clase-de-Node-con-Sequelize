@@ -1,8 +1,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
-
   modules: ["@nuxtjs/tailwindcss", "@nuxt/image", /* "@sidebase/nuxt-auth" */],
-
   css: ["@/assets/css/tailwind.css"],
 
   postcss: {
@@ -16,7 +14,8 @@ export default defineNuxtConfig({
     public: {
       BACKEND_URL: process.env.BACKEND_URL || "http://localhost:3000", // Variable de entorno para el backend
     },
-  },
+  }
+  
 
   /* auth: {
     baseURL: process.env.BACKEND_URL || 'http://localhost:3000/api',
@@ -47,5 +46,7 @@ export default defineNuxtConfig({
         },
       },
     },
-  }, */
+  }, */,
+
+  compatibilityDate: '2025-01-24'
 });

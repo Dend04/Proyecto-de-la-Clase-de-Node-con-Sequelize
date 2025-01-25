@@ -1,94 +1,77 @@
 <template>
-  <div class="container mx-auto p-6 flex flex-col items-center">
-    <h1 class="text-3xl font-bold mb-6 text-red-600">Iniciar Sesión</h1>
-    <form @submit.prevent="login" class="w-full max-w-sm">
-      <!-- Campo para el Nombre de Usuario -->
-      <label class="block mb-2 text-white">Nombre de Usuario</label>
-      <input
-        v-model="nombre_usuario"
-        type="text"
-        required
-        class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
-        placeholder="Ingresa tu usuario"
-      />
-      <!-- Campo para la Contraseña -->
-      <label class="block mb-2 text-white">Contraseña</label>
-      <input
-        v-model="password"
-        type="password"
-        required
-        class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
-        placeholder="Ingresa tu contraseña"
-      />
-      <!-- Botón de Inicio de Sesión -->
-      <button
-        type="submit"
-        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
-      >
-        Iniciar Sesión
-      </button>
-    </form>
-    <!-- Mostrar Errores -->
-    <p v-if="error" class="text-red-500 mt-4">{{ error }}</p>
-  </div>
-</template>
-
-<script setup>
-/* import { ref } from "vue";
-import { definePageMeta } from "#imports";
-import { useRuntimeConfig } from "#app";
-import { useRouter } from "vue-router"; // Importa el router
-
-const { signIn, token } = useAuth();
-const nombre_usuario = ref("");
-const password = ref("");
-const error = ref("");
-const config = useRuntimeConfig();
-const router = useRouter(); // Inicializa el router
-
-const login = async () => {
-  try {
-    console.log("Iniciando proceso de inicio de sesión...");
-    console.log("Datos enviados al servidor:", {
-      nombreUsuario: nombre_usuario.value,
-      password: password.value,
-    });
-
-    // Llama a la función signIn
-    const response = await signIn(
-      { nombreUsuario: nombre_usuario.value, password: password.value },
-      { callbackUrl: "/", redirect: true }
-    );
-
-    console.log("Respuesta de signIn:", response);
-
-    // Obtén el estado de autenticación
-    const { status, data } = useAuth();
-
-    console.log("Estado de autenticación:", status.value);
-    console.log("Datos de autenticación:", data.value);
-
-    // Verifica si el inicio de sesión fue exitoso
-    if (status.value === "authenticated" && data.value) {
-      const { accessToken, refreshToken } = data.value;
-
-      console.log("Tokens recibidos:", { accessToken, refreshToken });
-
-      // Almacena los tokens en localStorage (opcional)
+    <div class="min-h-screen flex items-center justify-center bg-gray-100">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Iniciar Sesión</h2>
+        <form @submit.prevent="handleLogin">
+          <div class="mb-4">
+            <label for="nombreUsuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+            <input
+              v-model="loginForm.nombreUsuario"
+              type="text"
+              id="nombreUsuario"
+              class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+          <div class="mb-6">
+            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input
+              v-model="loginForm.password"
+              type="password"
+              id="password"
+              class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-teal-700 rounded-md hover:bg-teal-800"
+            >
+              Iniciar Sesión
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref } from "vue";
+  
+  // Estado para el formulario de login
+  const loginForm = ref({
+    nombreUsuario: "",
+    password: "",
+  });
+  
+  // Función para manejar el login
+  const handleLogin = async () => {
+    try {
+      const backendUrl = "http://localhost:3000/api"; // URL del backend
+      const response = await fetch(`${backendUrl}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginForm.value),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error en la autenticación");
+      }
+  
+      const { accessToken, refreshToken } = await response.json();
+  
+      // Guardar los tokens en localStorage
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-
-      console.log("Tokens almacenados en localStorage");
-
-      // Redirige al usuario
-      router.push("/");
-    } else {
-      console.error("No se obtuvieron los tokens. Verifica la lógica del servidor.");
-      error.value = "No se obtuvieron los tokens. Verifica la lógica del servidor.";
+  
+      // Redirigir al usuario a la página principal y recargar la página
+      navigateTo("/", { reload: true });
+    } catch (error) {
+      console.error("Error:", error.message);
+      alert(error.message);
     }
-  } catch (err) {
-    console.error("Error durante el inicio de sesión:", err);
-    error.value = err.message || "Ocurrió un error inesperado. Por favor, intenta nuevamente.";
-  }
-}; */
-</script>
+  };
+  </script>
