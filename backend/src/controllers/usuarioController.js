@@ -107,50 +107,61 @@ export const buscarUsuarios = async (query) => {
 };
 
 // Iniciar sesión
-export const iniciarSesion = async (identificador, password) => {
+export async function iniciarSesion(nombreUsuario, password) {
   try {
-    console.log("Identificador en controlador:", identificador);
-    console.log("Password en controlador:", password);
+    console.log("Datos recibidos en iniciarSesion:", { nombreUsuario, password });
 
-    if (!identificador || !password) {
-      throw new Error("identificador y password son requeridos");
+    // Buscar el usuario en la base de datos
+    const usuario = await Usuario.findOne({ where: { nombreUsuario } });
+
+    if (!usuario) {
+      console.log("Usuario no encontrado");
+      throw new Error('Usuario no encontrado');
     }
 
-    let usuario;
-    if (identificador.includes('@')) {
-      // Buscar por email
-      usuario = await Usuario.findOne({ where: { email: identificador } });
-    } else {
-      // Buscar por nombre de usuario
-      usuario = await Usuario.findOne({ where: { nombreUsuario: identificador } });
+    // Comparar la contraseña hasheada
+    const contrasenaValida = await bcrypt.compare(password, usuario.password);
+
+    if (!contrasenaValida) {
+      console.log("Contraseña incorrecta");
+      throw new Error('Contraseña incorrecta');
     }
 
-    if (!usuario) throw new Error("Usuario no encontrado");
+    // Generar los tokens
+    const accessToken = jwt.sign(
+      {
+        id: usuario.id,
+        email: usuario.email,
+        phone_number: usuario.phone_number,
+        rol: usuario.rol,
+        username: usuario.nombreUsuario,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    const esValido = await bcrypt.compare(password, usuario.password);
-    if (!esValido) throw new Error("Contraseña incorrecta");
+    const refreshToken = jwt.sign(
+      {
+        id: usuario.id,
+        email: usuario.email,
+        phone_number: usuario.phone_number,
+        rol: usuario.rol,
+        username: usuario.username,
+      },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: '1d' }
+    );
 
-    // Generar los tokens JWT con información adicional
-    const tokenPayload = {
-      id: usuario.id,
-      nombreUsuario: usuario.nombreUsuario,
-      email: usuario.email,
-      rol: usuario.rol 
-    };
+    console.log("Tokens generados:", { accessToken, refreshToken });
 
-    const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const refreshToken = jwt.sign(tokenPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
-
-    // Retornar los tokens y la información del usuario
-    return {
-      accessToken,
-      refreshToken,
-    };
+    // Retornar los tokens
+    return { accessToken, refreshToken };
   } catch (error) {
-    console.error("Error en iniciarSesion:", error);
-    throw error;
+    console.error("Error en iniciarSesion:", error.message);
+    throw error; // Vuelve a lanzar el error para que pueda ser manejado por el llamador
   }
-};
+}
+
 
 // Refrescar el token
 export const refrescarToken = async (refreshToken) => {

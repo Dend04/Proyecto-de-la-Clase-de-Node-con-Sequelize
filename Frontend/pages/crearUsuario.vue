@@ -154,7 +154,7 @@
   </template>
   
   <script setup>
-  import { ref } from "vue";
+  /* import { ref } from "vue";
   import { useRouter } from "vue-router"; // Importa useRouter para la redirección
   import { definePageMeta, useAuth } from "#imports";
   import { UserIcon, MailIcon, LockClosedIcon, ScaleIcon } from '@heroicons/vue/solid';
@@ -204,5 +204,5 @@
       unauthenticatedOnly: true,
       navigateAuthenticatedTo: "/",
     },
-  });
+  }); */
   </script> 

@@ -11,7 +11,6 @@
         class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
         placeholder="Ingresa tu usuario"
       />
-
       <!-- Campo para la Contraseña -->
       <label class="block mb-2 text-white">Contraseña</label>
       <input
@@ -21,7 +20,6 @@
         class="p-3 border border-red-500 rounded-lg w-full mb-4 text-black placeholder-gray-400"
         placeholder="Ingresa tu contraseña"
       />
-
       <!-- Botón de Inicio de Sesión -->
       <button
         type="submit"
@@ -36,50 +34,61 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from 'vue-router';
+/* import { ref } from "vue";
 import { definePageMeta } from "#imports";
+import { useRuntimeConfig } from "#app";
+import { useRouter } from "vue-router"; // Importa el router
 
+const { signIn, token } = useAuth();
 const nombre_usuario = ref("");
 const password = ref("");
 const error = ref("");
-const router = useRouter();
-const { signIn } = useAuth();
+const config = useRuntimeConfig();
+const router = useRouter(); // Inicializa el router
 
 const login = async () => {
   try {
-    const response = await signIn({
-      redirect: false, // Cambia a false para manejar la redirección manualmente
-      identificador: nombre_usuario.value,
+    console.log("Iniciando proceso de inicio de sesión...");
+    console.log("Datos enviados al servidor:", {
+      nombreUsuario: nombre_usuario.value,
       password: password.value,
     });
 
-    // Verifica si la respuesta es válida y contiene la información esperada
-    if (response && response.ok) {
-      console.log("Inicio de sesión exitoso:", response);
-      // Redirige al usuario a la página de inicio
-      router.push('/');
+    // Llama a la función signIn
+    const response = await signIn(
+      { nombreUsuario: nombre_usuario.value, password: password.value },
+      { callbackUrl: "/", redirect: true }
+    );
+
+    console.log("Respuesta de signIn:", response);
+
+    // Obtén el estado de autenticación
+    const { status, data } = useAuth();
+
+    console.log("Estado de autenticación:", status.value);
+    console.log("Datos de autenticación:", data.value);
+
+    // Verifica si el inicio de sesión fue exitoso
+    if (status.value === "authenticated" && data.value) {
+      const { accessToken, refreshToken } = data.value;
+
+      console.log("Tokens recibidos:", { accessToken, refreshToken });
+
+      // Almacena los tokens en localStorage (opcional)
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      console.log("Tokens almacenados en localStorage");
+
+      // Redirige al usuario
+      router.push("/");
     } else {
-      console.warn("Respuesta inesperada:", response);
-      error.value = response?.error || "Error desconocido. Por favor, intenta nuevamente.";
+      console.error("No se obtuvieron los tokens. Verifica la lógica del servidor.");
+      error.value = "No se obtuvieron los tokens. Verifica la lógica del servidor.";
     }
   } catch (err) {
     console.error("Error durante el inicio de sesión:", err);
-    if (err.response) {
-      error.value = err.response.data?.error || "Solicitud incorrecta. Verifica tus datos.";
-    } else if (err.request) {
-      error.value = "No se recibió respuesta del servidor. Verifica tu conexión a internet.";
-    } else {
-      error.value = "Error al configurar la solicitud. Por favor, intenta nuevamente.";
-    }
+    error.value = err.message || "Ocurrió un error inesperado. Por favor, intenta nuevamente.";
   }
-};
-
-// Metadatos de la página para manejar autenticación
-definePageMeta({
-  auth: {
-    unauthenticatedOnly: true, // Permitir solo a usuarios no autenticados
-    navigateAuthenticatedTo: "/", // Redirigir si ya están autenticados
-  },
-});
+}; */
 </script>

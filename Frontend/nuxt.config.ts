@@ -1,83 +1,51 @@
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "@nuxt/image",
-    "@sidebase/nuxt-auth"
-  ],
+
+  modules: ["@nuxtjs/tailwindcss", "@nuxt/image", /* "@sidebase/nuxt-auth" */],
+
   css: ["@/assets/css/tailwind.css"],
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+
   runtimeConfig: {
     public: {
-      BACKEND_URL:'http://localhost:3000' // Reemplaza con la URL de tu API
-    }
+      BACKEND_URL: process.env.BACKEND_URL || "http://localhost:3000", // Variable de entorno para el backend
+    },
   },
-  auth: {
-    baseURL: process.env.backend_url, // URL base de tu backend
+
+  /* auth: {
+    baseURL: process.env.BACKEND_URL || 'http://localhost:3000/api',
     provider: {
-      type: "local",
+      type: 'local',
       endpoints: {
-        // Rutas de autenticación del backend que me proporcionaste
-        signIn: {
-          path: "/api/iniciarSesion",
-          method: "post"
-        },
-        signUp: {
-          path: "/api/crearUsuario",
-          method: "post"
-        },
-        signOut: {
-          path: "/api/cerrarSesion",
-          method: "post"
-        },
-        getSession: {
-          path: "/api/perfil",
-          method: "get"
-        }
-      },
-      pages: {
-        login: "/login" // Página de inicio de sesión en tu frontend
-      },
-      session: {
-        dataType: {
-          id: 'number',
-          nombre_usuario: 'string',
-          email: 'string',
-          rol: "'administrador' | 'usuario'", // Enum basado en tu backend
-          //twoFactorEnabled: "boolean", // Opcional según el diseño
-        },
-        dataResponsePointer: "/" // Ajustar si la estructura de respuesta lo requiere
+        signIn: { path: '/login', method: 'post' },
+        signOut: { path: '/cerrarSesion', method: 'post' },
+        getSession: { path: '/perfil', method: 'get' },
       },
       token: {
-        signInResponseTokenPointer: "/accessToken", // Asegúrate de que esta ruta coincida con la estructura de la respuesta
-        maxAgeInSeconds: 3600,
-        type: "Bearer",
-        headerName: "Authorization"
+        signInResponseTokenPointer: '/accessToken',
+        maxAgeInSeconds: 3600, // 1 hora
+        type: 'Bearer',
+        headerName: 'Authorization',
       },
       refresh: {
-        isEnabled: true, // Habilitar el refresco de token
+        isEnabled: true,
         endpoint: {
-          path: '/api/refrescarToken', // Ruta para renovar el access token
-          method: 'post'
+          path: '/refrescarToken',
+          method: 'post',
         },
-        refreshOnlyToken: true,
         token: {
-          signInResponseRefreshTokenPointer: '/refreshToken', // Ruta al refresh token en la respuesta
-          refreshRequestTokenPointer: '/refreshToken', // Ruta al token enviado para renovar
-          maxAgeInSeconds: 86400, // Tiempo de vida del refresh token (1 días)
-          cookieName: 'refresh_token' // Nombre de la cookie para almacenar el refresh token (opcional)
-        }
-      }
+          signInResponseRefreshTokenPointer: '/refreshToken',
+          refreshRequestTokenPointer: '/refreshToken',
+          maxAgeInSeconds: 604800, // 7 días
+          cookieName: 'refresh_token',
+        },
+      },
     },
-    globalAppMiddleware: {
-      isEnabled: true, // Habilitar middleware global
-      allow404WithoutAuth: true // Permitir 404 sin autenticación
-    }
-  },
+  }, */
 });

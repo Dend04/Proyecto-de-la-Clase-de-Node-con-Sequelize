@@ -1,6 +1,8 @@
 import express from 'express';
-import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, iniciarSesion, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario } from '../controllers/usuarioController.js';
+import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
+import { iniciarSesion } from "../controllers/usuarioController.js"; // Asegúrate de que la ruta sea correcta
+
 
 
 const router = express.Router();
@@ -317,30 +319,24 @@ router.get('/usuarios/buscar/:query',verificarToken, async (req, res) => {
  *             example:
  *               error: "Usuario no encontrado"
  */
-router.post('/iniciarSesion', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    const { identificador, password } = req.body;
+    const { nombreUsuario, password } = req.body;
 
-    // Verificar que los datos de entrada no estén vacíos
-    if (!identificador || !password) {
-      return res.status(400).json({ error: "Identificador y contraseña son requeridos" });
-    }
+    console.log("Datos recibidos en /api/login:", { nombreUsuario, password });
 
-    // Intentar iniciar sesión
-    const { accessToken, refreshToken } = await iniciarSesion(identificador, password);
+    // Llamar al controlador iniciarSesion
+    const { accessToken, refreshToken } = await iniciarSesion(nombreUsuario, password);
 
-    // Enviar respuesta exitosa
-    return res.status(200).json({ accessToken, refreshToken });
+    console.log("Tokens devueltos por iniciarSesion:", { accessToken, refreshToken });
+
+    // Enviar la respuesta al cliente
+    res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
-    console.error("Error durante el inicio de sesión:", error);
-
-    // Verificar si ya se ha enviado una respuesta
-    if (!res.headersSent) {
-      return res.status(400).json({ error: error.message });
-    }
+    console.error("Error en /api/login:", error.message);
+    res.status(400).json({ message: error.message });
   }
 });
-
 /**
  * @swagger
  * /api/registro:
