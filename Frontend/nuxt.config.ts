@@ -9,6 +9,19 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  app: {
+    head: {
+      title: "Pagina de Realización de Test", // Título global
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "description",
+          content: "Esta pagina tiene como objetivo, brindarle a los usuarios, test de todo tipo que pueden realizar", // Meta descripción global
+        },
+      ],
+    },
+  },
 
   runtimeConfig: {
     public: {

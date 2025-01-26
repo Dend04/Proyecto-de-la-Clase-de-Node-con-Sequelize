@@ -2,6 +2,7 @@ import express from 'express';
 import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
 import { iniciarSesion } from "../controllers/usuarioController.js"; // Asegúrate de que la ruta sea correcta
+import { generateUniqueUsername } from '../models/usuario_model.js';
 
 
 
@@ -522,5 +523,25 @@ router.get('/auth/estado', verificarToken, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
+router.post('/generarNombreUsuario', async (req, res) => {
+  try {
+    const { nombre, segundoNombre, apellidos } = req.body;
+
+    // Llamar a la función generateUniqueUsername
+    const nombreUsuario = await generateUniqueUsername({
+      nombre,
+      segundoNombre,
+      apellidos,
+    });
+
+    // Devolver el nombre de usuario generado
+    res.json({ nombreUsuario });
+  } catch (error) {
+    console.error('Error al generar el nombre de usuario:', error);
+    res.status(500).json({ error: 'Error al generar el nombre de usuario' });
+  }
+});
+
 
 export default router;

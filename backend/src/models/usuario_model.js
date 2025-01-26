@@ -54,6 +54,14 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  secret2FA: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  estaVerificado2FA: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -84,7 +92,7 @@ const Usuario = sequelize.define('Usuario', {
   },
 });
 
-async function generateUniqueUsername(usuario) {
+export async function generateUniqueUsername(usuario) {
   const nombres = [usuario.nombre, usuario.segundoNombre].filter(Boolean);
   const apellidos = usuario.apellidos.split(' ');
 

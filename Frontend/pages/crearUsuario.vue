@@ -1,0 +1,262 @@
+<template>
+    <div class="min-h-screen flex items-center justify-center bg-gray-100">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+        <!-- Paso 1: Datos básicos -->
+        <div v-if="step === 1">
+          <h2 class="text-2xl font-semibold mb-6 text-center">Crear Usuario - Paso 1</h2>
+          <form @submit.prevent="nextStep">
+            <!-- Nombre -->
+            <div class="mb-4">
+              <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+              <input
+                v-model="createUserForm.nombre"
+                type="text"
+                id="nombre"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: Juan"
+                required
+              />
+            </div>
+            <!-- Segundo Nombre -->
+            <div class="mb-4">
+              <label for="segundoNombre" class="block text-sm font-medium text-gray-700">Segundo Nombre</label>
+              <input
+                v-model="createUserForm.segundoNombre"
+                type="text"
+                id="segundoNombre"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: Antonio"
+              />
+            </div>
+            <!-- Apellidos -->
+            <div class="mb-4">
+              <label for="apellidos" class="block text-sm font-medium text-gray-700">Apellidos</label>
+              <input
+                v-model="createUserForm.apellidos"
+                type="text"
+                id="apellidos"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: Pérez García"
+                required
+              />
+            </div>
+            <!-- Peso -->
+            <div class="mb-4">
+              <label for="peso" class="block text-sm font-medium text-gray-700">Peso (kg)</label>
+              <input
+                v-model="createUserForm.peso"
+                type="number"
+                id="peso"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: 75.5"
+                required
+              />
+            </div>
+            <!-- Altura -->
+            <div class="mb-4">
+              <label for="altura" class="block text-sm font-medium text-gray-700">Altura (cm)</label>
+              <input
+                v-model="createUserForm.altura"
+                type="number"
+                id="altura"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: 175.5"
+                required
+              />
+            </div>
+            <!-- Enfermedad Crónica -->
+            <div class="mb-4">
+              <label for="enfermedadCronica" class="block text-sm font-medium text-gray-700">Enfermedad Crónica</label>
+              <input
+                v-model="createUserForm.enfermedadCronica"
+                type="text"
+                id="enfermedadCronica"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: Ninguna"
+                required
+              />
+            </div>
+            <!-- Estado Físico Actual -->
+            <div class="mb-6">
+              <label for="estadoFisicoActual" class="block text-sm font-medium text-gray-700">Estado Físico Actual</label>
+              <input
+                v-model="createUserForm.estadoFisicoActual"
+                type="text"
+                id="estadoFisicoActual"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: Activo"
+                required
+              />
+            </div>
+            <!-- Botón para avanzar al siguiente paso -->
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-teal-700 rounded-md hover:bg-teal-800"
+              >
+                Siguiente
+              </button>
+            </div>
+          </form>
+        </div>
+  
+        <!-- Paso 2: Datos adicionales -->
+        <div v-if="step === 2">
+          <h2 class="text-2xl font-semibold mb-6 text-center">Crear Usuario - Paso 2</h2>
+          <form @submit.prevent="handleCreateUser">
+            <!-- Nombre de Usuario -->
+            <div class="mb-4">
+              <label for="nombreUsuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+              <input
+                v-model="createUserForm.nombreUsuario"
+                type="text"
+                id="nombreUsuario"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: juanperez"
+                required
+              />
+            </div>
+            <!-- Correo Electrónico -->
+            <div class="mb-4">
+              <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+              <input
+                v-model="createUserForm.email"
+                type="email"
+                id="email"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: juan@ejemplo.com"
+                required
+              />
+            </div>
+            <!-- Contraseña -->
+            <div class="mb-4">
+              <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+              <input
+                v-model="createUserForm.password"
+                type="password"
+                id="password"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: password123"
+                required
+              />
+            </div>
+            <!-- Confirmar Contraseña -->
+            <div class="mb-6">
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+              <input
+                v-model="createUserForm.confirmPassword"
+                type="password"
+                id="confirmPassword"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+                placeholder="Ej: password123"
+                required
+              />
+            </div>
+            <!-- Botón para crear usuario -->
+            <div class="flex justify-between">
+              <button
+                type="button"
+                @click="prevStep"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Anterior
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-teal-700 rounded-md hover:bg-teal-800"
+              >
+                Crear Usuario
+              </button>
+            </div>
+          </form>
+        </div>
+  
+        <!-- Mensaje de éxito -->
+        <div v-if="successMessage" class="mt-4 p-4 bg-green-100 text-green-700 rounded-md text-center">
+          {{ successMessage }}
+        </div>
+        <!-- Enlace para iniciar sesión -->
+        <div class="mt-4 text-center">
+          <p class="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?
+            <NuxtLink to="/login" class="text-teal-700 hover:underline">
+              Iniciar Sesión
+            </NuxtLink>
+          </p>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref } from "vue";
+  import { useRouter } from "vue-router";
+  
+  const router = useRouter();
+  
+  // Estado para el formulario de creación de usuario
+  const createUserForm = ref({
+    nombre: "",
+    segundoNombre: "",
+    apellidos: "",
+    nombreUsuario: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    peso: null,
+    altura: null,
+    enfermedadCronica: "",
+    estadoFisicoActual: "",
+  });
+  
+  // Estado para el mensaje de éxito
+  const successMessage = ref("");
+  
+  // Estado para el paso actual
+  const step = ref(1);
+  
+  // Función para avanzar al siguiente paso
+  const nextStep = () => {
+    step.value = 2;
+  };
+  
+  // Función para retroceder al paso anterior
+  const prevStep = () => {
+    step.value = 1;
+  };
+  
+  // Función para manejar la creación de usuario
+  const handleCreateUser = async () => {
+    try {
+      // Validar que las contraseñas coincidan
+      if (createUserForm.value.password !== createUserForm.value.confirmPassword) {
+        throw new Error("Las contraseñas no coinciden");
+      }
+  
+      // Enviar la solicitud al backend
+      const backendUrl = "http://localhost:3000/api"; // URL del backend
+      const response = await fetch(`${backendUrl}/crearUsuario`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(createUserForm.value),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error al crear el usuario");
+      }
+  
+      // Mostrar mensaje de éxito
+      successMessage.value = "Usuario creado con éxito. Redirigiendo al login...";
+  
+      // Redirigir al usuario al login después de 3 segundos
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+    } catch (error) {
+      console.error("Error:", error.message);
+      alert(error.message);
+    }
+  };
+  </script>

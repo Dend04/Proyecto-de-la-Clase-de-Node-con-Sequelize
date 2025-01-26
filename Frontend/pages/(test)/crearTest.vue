@@ -114,6 +114,9 @@ const submitForm = async () => {
   try {
     const response = await $fetch('http://localhost:3000/api/crearTest', {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Enviar el token
+      },
       body: { 
         titulo: titulo.value, 
         descripcion: descripcion.value, 

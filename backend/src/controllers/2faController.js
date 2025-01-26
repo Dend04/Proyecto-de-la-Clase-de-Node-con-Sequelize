@@ -1,38 +1,46 @@
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
+import Usuario from '../models/usuario_model.js';
 
 export const habilitar2FA = async (req, res) => {
-    try {
-      const { id } = req.usuario; // ID del usuario autenticado
-  
-      // Generar un secreto para el usuario
-      const secret = speakeasy.generateSecret({
-        name: 'Health Testing', // Nombre de la aplicación
-        issuer: 'Mi mismo',     // Nombre de la empresa
-      });
-  
-      // Generar un código QR para que el usuario lo escanee
-      const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
-  
-      // Guardar el secreto en la base de datos (asociado al usuario)
-      await Usuario.update({ secret2FA: secret.base32 }, { where: { id } });
-  
-      // Enviar el código QR al frontend
-      res.json({
-        success: true,
-        message: 'Escanea el código QR con tu aplicación de autenticación',
-        qrCodeUrl,
-        secret: secret.base32, // Opcional: enviar el secreto en texto plano para copiar manualmente
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Error al habilitar 2FA',
-        error: error.message,
-      });
+  try {
+    console.log('Solicitud recibida en habilitar2FA');
+    const { id } = req.usuario;
+    console.log('ID del usuario:', id);
+
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+      console.log('Usuario no encontrado');
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
-  };
-  
+
+    const secret = speakeasy.generateSecret({
+      name: 'Health Testing',
+      issuer: 'Mi mismo',
+    });
+    console.log('Secreto generado:'/* , secret.base32 */);
+
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
+    console.log('Código QR generado:'/* , qrCodeUrl */);
+
+    await Usuario.update({ secret2FA: secret.base32 }, { where: { id } });
+    console.log('Secreto guardado en la base de datos');
+
+    res.json({
+      success: true,
+      message: 'Escanea el código QR con tu aplicación de autenticación',
+      qrCodeUrl,
+      secret: secret.base32,
+    });
+  } catch (error) {
+    console.error('Error en habilitar2FA:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al habilitar 2FA',
+      error: error.message,
+    });
+  }
+};
   export const verificar2FA = async (req, res) => {
     try {
       const { id } = req.usuario; // ID del usuario autenticado

@@ -10,7 +10,7 @@
       <!-- Botón de Toggle: Cambia entre mostrar el título y el icono de menú -->
       <button
         @click="toggleNavbar"
-        class="text-white text-xl mb-5 cursor-pointer"
+        class="text-black text-xl mb-5 cursor-pointer"
       >
         <span v-if="isNavbarOpen">Health Testing</span>
         <MenuIcon v-else class="h-6 w-6" />
@@ -21,7 +21,7 @@
         <li>
           <NuxtLink
             to="/"
-            class="text-white no-underline flex items-center"
+            class="text-black no-underline flex items-center"
             title="Home"
           >
             <HomeIcon class="h-5 w-5 mr-2" />
@@ -32,7 +32,7 @@
         <li>
           <NuxtLink
             to="/test"
-            class="text-white no-underline flex items-center"
+            class="text-black no-underline flex items-center"
             title="Test"
           >
             <BeakerIcon class="h-5 w-5 mr-2" />
@@ -43,7 +43,7 @@
         <li>
           <NuxtLink
             to="/usuarios"
-            class="text-white no-underline flex items-center"
+            class="text-black no-underline flex items-center"
             title="Usuarios"
           >
             <UserIcon class="h-5 w-5 mr-2" />
@@ -54,7 +54,7 @@
         <li>
           <NuxtLink
             to="/config"
-            class="text-white no-underline flex items-center"
+            class="text-black no-underline flex items-center"
             title="Config"
           >
             <CogIcon class="h-5 w-5 mr-2" />

@@ -69,7 +69,7 @@ app.use('/api', testRoutes);
 app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
-app.use('/api/auth', faRoutes);
+app.use('/api', faRoutes);
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);

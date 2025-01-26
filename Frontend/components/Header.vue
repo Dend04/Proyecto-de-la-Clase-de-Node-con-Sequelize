@@ -1,18 +1,32 @@
 <template>
-  <div class="fixed top-0 right-0 w-[calc(100%-5rem)] md:w-[calc(100%-13rem)] flex items-center justify-between p-4 bg-gradient-to-r from-[#eaebef] to-[#aab2b5] shadow-md z-30 transition-all duration-300">
+  <div
+    class="fixed top-0 right-0 w-[calc(100%-5rem)] md:w-[calc(100%-13rem)] flex items-center justify-between p-4 bg-gradient-to-r from-[#eaebef] to-[#aab2b5] shadow-md z-30 transition-all duration-300"
+  >
     <!-- Barra de búsqueda -->
-    <div class="hidden md:flex items-center gap-2 text-xs rounded-full ring-1.5 ring-gray-300 px-2 ml-auto">
+    <div
+      class="hidden md:flex items-center gap-2 text-xs rounded-full ring-1.5 ring-gray-300 px-2 ml-auto"
+    >
       <SearchIcon class="h-5 w-5 text-gray-500" />
-      <input type="text" placeholder="Buscar..." class="w-48 p-2 bg-transparent outline-none" />
+      <input
+        type="text"
+        placeholder="Buscar..."
+        class="w-48 p-2 bg-transparent outline-none"
+      />
     </div>
     <!-- Usuarios e iconos -->
     <div class="flex items-center gap-6 ml-auto">
-      <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
+      <div
+        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
+      >
         <ChatIcon class="h-5 w-5 text-gray-500" />
       </div>
-      <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
+      <div
+        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative"
+      >
         <BellIcon class="h-5 w-5 text-gray-500" />
-        <div class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs">
+        <div
+          class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs"
+        >
           1
         </div>
       </div>
@@ -22,7 +36,8 @@
         @click="handleLogout"
         class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
       >
-        <LogoutIcon class="h-4 w-4" /> <!-- Ícono de cierre de sesión -->
+        <LogoutIcon class="h-4 w-4" />
+        <!-- Ícono de cierre de sesión -->
         <span>Cerrar sesión</span>
       </button>
       <!-- Nombre del usuario o botón de inicio -->
@@ -32,8 +47,8 @@
         class="flex flex-col cursor-pointer hover:underline"
         @click="redirectToLogin"
       >
-        <span class="text-xs leading-3 font-medium">Inicio</span>
-        <span class="text-[10px] text-gray-500 text-right">Admin</span>
+        <span class="text-xs leading-3 font-medium">Iniciar o</span>
+        <span class="text-[10px] text-gray-500 text-right">Crear sesión</span>
       </NuxtLink>
       <button
         v-else
@@ -63,13 +78,16 @@
       />
     </div>
 
-    <!-- Modal del perfil -->
+    <!-- Fondo oscuro semitransparente -->
     <div
       v-if="showProfileModal"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40"
       @click.self="showProfileModal = false"
     >
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+      <!-- Modal del perfil -->
+      <div
+        class="fixed top-16 right-4 bg-white p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto z-50"
+      >
         <!-- Botón de cierre (cruz) -->
         <button
           @click="showProfileModal = false"
@@ -82,27 +100,43 @@
         <div class="space-y-4">
           <!-- Nombre -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <label class="block text-sm font-medium text-gray-700"
+              >Nombre</label
+            >
             <p class="mt-1 text-sm text-gray-900">{{ userProfile.nombre }}</p>
           </div>
           <!-- Segundo nombre (solo si existe) -->
           <div v-if="userProfile.segundoNombre">
-            <label class="block text-sm font-medium text-gray-700">Segundo Nombre</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.segundoNombre }}</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Segundo Nombre</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.segundoNombre }}
+            </p>
           </div>
           <!-- Apellidos -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Apellidos</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.apellidos }}</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Apellidos</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.apellidos }}
+            </p>
           </div>
           <!-- Nombre de usuario -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.nombreUsuario }}</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Nombre de Usuario</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.nombreUsuario }}
+            </p>
           </div>
           <!-- Correo electrónico -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+            <label class="block text-sm font-medium text-gray-700"
+              >Correo Electrónico</label
+            >
             <p class="mt-1 text-sm text-gray-900">{{ userProfile.email }}</p>
           </div>
           <!-- Peso -->
@@ -112,18 +146,30 @@
           </div>
           <!-- Altura -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Altura</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.altura }} cm</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Altura</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.altura }} cm
+            </p>
           </div>
           <!-- Enfermedad crónica -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Enfermedad Crónica</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.enfermedadCronica || "No especificado" }}</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Enfermedad Crónica</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.enfermedadCronica || "No especificado" }}
+            </p>
           </div>
           <!-- Estado físico actual -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Estado Físico Actual</label>
-            <p class="mt-1 text-sm text-gray-900">{{ userProfile.estadoFisicoActual || "No especificado" }}</p>
+            <label class="block text-sm font-medium text-gray-700"
+              >Estado Físico Actual</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ userProfile.estadoFisicoActual || "No especificado" }}
+            </p>
           </div>
         </div>
       </div>
@@ -132,8 +178,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { SearchIcon, BellIcon, ChatIcon, UserIcon, LogoutIcon, XIcon } from "@heroicons/vue/outline"; // Importa XIcon
+import { ref, onMounted, onUnmounted } from "vue";
+import {
+  SearchIcon,
+  BellIcon,
+  ChatIcon,
+  UserIcon,
+  LogoutIcon,
+  XIcon,
+} from "@heroicons/vue/outline"; // Importa XIcon
 import { navigateTo } from "#app"; // Importa navigateTo de Nuxt
 
 // Estado para el nombre del usuario
@@ -160,6 +213,40 @@ const accessToken = ref(null);
 
 // Estado para controlar la visibilidad del modal del perfil
 const showProfileModal = ref(false);
+
+// Estado para controlar la visibilidad del header
+const isHeaderVisible = ref(true);
+
+// Referencia al header
+const header = ref(null);
+
+// Variables para detectar el scroll
+let lastScrollTop = 0;
+
+// Función para manejar el scroll
+const handleScroll = () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (scrollTop > lastScrollTop) {
+    // Scroll hacia abajo: ocultar el header
+    isHeaderVisible.value = false;
+  } else {
+    // Scroll hacia arriba: mostrar el header
+    isHeaderVisible.value = true;
+  }
+
+  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Evitar valores negativos
+};
+
+// Añadir el evento de scroll al montar el componente
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+// Eliminar el evento de scroll al desmontar el componente
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 
 // Función para redirigir a login
 const redirectToLogin = () => {
