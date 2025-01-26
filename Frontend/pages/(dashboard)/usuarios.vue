@@ -1,10 +1,12 @@
 <template>
-  <div class="pt-16 pl-20 md:pl-52 relative z-20">
+  <div class="pt-16 pl-20 md:pl-52 relative z-10"> <!-- z-index reducido a 10 -->
     <h1 class="text-2xl font-bold mb-4 text-center">Lista de Usuarios</h1>
     <div class="overflow-x-auto">
       <!-- Mostrar mensaje de error si no se puede conectar al servidor -->
       <div v-if="error" class="max-w-2xl mx-auto mb-8">
-        <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-8 border-l-4 border-red-500">
+        <div
+          class="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-8 border-l-4 border-red-500"
+        >
           <div class="flex flex-col items-center text-center">
             <div class="mb-4">
               <svg
@@ -68,24 +70,48 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in paginatedUsers" :key="user.id" class="hover:bg-gray-100 transition cursor-default">
+          <tr
+            v-for="user in paginatedUsers"
+            :key="user.id"
+            class="hover:bg-gray-100 transition cursor-default"
+          >
             <td class="py-2 px-4 border-b text-black">{{ user.nombre }}</td>
-            <td class="py-2 px-4 border-b text-black">{{ user.segundoNombre }}</td>
+            <td class="py-2 px-4 border-b text-black">
+              {{ user.segundoNombre }}
+            </td>
             <td class="py-2 px-4 border-b text-black">{{ user.apellidos }}</td>
-            <td class="py-2 px-4 border-b text-black">{{ user.nombreUsuario }}</td>
+            <td class="py-2 px-4 border-b text-black">
+              {{ user.nombreUsuario }}
+            </td>
             <td class="py-2 px-4 border-b text-black">{{ user.email }}</td>
             <td class="py-2 px-4 border-b text-black">{{ user.peso }}</td>
             <td class="py-2 px-4 border-b text-black">{{ user.altura }}</td>
-            <td class="py-2 px-4 border-b text-black">{{ user.enfermedadCronica }}</td>
-            <td class="py-2 px-4 border-b text-black">{{ user.estadoFisicoActual }}</td>
+            <td class="py-2 px-4 border-b text-black">
+              {{ user.enfermedadCronica }}
+            </td>
+            <td class="py-2 px-4 border-b text-black">
+              {{ user.estadoFisicoActual }}
+            </td>
             <td class="py-2 px-4 border-b text-black flex space-x-2">
-              <button @click="editUser(user.id)" class="text-blue-500 hover:underline relative group">
+              <button
+                @click="editUser(user.id)"
+                class="text-blue-500 hover:underline relative group"
+              >
                 <PencilIcon class="h-5 w-5" />
-                <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">Editar</span>
+                <span
+                  class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >Editar</span
+                >
               </button>
-              <button @click="deleteUser(user.id)" class="text-red-500 hover:underline relative group">
+              <button
+                @click="deleteUser(user.id)"
+                class="text-red-500 hover:underline relative group"
+              >
                 <TrashIcon class="h-5 w-5" />
-                <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</span>
+                <span
+                  class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >Eliminar</span
+                >
               </button>
             </td>
           </tr>
@@ -94,13 +120,27 @@
     </div>
     <!-- Mostrar paginación solo si hay usuarios disponibles -->
     <div v-if="!error && users.length > 0" class="flex justify-center mt-4">
-      <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 mx-1 bg-[#3c9a7d] text-white rounded disabled:opacity-50">
+      <button
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        class="px-4 py-2 mx-1 bg-[#3c9a7d] text-white rounded disabled:opacity-50"
+      >
         <ChevronLeftIcon class="h-5 w-5" />
       </button>
-      <span v-for="page in totalPages" :key="page" @click="goToPage(page)" class="px-4 py-2 mx-1 cursor-pointer" :class="{'bg-[#3c9a7d] text-white rounded': currentPage === page}">
+      <span
+        v-for="page in totalPages"
+        :key="page"
+        @click="goToPage(page)"
+        class="px-4 py-2 mx-1 cursor-pointer"
+        :class="{ 'bg-[#3c9a7d] text-white rounded': currentPage === page }"
+      >
         {{ page }}
       </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 mx-1 bg-[#3c9a7d] text-white rounded disabled:opacity-50">
+      <button
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        class="px-4 py-2 mx-1 bg-[#3c9a7d] text-white rounded disabled:opacity-50"
+      >
         <ChevronRightIcon class="h-5 w-5" />
       </button>
     </div>
@@ -109,8 +149,13 @@
 
 <script setup>
 // Importar funciones y componentes necesarios
-import { ref, computed, onMounted } from 'vue';
-import { PencilIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/outline';
+import { ref, computed, onMounted } from "vue";
+import {
+  PencilIcon,
+  TrashIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/vue/outline";
 
 // Definir variables reactivas para usuarios y errores
 const users = ref([]);
@@ -119,10 +164,23 @@ const error = ref(null);
 // Función para obtener usuarios desde la API
 const fetchUsers = async () => {
   try {
-    users.value = await $fetch('http://localhost:3000/api/usuarios');
+    // Obtener el token del localStorage
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      throw new Error("No se encontró un token de autenticación.");
+    }
+    // Hacer la solicitud con el token en la cabecera
+    users.value = await $fetch("http://localhost:3000/api/usuarios", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`, // Enviar el token en la cabecera
+      },
+    });
     error.value = null;
   } catch (err) {
-    error.value = "No se puede conectar con el servidor. Por favor, verifica que el servidor esté en funcionamiento.";
+    error.value =
+      "No se puede conectar con el servidor. Por favor, verifica que el servidor esté en funcionamiento.";
     console.error("Error:", err);
   }
 };
