@@ -56,6 +56,7 @@
 <script setup>
 import { ref } from "vue";
 
+const runtimeConfig = useRuntimeConfig();
 // Estado para el formulario de login
 const loginForm = ref({
   nombreUsuario: "",
@@ -65,8 +66,8 @@ const loginForm = ref({
 // Función para manejar el login
 const handleLogin = async () => {
   try {
-    const backendUrl = "http://localhost:3000/api"; // URL del backend
-    const response = await fetch(`${backendUrl}/login`, {
+    const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+    const response = await fetch(`${apiBaseUrl}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

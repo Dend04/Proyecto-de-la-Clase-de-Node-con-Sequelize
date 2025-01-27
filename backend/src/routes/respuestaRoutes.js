@@ -1,5 +1,6 @@
 import express from 'express';
 import { getRespuestas, getRespuestaById, createRespuesta, updateRespuesta, deleteRespuesta, getRespuestasByPreguntaId } from '../controllers/respuestaController.js';
+import { verificarToken } from '../middleware/middleware.js';
 
 const router = express.Router();
 
@@ -105,7 +106,7 @@ router.get('/respuestas', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.get('/respuesta/:id', async (req, res) => {
+router.get('/respuesta/:id',verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     const respuesta = await getRespuestaById(id);
@@ -171,7 +172,7 @@ router.get('/respuesta/:id', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.post('/crearRespuesta', async (req, res) => {
+router.post('/crearRespuesta', verificarToken, async (req, res) => {
   try {
     const respuesta = await createRespuesta(req.body);
     res.status(201).json(respuesta);
@@ -240,7 +241,7 @@ router.post('/crearRespuesta', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.put('/respuesta/:id', async (req, res) => {
+router.put('/respuesta/:id',verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     const respuesta = await updateRespuesta(id, req.body);
@@ -276,7 +277,7 @@ router.put('/respuesta/:id', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.delete('/borrarRespuesta/:id', async (req, res) => {
+router.delete('/borrarRespuesta/:id',verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     await deleteRespuesta(id);
@@ -338,7 +339,7 @@ router.delete('/borrarRespuesta/:id', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.get('/respuestas/pregunta/:preguntaId', async (req, res) => {
+router.get('/respuestas/pregunta/:preguntaId',verificarToken, async (req, res) => {
   try {
     const respuestas = await getRespuestasByPreguntaId(req.params.preguntaId);
     if (respuestas.length > 0) {

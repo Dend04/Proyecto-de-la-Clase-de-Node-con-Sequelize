@@ -78,10 +78,12 @@ const error = ref(null);
 const mostrarModal = ref(false);
 const pregunta = ref('');
 const agregarInterrogacion = ref(false);
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
 const fetchPreguntas = async () => {
   try {
-    const response = await $fetch(`http://localhost:3000/api/preguntas/test/id/${route.params.id}`);
+    const response = await $fetch(`${apiBaseUrl}/preguntas/test/id/${route.params.id}`);
     if (response.length === 0) {
       error.value = 'No hay preguntas disponibles para este test.';
     } else {
@@ -109,8 +111,11 @@ const submitPregunta = async () => {
   }
 
   try {
-    await $fetch(`http://localhost:3000/api/preguntas/test/id/${route.params.id}`, {
+    await $fetch(`${apiBaseUrl}/preguntas/test/id/${route.params.id}`, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Enviar el token
+      },
       body: { 
         texto: textoPregunta
       }

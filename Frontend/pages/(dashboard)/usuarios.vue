@@ -148,7 +148,6 @@
 </template>
 
 <script setup>
-// Importar funciones y componentes necesarios
 import { ref, computed, onMounted } from "vue";
 import {
   PencilIcon,
@@ -157,24 +156,25 @@ import {
   ChevronRightIcon,
 } from "@heroicons/vue/outline";
 
-// Definir variables reactivas para usuarios y errores
+const runtimeConfig = useRuntimeConfig();
 const users = ref([]);
 const error = ref(null);
 
-// Función para obtener usuarios desde la API
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+
+
 const fetchUsers = async () => {
   try {
-    // Obtener el token del localStorage
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
       throw new Error("No se encontró un token de autenticación.");
     }
-    // Hacer la solicitud con el token en la cabecera
-    users.value = await $fetch("http://localhost:3000/api/usuarios", {
+
+    users.value = await $fetch(`${apiBaseUrl}/usuarios`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`, // Enviar el token en la cabecera
+        Authorization: `Bearer ${token}`,
       },
     });
     error.value = null;
@@ -185,57 +185,67 @@ const fetchUsers = async () => {
   }
 };
 
-// Función para reintentar la conexión
 const retryConnection = () => {
   fetchUsers();
 };
 
-// Definir variables reactivas para la paginación
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
-// Computar los usuarios paginados
 const paginatedUsers = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return users.value.slice(start, end);
 });
 
-// Computar el número total de páginas
 const totalPages = computed(() => {
   return Math.ceil(users.value.length / itemsPerPage);
 });
 
-// Función para ir a la página siguiente
 function nextPage() {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 }
 
-// Función para ir a la página anterior
 function prevPage() {
   if (currentPage.value > 1) {
     currentPage.value--;
   }
 }
 
-// Función para ir a una página específica
 function goToPage(page) {
   currentPage.value = page;
 }
 
-// Función para editar un usuario
 function editUser(id) {
   console.log(`Editar usuario con id: ${id}`);
 }
 
-// Función para eliminar un usuario
-function deleteUser(id) {
-  console.log(`Eliminar usuario con id: ${id}`);
-}
+const deleteUser = async (id) => {
+  try {
+    const token = localStorage.getItem("accessToken");
 
-// Obtener usuarios cuando el componente se monta
+    if (!token) {
+      throw new Error("No se encontró un token de autenticación.");
+    }
+
+    const response = await $fetch(`${apiBaseUrl}/usuario/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response) {
+      fetchUsers();
+    }
+  } catch (err) {
+    console.error("Error al eliminar el usuario:", err);
+    error.value = "No se pudo eliminar el usuario. Por favor, inténtalo de nuevo.";
+  }
+};
+
 onMounted(() => {
   fetchUsers();
 });

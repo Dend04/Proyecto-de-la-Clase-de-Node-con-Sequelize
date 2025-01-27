@@ -77,6 +77,8 @@ const secret2FA = ref('');
 const otp = ref('');
 const is2FAEnabled = ref(false);
 const accessToken = ref(null); // Token de acceso
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
 // Verificar el token al cargar la página
 onMounted(() => {
@@ -98,7 +100,7 @@ const toggle2FA = async () => {
 // Función para habilitar 2FA
 const habilitar2FA = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/habilitar-2fa', {
+    const response = await fetch(`${apiBaseUrl}/habilitar-2fa`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -120,7 +122,7 @@ const habilitar2FA = async () => {
 // Función para verificar 2FA
 const verificar2FA = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/verificar-2fa', {
+    const response = await fetch(`${apiBaseUrl}/verificar-2fa`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +145,7 @@ const verificar2FA = async () => {
 // Función para deshabilitar 2FA
 const deshabilitar2FA = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/deshabilitar-2fa', {
+    const response = await fetch(`${apiBaseUrl}/deshabilitar-2fa`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +169,7 @@ const deshabilitar2FA = async () => {
 // Verificar el estado del 2FA al cargar la página
 const verificarEstado2FA = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/estado-2fa', {
+    const response = await fetch(`${apiBaseUrl}/estado-2fa`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken.value}`,

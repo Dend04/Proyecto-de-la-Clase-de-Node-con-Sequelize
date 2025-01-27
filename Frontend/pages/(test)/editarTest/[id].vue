@@ -1,7 +1,10 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center p-4">
     <h1 class="text-4xl font-bold text-gray-800 mb-8">Editar Test</h1>
-    <form @submit.prevent="submitForm" class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+    <form
+      @submit.prevent="submitForm"
+      class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg"
+    >
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="titulo">
           <PencilIcon class="h-5 w-5 inline-block mr-1" /> Título
@@ -15,7 +18,10 @@
         />
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="descripcion">
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="descripcion"
+        >
           <DocumentTextIcon class="h-5 w-5 inline-block mr-1" /> Descripción
         </label>
         <textarea
@@ -26,8 +32,12 @@
         ></textarea>
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="duracion">
-          <ClockIcon class="h-5 w-5 inline-block mr-1" /> Duración (minutos) <span class="text-gray-500">(Opcional)</span>
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="duracion"
+        >
+          <ClockIcon class="h-5 w-5 inline-block mr-1" /> Duración (minutos)
+          <span class="text-gray-500">(Opcional)</span>
         </label>
         <select
           v-model="duracion"
@@ -42,8 +52,12 @@
         </select>
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="dificultad">
-          <AdjustmentsIcon class="h-5 w-5 inline-block mr-1" /> Dificultad <span class="text-gray-500">(Opcional)</span>
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="dificultad"
+        >
+          <AdjustmentsIcon class="h-5 w-5 inline-block mr-1" /> Dificultad
+          <span class="text-gray-500">(Opcional)</span>
         </label>
         <select
           v-model="dificultad"
@@ -57,7 +71,10 @@
         </select>
       </div>
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="etiqueta">
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="etiqueta"
+        >
           <TagIcon class="h-5 w-5 inline-block mr-1" /> Etiqueta
         </label>
         <select
@@ -80,66 +97,91 @@
         </button>
       </div>
     </form>
-    <div v-if="mensaje" :class="mensajeClase" class="mt-4 p-4 rounded-lg shadow-lg flex items-center">
-      <CheckCircleIcon v-if="mensajeClase === 'bg-green-100 text-green-700'" class="h-6 w-6 mr-2" />
-      <ExclamationCircleIcon v-if="mensajeClase === 'bg-red-100 text-red-700'" class="h-6 w-6 mr-2" />
+    <div
+      v-if="mensaje"
+      :class="mensajeClase"
+      class="mt-4 p-4 rounded-lg shadow-lg flex items-center"
+    >
+      <CheckCircleIcon
+        v-if="mensajeClase === 'bg-green-100 text-green-700'"
+        class="h-6 w-6 mr-2"
+      />
+      <ExclamationCircleIcon
+        v-if="mensajeClase === 'bg-red-100 text-red-700'"
+        class="h-6 w-6 mr-2"
+      />
       <span>{{ mensaje }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { PencilIcon, DocumentTextIcon, ClockIcon, AdjustmentsIcon, TagIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/outline';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  PencilIcon,
+  DocumentTextIcon,
+  ClockIcon,
+  AdjustmentsIcon,
+  TagIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/vue/outline";
 
 const route = useRoute();
 const router = useRouter();
 
-const titulo = ref('');
-const descripcion = ref('');
-const duracion = ref('');
-const dificultad = ref('');
-const etiqueta = ref('');
-const mensaje = ref('');
-const mensajeClase = ref('');
+const titulo = ref("");
+const descripcion = ref("");
+const duracion = ref("");
+const dificultad = ref("");
+const etiqueta = ref("");
+const mensaje = ref("");
+const mensajeClase = ref("");
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
 const fetchTest = async () => {
   try {
-    const response = await $fetch(`http://localhost:3000/api/test/${route.params.id}`);
+    const response = await $fetch(
+      `${apiBaseUrl}/test/${route.params.id}`
+    );
     titulo.value = response.titulo;
     descripcion.value = response.descripcion;
     duracion.value = response.duracion;
     dificultad.value = response.dificultad;
     etiqueta.value = response.etiqueta;
   } catch (error) {
-    mensaje.value = 'No se pudo cargar el test.';
-    mensajeClase.value = 'bg-red-100 text-red-700';
-    console.error('Error al cargar el test:', error);
+    mensaje.value = "No se pudo cargar el test.";
+    mensajeClase.value = "bg-red-100 text-red-700";
+    console.error("Error al cargar el test:", error);
   }
 };
 
 const submitForm = async () => {
   try {
-    await $fetch(`http://localhost:3000/api/test/${route.params.id}`, {
-      method: 'PUT',
-      body: { 
-        titulo: titulo.value, 
-        descripcion: descripcion.value, 
-        duracion: duracion.value || null, 
+    await $fetch(`${apiBaseUrl}/test/${route.params.id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
+      },
+      body: {
+        titulo: titulo.value,
+        descripcion: descripcion.value,
+        duracion: duracion.value || null,
         dificultad: dificultad.value || null,
-        etiqueta: etiqueta.value
-      }
+        etiqueta: etiqueta.value,
+      },
     });
-    mensaje.value = 'Test actualizado con éxito.';
-    mensajeClase.value = 'bg-green-100 text-green-700';
+    mensaje.value = "Test actualizado con éxito.";
+    mensajeClase.value = "bg-green-100 text-green-700";
     setTimeout(() => {
-      router.push('/test');
+      router.push("/test");
     }, 2000);
   } catch (error) {
-    mensaje.value = 'Algo salió mal al actualizar el test.';
-    mensajeClase.value = 'bg-red-100 text-red-700';
-    console.error('Error al actualizar el test:', error);
+    mensaje.value = "Algo salió mal al actualizar el test.";
+    mensajeClase.value = "bg-red-100 text-red-700";
+    console.error("Error al actualizar el test:", error);
   }
 };
 

@@ -8,6 +8,7 @@ import {
   getPreguntasByTestId,
   getPreguntasByTestName,
 } from "../controllers/preguntaController.js";
+import { verificarToken } from "../middleware/middleware.js";
 
 const router = express.Router();
 
@@ -109,7 +110,7 @@ router.get("/preguntas", async (req, res, next) => {
  *             example:
  *               error: "Error interno del servidor"
  */
-router.get("/pregunta/:id", async (req, res, next) => {
+router.get("/pregunta/:id",verificarToken, async (req, res, next) => {
   try {
     const pregunta = await getPreguntaById(req.params.id);
     if (pregunta) {
@@ -162,7 +163,7 @@ router.get("/pregunta/:id", async (req, res, next) => {
  *             example:
  *               error: "El campo 'texto' es obligatorio"
  */
-router.post("/crearPregunta", async (req, res, next) => {
+router.post("/crearPregunta",verificarToken, async (req, res, next) => {
   try {
     const nuevaPregunta = await createPregunta(req.body);
     res.status(201).json(nuevaPregunta);
@@ -218,7 +219,7 @@ router.post("/crearPregunta", async (req, res, next) => {
  *             example:
  *               error: "Pregunta no encontrada"
  */
-router.put("/pregunta/:id", async (req, res, next) => {
+router.put("/pregunta/:id",verificarToken, async (req, res, next) => {
   try {
     const updatedPregunta = await updatePregunta(req.params.id, req.body);
     res.json(updatedPregunta);
@@ -263,7 +264,7 @@ router.put("/pregunta/:id", async (req, res, next) => {
  *             example:
  *               error: "Pregunta no encontrada"
  */
-router.delete("/pregunta/:id", async (req, res, next) => {
+router.delete("/pregunta/:id",verificarToken, async (req, res, next) => {
   try {
     await deletePregunta(req.params.id);
     res.status(200).json({ message: "Pregunta eliminada satisfactoriamente" });
@@ -403,7 +404,7 @@ router.get("/preguntas/test/id/:testId", async (req, res, next) => {
  *             example:
  *               error: "Error interno del servidor"
  */
-router.get('/preguntas/test/name/:testName', async (req, res, next) => {
+router.get('/preguntas/test/name/:testName', verificarToken, async (req, res, next) => {
   try {
     const preguntas = await getPreguntasByTestName(req.params.testName);
     if (preguntas.length > 0) {
@@ -476,7 +477,7 @@ router.get('/preguntas/test/name/:testName', async (req, res, next) => {
  *                 error:
  *                   type: string
  */
-router.post('/preguntas/test/id/:testId', async (req, res) => {
+router.post('/preguntas/test/id/:testId',verificarToken, async (req, res) => {
   try {
     const nuevaPregunta = await createPregunta(req.params.testId, req.body);
     res.status(201).json(nuevaPregunta);

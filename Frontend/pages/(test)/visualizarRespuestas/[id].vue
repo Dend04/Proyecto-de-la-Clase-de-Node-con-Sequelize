@@ -19,7 +19,9 @@
           >
             <div class="flex justify-between items-start">
               <h2 class="text-xl font-semibold text-gray-800 mt-6">
-                {{ respuesta.respuesta_textual || respuesta.respuesta_numerica }}
+                {{
+                  respuesta.respuesta_textual || respuesta.respuesta_numerica
+                }}
               </h2>
               <div class="flex space-x-2">
                 <button
@@ -146,7 +148,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { PencilIcon, TrashIcon } from '@heroicons/vue/solid';
+import { PencilIcon, TrashIcon } from "@heroicons/vue/solid";
 
 const route = useRoute();
 const respuestas = ref([]);
@@ -157,7 +159,8 @@ const tipo = ref("texto");
 const respuesta_textual = ref("");
 const respuesta_numerica = ref(null);
 const respuestaId = ref(null);
-
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 const fetchRespuestas = async () => {
   try {
     const preguntaId = route.params.id;
@@ -165,7 +168,7 @@ const fetchRespuestas = async () => {
       throw new Error("El parámetro id es undefined");
     }
     const response = await $fetch(
-      `http://localhost:3000/api/respuestas/pregunta/${preguntaId}`
+      `${apiBaseUrl}/respuestas/pregunta/${preguntaId}`
     );
     if (response.length === 0) {
       error.value = "No hay respuestas disponibles para esta pregunta.";
@@ -205,14 +208,17 @@ const submitRespuesta = async () => {
   try {
     if (editando.value) {
       await $fetch(
-        `http://localhost:3000/api/respuestas/${respuestaId.value}`,
+        `${apiBaseUrl}/respuestas/${respuestaId.value}`,
         {
           method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
+          },
           body: nuevaRespuesta,
         }
       );
     } else {
-      await $fetch(`http://localhost:3000/api/crearRespuesta`, {
+      await $fetch(`${apiBaseUrl}/crearRespuesta`, {
         method: "POST",
         body: nuevaRespuesta,
       });
@@ -239,8 +245,11 @@ const editarRespuesta = (respuesta) => {
 const eliminarRespuesta = async (id) => {
   if (confirm("¿Estás seguro de que deseas eliminar esta respuesta?")) {
     try {
-      await $fetch(`http://localhost:3000/api/borrarRespuesta/${id}`, {
+      await $fetch(`${apiBaseUrl}/borrarRespuesta/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
+        },
       });
       fetchRespuestas(); // Volver a cargar las respuestas
     } catch (error) {
@@ -264,4 +273,4 @@ onMounted(() => {
 
 <style scoped>
 /* Puedes agregar estilos personalizados aquí */
-</style>  
+</style>

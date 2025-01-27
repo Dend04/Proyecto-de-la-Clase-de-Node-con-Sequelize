@@ -189,6 +189,7 @@ import {
 } from "@heroicons/vue/outline"; // Importa XIcon
 import { navigateTo } from "#app"; // Importa navigateTo de Nuxt
 
+const runtimeConfig = useRuntimeConfig();
 // Estado para el nombre del usuario
 const userName = ref("Inicio");
 
@@ -266,7 +267,8 @@ const handleLogout = () => {
 // Función para obtener el perfil del usuario
 const obtenerPerfil = async () => {
   try {
-    const backendUrl = "http://localhost:3000/api"; // URL del backend
+     
+    const backendUrl = runtimeConfig.public.BACKEND_URL; // URL del backend
     const response = await fetch(`${backendUrl}/perfil`, {
       method: "GET",
       headers: {

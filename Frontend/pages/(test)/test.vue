@@ -142,10 +142,12 @@ import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, HeartIcon, LightBulbIcon, Glo
 
 const tests = ref([]);
 const error = ref(null);
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
 const fetchTests = async () => {
   try {
-    tests.value = await $fetch("http://localhost:3000/api/tests");
+    tests.value = await $fetch(`${apiBaseUrl}/tests`);
     error.value = null;
   } catch (err) {
     error.value = "No se puede conectar con el servidor. Por favor, verifica que el servidor esté en funcionamiento.";
@@ -159,8 +161,11 @@ const retryConnection = () => {
 
 const borrarTest = async (id) => {
   try {
-    await $fetch(`http://localhost:3000/api/test/${id}`, {
-      method: 'DELETE'
+    await $fetch(`${apiBaseUrl}/test/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Enviar el token
+      },
     });
     fetchTests(); // Volver a cargar los tests después de borrar
   } catch (err) {

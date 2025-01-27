@@ -192,8 +192,10 @@
   import { ref } from "vue";
   import { useRouter } from "vue-router";
   
+  const runtimeConfig = useRuntimeConfig();
   const router = useRouter();
-  
+  const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+
   // Estado para el formulario de creación de usuario
   const createUserForm = ref({
     nombre: "",
@@ -234,8 +236,8 @@
       }
   
       // Enviar la solicitud al backend
-      const backendUrl = "http://localhost:3000/api"; // URL del backend
-      const response = await fetch(`${backendUrl}/crearUsuario`, {
+      
+      const response = await fetch(`${apiBaseUrl}/crearUsuario`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
