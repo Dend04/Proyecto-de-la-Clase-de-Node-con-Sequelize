@@ -26,24 +26,31 @@ export const getResultadosByUsuarioId = async (usuarioId) => {
 
 // Crear un nuevo resultado
 export const createResultadoFromTest = async (resultadoData) => {
-  const { usuarioId, respuestas } = resultadoData;
-  
-  const usuario = await Usuario.findByPk(usuarioId);
-  if (!usuario) throw new Error('Usuario no encontrado');
+  try {
+    const { usuarioId, respuestas } = resultadoData;
 
-  const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) throw new Error('Usuario no encontrado');
 
-  return await Resultado.create({
-    usuarioId,
-    estado,
-    deficiencias: deficiencias.join(', '),
-    planchas: respuestas.planchas,
-    abdominales: respuestas.abdominales,
-    flexibilidad: respuestas.flexibilidad,
-    velocidad: respuestas.velocidad,
-    resistencia: respuestas.resistencia,
-    tiempoDescanso: respuestas.tiempoDescanso
-  });
+    const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
+
+    const resultado = await Resultado.create({
+      usuarioId,
+      estado,
+      deficiencias: deficiencias.length > 0 ? deficiencias.join(', ') : null,
+      planchas: respuestas.planchas,
+      abdominales: respuestas.abdominales,
+      flexibilidad: respuestas.flexibilidad,
+      velocidad: respuestas.velocidad,
+      resistencia: respuestas.resistencia,
+      tiempo_descanso: respuestas.tiempoDescanso,
+    });
+
+    return resultado;
+  } catch (error) {
+    console.error('Error al crear resultado:', error);
+    throw new Error('Error al crear resultado');
+  }
 };
 
 // Función auxiliar para determinar estado físico

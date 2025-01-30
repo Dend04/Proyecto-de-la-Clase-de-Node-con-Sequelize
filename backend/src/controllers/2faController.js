@@ -127,3 +127,17 @@ export const habilitar2FA = async (req, res) => {
       });
     }
   };
+
+  export const estado2FA = async (req, res) => {
+    try {
+      const usuario = await Usuario.findByPk(req.usuario.id); // Obtén el usuario autenticado
+      if (!usuario) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      }
+  
+      res.json({ success: true, is2FAEnabled: usuario.estaVerificado2FA });
+    } catch (error) {
+      console.error('Error al verificar el estado del 2FA:', error);
+      res.status(500).json({ success: false, message: 'Error al verificar el estado del 2FA' });
+    }
+  };

@@ -339,7 +339,7 @@ router.delete('/borrarRespuesta/:id',verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.get('/respuestas/pregunta/:preguntaId',verificarToken, async (req, res) => {
+router.get('/respuestas/pregunta/:preguntaId', async (req, res) => {
   try {
     const respuestas = await getRespuestasByPreguntaId(req.params.preguntaId);
     if (respuestas.length > 0) {

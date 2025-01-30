@@ -39,7 +39,7 @@ const Resultado = sequelize.define('Resultado', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
-  resistenccia: {
+  resistencia: {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
@@ -59,5 +59,8 @@ const Resultado = sequelize.define('Resultado', {
   timestamps: true,
   tableName: 'Resultado',
 });
+
+Resultado.belongsTo(Usuario, { foreignKey: 'usuarioId' });
+Resultado.belongsTo(Test, { foreignKey: 'testId' });
 
 export default Resultado;

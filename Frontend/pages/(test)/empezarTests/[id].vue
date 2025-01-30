@@ -1,0 +1,204 @@
+<template>
+  <div class="min-h-screen bg-gray-50 p-8">
+    <!-- Cargando -->
+    <div v-if="loading" class="text-center p-8 text-xl text-gray-600">
+      Cargando test...
+    </div>
+
+    <!-- Test cargado -->
+    <div v-else class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ test.titulo }}</h1>
+      <p class="text-gray-600 mb-8">{{ test.descripcion }}</p>
+
+      <!-- Pregunta actual -->
+      <div v-if="currentQuestion">
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold text-gray-700">
+            Pregunta {{ currentQuestionIndex + 1 }} de {{ totalQuestions }}
+          </h2>
+          <p class="mt-2 text-gray-800">{{ currentQuestion.texto }}</p>
+        </div>
+
+        <!-- Respuestas -->
+        <div class="space-y-3">
+          <button
+            v-for="respuesta in currentQuestion.respuestas"
+            :key="respuesta.id"
+            @click="selectAnswer(respuesta)"
+            class="w-full p-4 text-left rounded-lg border border-gray-200 transition-all"
+            :class="{
+              'bg-blue-500 text-white border-blue-500':
+                respuestaSeleccionada?.id === respuesta.id,
+              'hover:border-blue-300 hover:bg-gray-50':
+                respuestaSeleccionada?.id !== respuesta.id,
+            }"
+          >
+          {{ respuesta.respuesta_textual }}
+          </button>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="mt-8 flex justify-end gap-4">
+          <button
+            v-if="currentQuestionIndex < totalQuestions - 1"
+            @click="nextQuestion"
+            :disabled="!respuestaSeleccionada"
+            class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+          >
+            Siguiente →
+          </button>
+
+          <button
+            v-if="currentQuestionIndex === totalQuestions - 1"
+            @click="finishTest"
+            :disabled="!respuestaSeleccionada"
+            class="px-6 py-2 bg-green-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+          >
+            Finalizar Test
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
+
+// Estado reactivo
+const testId = ref(null);
+const test = ref({});
+const loading = ref(true);
+const currentQuestionIndex = ref(0);
+const totalQuestions = ref(0);
+const currentQuestion = ref(null);
+const answers = ref([]);
+const respuestaSeleccionada = ref(null);
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+
+
+// Función para obtener el test
+const fetchTest = async () => {
+  try {
+    loading.value = true;
+
+    // Obtener el token desde el localStorage usando la clave correcta
+    const token = localStorage.getItem('accessToken'); // Cambia 'token' por 'accessToken'
+
+    if (!token) {
+      throw new Error("No se encontró un token de autenticación");
+    }
+
+    // 1. Obtener el test básico
+    const testResponse = await $fetch(`http://localhost:3000/api/test/${testId.value}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
+      },
+    });
+    test.value = testResponse;
+
+    // 2. Obtener las preguntas del test
+    const preguntasResponse = await $fetch(`${apiBaseUrl}/preguntas/test/id/${testId.value}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
+      },
+    });
+    test.value.preguntas = preguntasResponse;
+
+    // 3. Obtener las respuestas para cada pregunta
+    for (const pregunta of test.value.preguntas) {
+      const respuestasResponse = await $fetch(`${apiBaseUrl}/respuestas/pregunta/${pregunta.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
+        },
+      });
+      console.log(respuestasResponse); // Verifica la estructura de las respuestas
+      pregunta.respuestas = respuestasResponse;
+    }
+
+    // Verificar si hay preguntas
+    totalQuestions.value = test.value.preguntas?.length || 0;
+    if (totalQuestions.value === 0) {
+      throw new Error("El test no tiene preguntas");
+    }
+
+    // Mostrar la primera pregunta
+    currentQuestion.value = test.value.preguntas[currentQuestionIndex.value];
+    loading.value = false;
+  } catch (error) {
+    console.error("Error:", error);
+    test.value = { titulo: "Error", descripcion: error.message };
+    loading.value = false;
+
+    // Si el error es 401, redirigir al usuario a la página de inicio de sesión
+    if (error.response?.status === 401) {
+      router.push('/login');
+    }
+  }
+};
+
+// Watcher para cambios en el ID de la ruta
+watch(
+  () => route.params.id,
+  async (newId) => {
+    if (newId) {
+      testId.value = newId;
+      await fetchTest();
+    }
+  },
+  { immediate: true }
+);
+
+// Selección de respuesta
+const selectAnswer = (respuesta) => {
+  respuestaSeleccionada.value = respuesta;
+};
+
+// Siguiente pregunta
+const nextQuestion = () => {
+  if (respuestaSeleccionada.value) {
+    answers.value.push({
+      preguntaId: currentQuestion.value.id,
+      respuestaId: respuestaSeleccionada.value.id,
+    });
+    respuestaSeleccionada.value = null;
+
+    if (currentQuestionIndex.value < totalQuestions.value - 1) {
+      currentQuestionIndex.value++;
+      currentQuestion.value = test.value.preguntas[currentQuestionIndex.value];
+    }
+  }
+};
+
+// Finalizar test
+const finishTest = async () => {
+  answers.value.push({
+    preguntaId: currentQuestion.value.id,
+    respuestaId: respuestaSeleccionada.value.id,
+  });
+
+  try {
+    const resultado = await $fetch(
+      `${apiBaseUrl}/test/${testId.value}/resultados`,
+      {
+        method: "POST",
+        body: { respuestas: answers.value },
+      }
+    );
+
+    router.push({
+      name: "resultados-test",
+      params: { id: testId.value },
+      query: { resultado: resultado.id },
+    });
+  } catch (error) {
+    console.error("Error al enviar respuestas:", error);
+    alert("Error al enviar respuestas. Inténtalo de nuevo.");
+  }
+};
+</script>

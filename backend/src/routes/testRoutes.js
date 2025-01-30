@@ -52,7 +52,7 @@ router.get('/tests', async (req, res) => {
  *       404:
  *         description: Test no encontrado
  */
-router.get('/test/:id',verificarToken, async (req, res) => {
+router.get('/test/:id', async (req, res) => {
     try {
       const test = await getTestById(req.params.id);
       if (!test) {

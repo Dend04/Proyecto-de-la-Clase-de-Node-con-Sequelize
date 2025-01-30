@@ -201,4 +201,107 @@ router.get('/resultados/usuario/:usuarioId', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/test/{id}/resultados:
+ *   post:
+ *     summary: Guarda los resultados de un test
+ *     tags: [Test]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del test
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               respuestas:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     preguntaId:
+ *                       type: integer
+ *                     respuestaId:
+ *                       type: integer
+ *             example:
+ *               respuestas:
+ *                 - preguntaId: 1
+ *                   respuestaId: 1
+ *                 - preguntaId: 2
+ *                   respuestaId: 3
+ *     responses:
+ *       200:
+ *         description: Resultados guardados exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 testId:
+ *                   type: integer
+ *                 respuestas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       preguntaId:
+ *                         type: integer
+ *                       respuestaId:
+ *                         type: integer
+ *             example:
+ *               id: 1
+ *               testId: 1
+ *               respuestas:
+ *                 - preguntaId: 1
+ *                   respuestaId: 1
+ *                 - preguntaId: 2
+ *                   respuestaId: 3
+ *       404:
+ *         description: Test no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Test no encontrado"
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Error interno del servidor"
+ */
+router.post('/test/:id/resultados', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { respuestas } = req.body;
+
+    const resultado = await saveTestResults(id, respuestas); // Llama a la función del controlador
+    res.status(200).json(resultado);
+  } catch (error) {
+    if (error.message.includes("no encontrado")) {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
 export default router;

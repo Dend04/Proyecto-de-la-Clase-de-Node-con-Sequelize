@@ -36,8 +36,7 @@ Resultado.belongsTo(Usuario, { foreignKey: "usuarioId" });
 Resultado.hasOne(Rutina, { foreignKey: "resultadoId" });
 Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
 
-Usuario.hasOne(Rutina, { foreignKey: "usuarioId" });
-Rutina.belongsTo(Usuario, { foreignKey: "usuarioId" });
+
 
 const app = express();
 

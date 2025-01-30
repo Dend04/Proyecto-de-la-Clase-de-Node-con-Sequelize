@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Contenido principal centrado -->
-    <div class="flex-grow flex flex-col items-center justify-start mt-4 relative">
+    <div
+      class="flex-grow flex flex-col items-center justify-start mt-4 relative"
+    >
       <div class="relative w-full max-w-4xl mx-auto px-6 py-12">
         <!-- Contenido principal -->
         <div class="relative z-20 text-center">
@@ -11,7 +13,9 @@
 
           <!-- Estado de error -->
           <div v-if="error" class="max-w-2xl mx-auto mb-8">
-            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-8 border-l-4 border-red-500">
+            <div
+              class="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-8 border-l-4 border-red-500"
+            >
               <div class="flex flex-col items-center text-center">
                 <div class="mb-4">
                   <svg
@@ -56,8 +60,13 @@
           </div>
 
           <!-- Botón de agregar test cuando no hay tests -->
-          <div v-if="!error && tests.length === 0" class="flex justify-center items-center h-full">
-            <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+          <div
+            v-if="!error && tests.length === 0"
+            class="flex justify-center items-center h-full"
+          >
+            <div
+              class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+            >
               <div class="flex flex-col h-full space-y-4 items-center">
                 <h2 class="text-xl font-semibold text-gray-800">
                   No hay tests disponibles
@@ -75,20 +84,31 @@
 
           <!-- Grid de tests -->
           <div v-if="!error && tests.length > 0" class="relative">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+            >
               <div
                 v-for="test in tests"
                 :key="test.id"
                 class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative"
               >
                 <div class="absolute top-2 right-2 flex space-x-2">
-                  <NuxtLink :to="`/editarTest/${test.id}`" class="text-blue-500 hover:text-blue-700">
+                  <NuxtLink
+                    :to="`/editarTest/${test.id}`"
+                    class="text-blue-500 hover:text-blue-700"
+                  >
                     <PencilIcon class="h-5 w-5" />
                   </NuxtLink>
-                  <button @click="borrarTest(test.id)" class="text-red-500 hover:text-red-700">
+                  <button
+                    @click="borrarTest(test.id)"
+                    class="text-red-500 hover:text-red-700"
+                  >
                     <TrashIcon class="h-5 w-5" />
                   </button>
-                  <NuxtLink :to="`/visualizarPreguntas/${test.id}`" class="text-green-500 hover:text-green-700">
+                  <NuxtLink
+                    :to="`/visualizarPreguntas/${test.id}`"
+                    class="text-green-500 hover:text-green-700"
+                  >
                     <EyeIcon class="h-5 w-5" />
                   </NuxtLink>
                 </div>
@@ -106,19 +126,28 @@
                     Dificultad: {{ test.dificultad }}
                   </p>
                   <div class="flex items-center mt-2">
-                    <span v-if="test.etiqueta === 'Salud'" class="text-green-500">
+                    <span
+                      v-if="test.etiqueta === 'Salud'"
+                      class="text-green-500"
+                    >
                       <HeartIcon class="h-5 w-5 inline-block mr-1" />
                     </span>
-                    <span v-if="test.etiqueta === 'Conocimiento'" class="text-yellow-500">
+                    <span
+                      v-if="test.etiqueta === 'Conocimiento'"
+                      class="text-yellow-500"
+                    >
                       <LightBulbIcon class="h-5 w-5 inline-block mr-1" />
                     </span>
-                    <span v-if="test.etiqueta === 'Idioma'" class="text-blue-500">
+                    <span
+                      v-if="test.etiqueta === 'Idioma'"
+                      class="text-blue-500"
+                    >
                       <GlobeAltIcon class="h-5 w-5 inline-block mr-1" />
                     </span>
                     <p class="text-gray-500">{{ test.etiqueta }}</p>
                   </div>
                   <NuxtLink
-                    :to="`/tests/${test.id}`"
+                    :to="`/empezarTests/${test.id}`"
                     class="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 hover:bg-blue-700"
                   >
                     Comenzar Test
@@ -130,15 +159,26 @@
         </div>
       </div>
     </div>
-    <NuxtLink to="/crearTest" class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg focus:outline-none focus:shadow-outline">
+    <NuxtLink
+      to="/crearTest"
+      class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg focus:outline-none focus:shadow-outline"
+    >
       <PlusIcon class="h-6 w-6" />
     </NuxtLink>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, HeartIcon, LightBulbIcon, GlobeAltIcon } from '@heroicons/vue/outline';
+import { ref, onMounted } from "vue";
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  HeartIcon,
+  LightBulbIcon,
+  GlobeAltIcon,
+} from "@heroicons/vue/outline";
 
 const tests = ref([]);
 const error = ref(null);
@@ -150,7 +190,8 @@ const fetchTests = async () => {
     tests.value = await $fetch(`${apiBaseUrl}/tests`);
     error.value = null;
   } catch (err) {
-    error.value = "No se puede conectar con el servidor. Por favor, verifica que el servidor esté en funcionamiento.";
+    error.value =
+      "No se puede conectar con el servidor. Por favor, verifica que el servidor esté en funcionamiento.";
     console.error("Error:", err);
   }
 };
@@ -162,9 +203,9 @@ const retryConnection = () => {
 const borrarTest = async (id) => {
   try {
     await $fetch(`${apiBaseUrl}/test/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Enviar el token
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
       },
     });
     fetchTests(); // Volver a cargar los tests después de borrar
