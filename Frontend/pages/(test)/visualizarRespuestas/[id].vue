@@ -18,10 +18,28 @@
             class="bg-white p-4 rounded-lg shadow-lg relative"
           >
             <div class="flex justify-between items-start">
+              <!-- Mostrar la respuesta según el tipo -->
               <h2 class="text-xl font-semibold text-gray-800 mt-6">
-                {{
-                  respuesta.respuesta_textual || respuesta.respuesta_numerica
-                }}
+                <span v-if="respuesta.tipo === 'texto'">
+                  {{ respuesta.respuesta }}
+                </span>
+                <span v-else-if="respuesta.tipo === 'numero'">
+                  {{ respuesta.respuesta }}
+                </span>
+                <span
+                  v-else-if="
+                    respuesta.tipo === 'multiple' || respuesta.tipo === 'unica'
+                  "
+                >
+                  <ul>
+                    <li
+                      v-for="(item, index) in respuesta.respuesta"
+                      :key="index"
+                    >
+                      {{ item }}
+                    </li>
+                  </ul>
+                </span>
               </h2>
               <div class="flex space-x-2">
                 <button
@@ -161,31 +179,46 @@ const respuesta_numerica = ref(null);
 const respuestaId = ref(null);
 const runtimeConfig = useRuntimeConfig();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+
 const fetchRespuestas = async () => {
   try {
     const preguntaId = route.params.id;
     if (!preguntaId) {
-      throw new Error("El parámetro id es undefined");
+      throw new Error('El parámetro id es undefined');
     }
-    const response = await $fetch(
-      `${apiBaseUrl}/respuestas/pregunta/${preguntaId}`
-    );
+
+    // Hacer la solicitud al backend
+    const response = await $fetch(`${apiBaseUrl}/respuestas/pregunta/${preguntaId}`);
+
+    // Verificar si no hay respuestas
     if (response.length === 0) {
-      error.value = "No hay respuestas disponibles para esta pregunta.";
+      error.value = 'No hay respuestas disponibles para esta pregunta.';
     } else {
-      respuestas.value = response;
+      // Mapear las respuestas según la estructura esperada
+      respuestas.value = response.map(respuesta => {
+        let respuestaValue = respuesta.respuesta;
+
+        // Si la respuesta es un string que parece un JSON, intentar parsearlo
+        if (typeof respuestaValue === 'string') {
+          try {
+            respuestaValue = JSON.parse(respuestaValue);
+          } catch (error) {
+            console.warn('La respuesta no es un JSON válido, se usará como texto:', respuestaValue);
+          }
+        }
+
+        return {
+          id: respuesta.id,
+          tipo: respuesta.tipo,
+          respuesta: respuestaValue, // Puede ser string, número, array, objeto, etc.
+        };
+      });
     }
   } catch (err) {
-    if (err.response && err.response.status === 404) {
-      error.value = "No se encontraron respuestas para esta pregunta.";
-    } else {
-      error.value =
-        "No se pudieron cargar las respuestas. Por favor, intenta nuevamente.";
-    }
-    console.error("Error al cargar las respuestas:", err);
+    error.value = 'No se pudieron cargar las respuestas. Por favor, intenta nuevamente.';
+    console.error('Error al cargar las respuestas:', err);
   }
 };
-
 const submitRespuesta = async () => {
   if (!respuesta_textual.value && !respuesta_numerica.value) {
     alert("Por favor, escribe una respuesta.");
@@ -194,39 +227,37 @@ const submitRespuesta = async () => {
 
   const nuevaRespuesta = {
     tipo: tipo.value,
-    respuesta_textual:
+    respuesta:
       tipo.value === "texto" ||
       tipo.value === "multiple" ||
       tipo.value === "unica"
         ? respuesta_textual.value
-        : null,
-    respuesta_numerica:
-      tipo.value === "numero" ? respuesta_numerica.value : null,
+        : respuesta_numerica.value,
     preguntaId: route.params.id,
   };
 
   try {
     if (editando.value) {
-      await $fetch(
-        `${apiBaseUrl}/respuestas/${respuestaId.value}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
-          },
-          body: nuevaRespuesta,
-        }
-      );
+      await $fetch(`${apiBaseUrl}/respuestas/${respuestaId.value}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: nuevaRespuesta,
+      });
     } else {
       await $fetch(`${apiBaseUrl}/crearRespuesta`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
         body: nuevaRespuesta,
       });
     }
-    respuesta_textual.value = ""; // Limpiar el campo de la respuesta textual
-    respuesta_numerica.value = null; // Limpiar el campo de la respuesta numérica
-    mostrarModal.value = false; // Cerrar el modal
-    fetchRespuestas(); // Volver a cargar las respuestas
+    respuesta_textual.value = "";
+    respuesta_numerica.value = null;
+    mostrarModal.value = false;
+    fetchRespuestas();
   } catch (error) {
     alert("Algo salió mal al agregar la respuesta.");
     console.error("Error al agregar la respuesta:", error);
@@ -235,8 +266,15 @@ const submitRespuesta = async () => {
 
 const editarRespuesta = (respuesta) => {
   tipo.value = respuesta.tipo;
-  respuesta_textual.value = respuesta.respuesta_textual;
-  respuesta_numerica.value = respuesta.respuesta_numerica;
+  if (
+    respuesta.tipo === "texto" ||
+    respuesta.tipo === "multiple" ||
+    respuesta.tipo === "unica"
+  ) {
+    respuesta_textual.value = respuesta.respuesta;
+  } else if (respuesta.tipo === "numero") {
+    respuesta_numerica.value = respuesta.respuesta;
+  }
   respuestaId.value = respuesta.id;
   editando.value = true;
   mostrarModal.value = true;
@@ -248,10 +286,10 @@ const eliminarRespuesta = async (id) => {
       await $fetch(`${apiBaseUrl}/borrarRespuesta/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-      fetchRespuestas(); // Volver a cargar las respuestas
+      fetchRespuestas();
     } catch (error) {
       alert("Algo salió mal al eliminar la respuesta.");
       console.error("Error al eliminar la respuesta:", error);

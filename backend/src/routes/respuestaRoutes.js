@@ -132,15 +132,15 @@ router.get('/respuesta/:id',verificarToken, async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               tipo:
- *                 type: string
- *                 example: "texto"
- *               respuesta_textual:
- *                 type: string
- *                 example: "París"
- *               respuesta_numerica:
- *                 type: integer
- *                 example: 42
+ *               respuesta:
+ *                 type: object
+ *                 properties:
+ *                   tipo:
+ *                     type: string
+ *                     example: "texto"
+ *                   valor:
+ *                     type: string
+ *                     example: "París"
  *               preguntaId:
  *                 type: integer
  *                 example: 1
@@ -154,12 +154,13 @@ router.get('/respuesta/:id',verificarToken, async (req, res) => {
  *               properties:
  *                 id:
  *                   type: integer
- *                 tipo:
- *                   type: string
- *                 respuesta_textual:
- *                   type: string
- *                 respuesta_numerica:
- *                   type: integer
+ *                 respuesta:
+ *                   type: object
+ *                   properties:
+ *                     tipo:
+ *                       type: string
+ *                     valor:
+ *                       type: string
  *                 preguntaId:
  *                   type: integer
  *       500:
@@ -241,7 +242,7 @@ router.post('/crearRespuesta', verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.put('/respuesta/:id',verificarToken, async (req, res) => {
+router.put('/respuesta/:id', verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     const respuesta = await updateRespuesta(id, req.body);
@@ -277,7 +278,7 @@ router.put('/respuesta/:id',verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.delete('/borrarRespuesta/:id',verificarToken, async (req, res) => {
+router.delete('/borrarRespuesta/:id', verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     await deleteRespuesta(id);
@@ -340,6 +341,7 @@ router.delete('/borrarRespuesta/:id',verificarToken, async (req, res) => {
  *                   type: string
  */
 router.get('/respuestas/pregunta/:preguntaId', async (req, res) => {
+  console.log('Accediendo a la ruta /respuestas/pregunta/:preguntaId');
   try {
     const respuestas = await getRespuestasByPreguntaId(req.params.preguntaId);
     if (respuestas.length > 0) {

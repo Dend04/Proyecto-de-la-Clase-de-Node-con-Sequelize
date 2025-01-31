@@ -26,6 +26,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       BACKEND_URL: process.env.BACKEND_URL || "http://localhost:3000", // Variable de entorno para el backend
+      NUXT_SUPABASE_URL: process.env.NUXT_SUPABASE_URL,
+      NUXT_SUPABASE_KEY: process.env.NUXT_SUPABASE_KEY,
     },
   }
   

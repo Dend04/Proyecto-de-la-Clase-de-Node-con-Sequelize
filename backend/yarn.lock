@@ -3556,7 +3556,7 @@ pg-connection-string@^2.6.1, pg-connection-string@^2.7.0:
 
 pg-hstore@^2.3.4:
   version "2.3.4"
-  resolved "https://registry.npmjs.org/pg-hstore/-/pg-hstore-2.3.4.tgz"
+  resolved "https://registry.yarnpkg.com/pg-hstore/-/pg-hstore-2.3.4.tgz#4425e3e2a3e15d2a334c35581186c27cf2e9b8dd"
   integrity sha512-N3SGs/Rf+xA1M2/n0JBiXFDVMzdekwLZLAO0g7mpDY9ouX+fDI7jS6kTq3JujmYbtNSJ53TJ0q4G98KVZSM4EA==
   dependencies:
     underscore "^1.13.1"
@@ -3589,7 +3589,7 @@ pg-types@^2.1.0:
 
 pg@^8.13.1:
   version "8.13.1"
-  resolved "https://registry.npmjs.org/pg/-/pg-8.13.1.tgz"
+  resolved "https://registry.yarnpkg.com/pg/-/pg-8.13.1.tgz#6498d8b0a87ff76c2df7a32160309d3168c0c080"
   integrity sha512-OUir1A0rPNZlX//c7ksiu7crsGZTKSOXJPgtNiHGIlC9H0lO+NC6ZDYksSgBYY/thSWhnSRBv8w1lieNNGATNQ==
   dependencies:
     pg-connection-string "^2.7.0"
@@ -3990,7 +3990,7 @@ send@0.19.0:
 
 sequelize-cli@^6.6.2:
   version "6.6.2"
-  resolved "https://registry.npmjs.org/sequelize-cli/-/sequelize-cli-6.6.2.tgz"
+  resolved "https://registry.yarnpkg.com/sequelize-cli/-/sequelize-cli-6.6.2.tgz#8d838b25c988cf136914cdc3843e19d88c3dcb67"
   integrity sha512-V8Oh+XMz2+uquLZltZES6MVAD+yEnmMfwfn+gpXcDiwE3jyQygLt4xoI0zG8gKt6cRcs84hsKnXAKDQjG/JAgg==
   dependencies:
     cli-color "^2.0.3"

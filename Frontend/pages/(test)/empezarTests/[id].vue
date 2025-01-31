@@ -33,7 +33,7 @@
                 respuestaSeleccionada?.id !== respuesta.id,
             }"
           >
-          {{ respuesta.respuesta_textual }}
+            {{ respuesta.respuesta }} <!-- Cambia 'texto' por 'respuesta' -->
           </button>
         </div>
 
@@ -81,44 +81,69 @@ const respuestaSeleccionada = ref(null);
 const runtimeConfig = useRuntimeConfig();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
-
 // Función para obtener el test
 const fetchTest = async () => {
   try {
     loading.value = true;
 
-    // Obtener el token desde el localStorage usando la clave correcta
-    const token = localStorage.getItem('accessToken'); // Cambia 'token' por 'accessToken'
-
+    // Obtener el token desde el localStorage
+    const token = localStorage.getItem("accessToken");
     if (!token) {
       throw new Error("No se encontró un token de autenticación");
     }
 
     // 1. Obtener el test básico
-    const testResponse = await $fetch(`http://localhost:3000/api/test/${testId.value}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
-      },
-    });
+    const testResponse = await $fetch(
+      `http://localhost:3000/api/test/${testId.value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     test.value = testResponse;
 
     // 2. Obtener las preguntas del test
-    const preguntasResponse = await $fetch(`${apiBaseUrl}/preguntas/test/id/${testId.value}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
-      },
-    });
+    const preguntasResponse = await $fetch(
+      `${apiBaseUrl}/preguntas/test/id/${testId.value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     test.value.preguntas = preguntasResponse;
 
     // 3. Obtener las respuestas para cada pregunta
     for (const pregunta of test.value.preguntas) {
-      const respuestasResponse = await $fetch(`${apiBaseUrl}/respuestas/pregunta/${pregunta.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Incluir el token en las cabeceras
-        },
+      const respuestasResponse = await $fetch(
+        `${apiBaseUrl}/respuestas/pregunta/${pregunta.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Parsear respuestas si es necesario
+      pregunta.respuestas = respuestasResponse.map((respuesta) => {
+        let respuestaValue = respuesta.respuesta;
+
+        // Si la respuesta es un string que parece un JSON, intentar parsearlo
+        if (typeof respuestaValue === "string") {
+          try {
+            respuestaValue = JSON.parse(respuestaValue);
+          } catch (error) {
+            console.warn("La respuesta no es un JSON válido, se usará como texto:", respuestaValue);
+          }
+        }
+
+        return {
+          id: respuesta.id,
+          tipo: respuesta.tipo,
+          respuesta: respuestaValue, // Puede ser string, número, array, objeto, etc.
+        };
       });
-      console.log(respuestasResponse); // Verifica la estructura de las respuestas
-      pregunta.respuestas = respuestasResponse;
     }
 
     // Verificar si hay preguntas
@@ -137,7 +162,7 @@ const fetchTest = async () => {
 
     // Si el error es 401, redirigir al usuario a la página de inicio de sesión
     if (error.response?.status === 401) {
-      router.push('/login');
+      router.push("/login");
     }
   }
 };

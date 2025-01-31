@@ -23,33 +23,13 @@ const Resultado = sequelize.define('Resultado', {
       key: 'id',
     },
   },
-  planchas: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  abdominales: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  flexibilidad: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  velocidad: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  resistencia: {
-    type: DataTypes.FLOAT,
+  resultado: {
+    type: DataTypes.JSON,
     allowNull: false,
   },
   estado: {
     type: DataTypes.STRING,
-    allowNull: false,
-  },
-  tiempo_descanso: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   deficiencias: {
     type: DataTypes.STRING,

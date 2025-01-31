@@ -12,18 +12,9 @@ const Respuesta = sequelize.define('Respuesta', {
     type: DataTypes.ENUM('multiple', 'unica', 'texto', 'numero'),
     allowNull: false,
   },
-  respuesta_boolean: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-    defaultValue: false,
-  },
-  respuesta_textual: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  respuesta_numerica: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
+  respuesta: {
+    type: DataTypes.JSON,
+    allowNull: false,
   },
   preguntaId: {
     type: DataTypes.INTEGER,
@@ -36,6 +27,5 @@ const Respuesta = sequelize.define('Respuesta', {
   timestamps: true,
   tableName: 'Respuesta',
 });
-
 
 export default Respuesta;

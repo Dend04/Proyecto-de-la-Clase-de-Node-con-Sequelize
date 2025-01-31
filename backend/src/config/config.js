@@ -1,10 +1,10 @@
-export default {
+module.exports = {
   development: {
     username: "postgres",
-    password: " ",
+    password: " ", // Asegúrate de que la contraseña sea correcta
     database: "Pruebas de tests",
     host: "127.0.0.1",
-    dialect: "postgres",
+    dialect: "postgres", // Asegúrate de que esto sea una cadena de texto
   },
   test: {
     username: "postgres",

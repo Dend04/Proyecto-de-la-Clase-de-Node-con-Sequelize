@@ -30,14 +30,13 @@
           1
         </div>
       </div>
-      <!-- Botón de cerrar sesión (solo se muestra si hay un nombre de usuario) -->
+      <!-- Botón de cerrar sesión -->
       <button
         v-if="userName !== 'Inicio'"
         @click="handleLogout"
         class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
       >
         <LogoutIcon class="h-4 w-4" />
-        <!-- Ícono de cierre de sesión -->
         <span>Cerrar sesión</span>
       </button>
       <!-- Nombre del usuario o botón de inicio -->
@@ -78,34 +77,29 @@
       />
     </div>
 
-    <!-- Fondo oscuro semitransparente -->
+    <!-- Modal del perfil -->
     <div
       v-if="showProfileModal"
       class="fixed inset-0 bg-black bg-opacity-50 z-40"
       @click.self="showProfileModal = false"
     >
-      <!-- Modal del perfil -->
       <div
         class="fixed top-16 right-4 bg-white p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto z-50"
       >
-        <!-- Botón de cierre (cruz) -->
         <button
           @click="showProfileModal = false"
           class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
         >
           <XIcon class="h-5 w-5" />
         </button>
-        <!-- Contenido del perfil -->
         <h2 class="text-xl font-semibold mb-4">Perfil de Usuario</h2>
         <div class="space-y-4">
-          <!-- Nombre -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Nombre</label
             >
             <p class="mt-1 text-sm text-gray-900">{{ userProfile.nombre }}</p>
           </div>
-          <!-- Segundo nombre (solo si existe) -->
           <div v-if="userProfile.segundoNombre">
             <label class="block text-sm font-medium text-gray-700"
               >Segundo Nombre</label
@@ -114,7 +108,6 @@
               {{ userProfile.segundoNombre }}
             </p>
           </div>
-          <!-- Apellidos -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Apellidos</label
@@ -123,7 +116,6 @@
               {{ userProfile.apellidos }}
             </p>
           </div>
-          <!-- Nombre de usuario -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Nombre de Usuario</label
@@ -132,19 +124,16 @@
               {{ userProfile.nombreUsuario }}
             </p>
           </div>
-          <!-- Correo electrónico -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Correo Electrónico</label
             >
             <p class="mt-1 text-sm text-gray-900">{{ userProfile.email }}</p>
           </div>
-          <!-- Peso -->
           <div>
             <label class="block text-sm font-medium text-gray-700">Peso</label>
             <p class="mt-1 text-sm text-gray-900">{{ userProfile.peso }} kg</p>
           </div>
-          <!-- Altura -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Altura</label
@@ -153,7 +142,6 @@
               {{ userProfile.altura }} cm
             </p>
           </div>
-          <!-- Enfermedad crónica -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Enfermedad Crónica</label
@@ -162,7 +150,6 @@
               {{ userProfile.enfermedadCronica || "No especificado" }}
             </p>
           </div>
-          <!-- Estado físico actual -->
           <div>
             <label class="block text-sm font-medium text-gray-700"
               >Estado Físico Actual</label
@@ -178,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
 import {
   SearchIcon,
   BellIcon,
@@ -186,17 +173,15 @@ import {
   UserIcon,
   LogoutIcon,
   XIcon,
-} from "@heroicons/vue/outline"; // Importa XIcon
-import { navigateTo } from "#app"; // Importa navigateTo de Nuxt
+} from "@heroicons/vue/outline";
+import { navigateTo } from "#app";
+import { jwtDecode } from 'jwt-decode';
 
 const runtimeConfig = useRuntimeConfig();
-// Estado para el nombre del usuario
+const backendUrl = runtimeConfig.public.BACKEND_URL;
+
 const userName = ref("Inicio");
-
-// Estado para el rol del usuario
-const userRole = ref("Admin"); // Valor por defecto
-
-// Estado para el perfil del usuario
+const userRole = ref("Admin");
 const userProfile = ref({
   nombre: "",
   segundoNombre: "",
@@ -208,77 +193,56 @@ const userProfile = ref({
   enfermedadCronica: "",
   estadoFisicoActual: "",
 });
-
-// Estado para el token de acceso
 const accessToken = ref(null);
-
-// Estado para controlar la visibilidad del modal del perfil
+const refreshToken = ref(null);
 const showProfileModal = ref(false);
 
-// Estado para controlar la visibilidad del header
-const isHeaderVisible = ref(true);
-
-// Referencia al header
-const header = ref(null);
-
-// Variables para detectar el scroll
-let lastScrollTop = 0;
-
-// Función para manejar el scroll
-const handleScroll = () => {
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-  if (scrollTop > lastScrollTop) {
-    // Scroll hacia abajo: ocultar el header
-    isHeaderVisible.value = false;
-  } else {
-    // Scroll hacia arriba: mostrar el header
-    isHeaderVisible.value = true;
-  }
-
-  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Evitar valores negativos
+const isTokenExpired = (token) => {
+  if (!token) return true;
+  const decoded = jwtDecode(token);
+  const currentTime = Date.now() / 1000;
+  return decoded.exp < currentTime;
 };
 
-// Añadir el evento de scroll al montar el componente
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-});
+const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) throw new Error("No refresh token available");
 
-// Eliminar el evento de scroll al desmontar el componente
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
-
-// Función para redirigir a login
-const redirectToLogin = () => {
-  navigateTo("/login");
-};
-
-// Función para manejar el cierre de sesión
-const handleLogout = () => {
-  // Eliminar los tokens del localStorage
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-
-  // Recargar la página para actualizar el estado
-  window.location.reload();
-};
-
-// Función para obtener el perfil del usuario
-const obtenerPerfil = async () => {
   try {
-     
-    const backendUrl = runtimeConfig.public.BACKEND_URL; // URL del backend
-    const response = await fetch(`${backendUrl}/perfil`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken.value}`, // Enviar el token en el header
-      },
+    const response = await fetch(`${backendUrl}/refrescarToken`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error al obtener el perfil del usuario");
-    }
+    if (!response.ok) throw new Error("Failed to refresh token");
+
+    const { token } = await response.json();
+    localStorage.setItem("accessToken", token);
+    return token;
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    throw error;
+  }
+};
+
+const getValidToken = async () => {
+  let token = localStorage.getItem("accessToken");
+  if (isTokenExpired(token)) {
+    token = await refreshAccessToken();
+  }
+  return token;
+};
+
+const obtenerPerfil = async () => {
+  try {
+    const token = await getValidToken();
+    const response = await fetch(`${backendUrl}/perfil`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch profile");
 
     const usuario = await response.json();
     userProfile.value = {
@@ -292,19 +256,30 @@ const obtenerPerfil = async () => {
       enfermedadCronica: usuario.enfermedadCronica,
       estadoFisicoActual: usuario.estadoFisicoActual,
     };
-    userName.value = usuario.nombreUsuario; // Actualizar el nombre del usuario
-    userRole.value = usuario.rol; // Actualizar el rol del usuario
+    userName.value = usuario.nombreUsuario;
+    userRole.value = usuario.rol;
   } catch (error) {
     console.error("Error:", error.message);
+    navigateTo("/login");
   }
 };
 
-// Al cargar el componente, verificar si hay un token y obtener el perfil
-onMounted(() => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    accessToken.value = token;
-    obtenerPerfil(); // Obtener el perfil del usuario
+const handleLogout = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  navigateTo("/login");
+};
+
+onMounted(async () => {
+  try {
+    const token = await getValidToken();
+    if (token) {
+      accessToken.value = token;
+      await obtenerPerfil();
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    navigateTo("/login");
   }
 });
 </script>

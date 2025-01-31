@@ -27,23 +27,35 @@ export const getResultadosByUsuarioId = async (usuarioId) => {
 // Crear un nuevo resultado
 export const createResultadoFromTest = async (resultadoData) => {
   try {
-    const { usuarioId, respuestas } = resultadoData;
+    const { usuarioId, testId, respuestas } = resultadoData;
 
     const usuario = await Usuario.findByPk(usuarioId);
     if (!usuario) throw new Error('Usuario no encontrado');
 
-    const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestas);
+    const test = await Test.findByPk(testId);
+    if (!test) throw new Error('Test no encontrado');
+
+    let estado, deficiencias;
+
+    if (test.tipo === 'salud') {
+      const resultadoSalud = determinarEstadoFisicoYDeficiencias(respuestas);
+      estado = resultadoSalud.estado;
+      deficiencias = resultadoSalud.deficiencias;
+    } else if (test.tipo === 'conocimiento') {
+      const resultadoConocimiento = determinarResultadoConocimiento(respuestas);
+      estado = resultadoConocimiento.estado;
+      deficiencias = resultadoConocimiento.deficiencias;
+    } else {
+      estado = 'Resultado generado';
+      deficiencias = null;
+    }
 
     const resultado = await Resultado.create({
       usuarioId,
+      testId,
+      resultado: respuestas,
       estado,
-      deficiencias: deficiencias.length > 0 ? deficiencias.join(', ') : null,
-      planchas: respuestas.planchas,
-      abdominales: respuestas.abdominales,
-      flexibilidad: respuestas.flexibilidad,
-      velocidad: respuestas.velocidad,
-      resistencia: respuestas.resistencia,
-      tiempo_descanso: respuestas.tiempoDescanso,
+      deficiencias: deficiencias ? deficiencias.join(', ') : null,
     });
 
     return resultado;
@@ -89,6 +101,25 @@ const determinarEstadoFisicoYDeficiencias = (respuestas) => {
   else if (puntaje >= 4) estado = 'Saludable';
   else if (puntaje >= 2) estado = 'Estado normal';
   else estado = 'Poco saludable';
+
+  return { estado, deficiencias };
+};
+
+// Función auxiliar para determinar resultado de conocimiento
+const determinarResultadoConocimiento = (respuestas) => {
+  let puntaje = 0;
+  let deficiencias = [];
+  const { respuestasCorrectas, respuestasIncorrectas } = respuestas;
+
+  puntaje = respuestasCorrectas.length;
+  deficiencias = respuestasIncorrectas.map(respuesta => `Pregunta ${respuesta.preguntaId}`);
+
+  let estado;
+  if (puntaje >= 90) estado = 'Excelente conocimiento';
+  else if (puntaje >= 70) estado = 'Buen conocimiento';
+  else if (puntaje >= 50) estado = 'Conocimiento regular';
+  else if (puntaje >= 30) estado = 'Conocimiento básico';
+  else estado = 'Conocimiento insuficiente';
 
   return { estado, deficiencias };
 };
