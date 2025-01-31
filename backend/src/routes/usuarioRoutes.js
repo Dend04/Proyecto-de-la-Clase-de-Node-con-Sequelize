@@ -3,6 +3,11 @@ import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, 
 import { verificarToken } from '../middleware/middleware.js';
 import { iniciarSesion } from "../controllers/usuarioController.js"; // Asegúrate de que la ruta sea correcta
 import { generateUniqueUsername } from '../models/usuario_model.js';
+import multer from "multer";
+import { uploadFotoPerfil } from '../middleware/multer.js';
+
+// Configuración de multer para manejar la subida de archivos
+const upload = multer({ dest: "uploads/" });
 
 
 
@@ -63,7 +68,7 @@ const router = express.Router();
  *             example:
  *               error: "El email ya está registrado"
  */
-router.post('/crearUsuario',  async (req, res) => {
+router.post('/crearUsuario', uploadFotoPerfil,  async (req, res) => {
   try {
     const usuario = await crearUsuario(req.body);
     res.status(201).json(usuario);

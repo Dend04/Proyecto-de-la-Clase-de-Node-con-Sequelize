@@ -66,9 +66,10 @@
       >
         <UserIcon class="h-7 w-7 text-gray-500 hover:text-gray-700" />
       </NuxtLink>
+      <!-- Mostrar foto de perfil si está disponible, de lo contrario mostrar la imagen por defecto -->
       <NuxtImg
         v-else
-        src="/avatar.png"
+        :src="userProfile.fotoPerfil || '/avatar.png'"
         alt="Avatar"
         width="36"
         height="36"
@@ -179,7 +180,12 @@ import { jwtDecode } from 'jwt-decode';
 
 const runtimeConfig = useRuntimeConfig();
 const backendUrl = runtimeConfig.public.BACKEND_URL;
-
+const props = defineProps({
+  redirectToLogin: {
+    type: Boolean,
+    default: false,
+  },
+});
 const userName = ref("Inicio");
 const userRole = ref("Admin");
 const userProfile = ref({
@@ -192,6 +198,7 @@ const userProfile = ref({
   altura: "",
   enfermedadCronica: "",
   estadoFisicoActual: "",
+  fotoPerfil: "", // Añadimos el campo fotoPerfil
 });
 const accessToken = ref(null);
 const refreshToken = ref(null);
@@ -255,6 +262,7 @@ const obtenerPerfil = async () => {
       altura: usuario.altura,
       enfermedadCronica: usuario.enfermedadCronica,
       estadoFisicoActual: usuario.estadoFisicoActual,
+      fotoPerfil: usuario.fotoPerfil || "",
     };
     userName.value = usuario.nombreUsuario;
     userRole.value = usuario.rol;

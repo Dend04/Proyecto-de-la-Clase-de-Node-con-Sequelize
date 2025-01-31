@@ -66,6 +66,10 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  fotoPerfil: {
+    type: DataTypes.STRING, // Almacenaremos la URL de la imagen
+    allowNull: true, // Hacemos que el campo sea opcional
+  },
 }, {
   timestamps: true, // Esto añade automáticamente los campos createdAt y updatedAt
   tableName: 'Usuario', // Nombre de la tabla en la base de datos

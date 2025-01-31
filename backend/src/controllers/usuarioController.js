@@ -2,6 +2,8 @@ import Usuario from "../models/usuario_model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
+import multer from 'multer';
+import path from 'path';
 
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
@@ -210,3 +212,18 @@ export const obtenerEstadoUsuario = async (req, res) => {
       .json({ message: "Error al obtener estado del usuario", error });
   }
 };
+
+// Configuración de multer para almacenar las imágenes
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nombre del archivo
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// Middleware para subir la imagen
+export const uploadFotoPerfil = upload.single('fotoPerfil');
