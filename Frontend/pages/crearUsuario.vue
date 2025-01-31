@@ -315,7 +315,7 @@ const createUserForm = ref({
 });
 
 // Estado para la vista previa de la imagen
-const imagePreview = ref(null);x
+const imagePreview = ref(null);
 
 // Estado para el mensaje de éxito
 const successMessage = ref("");
