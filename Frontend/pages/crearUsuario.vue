@@ -3,11 +3,15 @@
     <div class="bg-white p-8 rounded-lg shadow-lg w-96">
       <!-- Paso 1: Datos básicos -->
       <div v-if="step === 1">
-        <h2 class="text-2xl font-semibold mb-6 text-center">Crear Usuario - Paso 1</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-center">
+          Crear Usuario - Paso 1
+        </h2>
         <form @submit.prevent="nextStep">
           <!-- Nombre -->
           <div class="mb-4">
-            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+            <label for="nombre" class="block text-sm font-medium text-gray-700"
+              >Nombre</label
+            >
             <input
               v-model="createUserForm.nombre"
               type="text"
@@ -19,7 +23,11 @@
           </div>
           <!-- Segundo Nombre -->
           <div class="mb-4">
-            <label for="segundoNombre" class="block text-sm font-medium text-gray-700">Segundo Nombre</label>
+            <label
+              for="segundoNombre"
+              class="block text-sm font-medium text-gray-700"
+              >Segundo Nombre</label
+            >
             <input
               v-model="createUserForm.segundoNombre"
               type="text"
@@ -30,7 +38,11 @@
           </div>
           <!-- Apellidos -->
           <div class="mb-4">
-            <label for="apellidos" class="block text-sm font-medium text-gray-700">Apellidos</label>
+            <label
+              for="apellidos"
+              class="block text-sm font-medium text-gray-700"
+              >Apellidos</label
+            >
             <input
               v-model="createUserForm.apellidos"
               type="text"
@@ -42,7 +54,9 @@
           </div>
           <!-- Peso -->
           <div class="mb-4">
-            <label for="peso" class="block text-sm font-medium text-gray-700">Peso (kg)</label>
+            <label for="peso" class="block text-sm font-medium text-gray-700"
+              >Peso (kg)</label
+            >
             <input
               v-model="createUserForm.peso"
               type="number"
@@ -54,7 +68,9 @@
           </div>
           <!-- Altura -->
           <div class="mb-4">
-            <label for="altura" class="block text-sm font-medium text-gray-700">Altura (cm)</label>
+            <label for="altura" class="block text-sm font-medium text-gray-700"
+              >Altura (cm)</label
+            >
             <input
               v-model="createUserForm.altura"
               type="number"
@@ -66,7 +82,11 @@
           </div>
           <!-- Enfermedad Crónica -->
           <div class="mb-4">
-            <label for="enfermedadCronica" class="block text-sm font-medium text-gray-700">Enfermedad Crónica</label>
+            <label
+              for="enfermedadCronica"
+              class="block text-sm font-medium text-gray-700"
+              >Enfermedad Crónica</label
+            >
             <input
               v-model="createUserForm.enfermedadCronica"
               type="text"
@@ -78,7 +98,11 @@
           </div>
           <!-- Estado Físico Actual -->
           <div class="mb-6">
-            <label for="estadoFisicoActual" class="block text-sm font-medium text-gray-700">Estado Físico Actual</label>
+            <label
+              for="estadoFisicoActual"
+              class="block text-sm font-medium text-gray-700"
+              >Estado Físico Actual</label
+            >
             <input
               v-model="createUserForm.estadoFisicoActual"
               type="text"
@@ -102,11 +126,17 @@
 
       <!-- Paso 2: Datos adicionales -->
       <div v-if="step === 2">
-        <h2 class="text-2xl font-semibold mb-6 text-center">Crear Usuario - Paso 2</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-center">
+          Crear Usuario - Paso 2
+        </h2>
         <form @submit.prevent="nextStep">
           <!-- Nombre de Usuario -->
           <div class="mb-4">
-            <label for="nombreUsuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+            <label
+              for="nombreUsuario"
+              class="block text-sm font-medium text-gray-700"
+              >Nombre de Usuario</label
+            >
             <input
               v-model="createUserForm.nombreUsuario"
               type="text"
@@ -118,7 +148,9 @@
           </div>
           <!-- Correo Electrónico -->
           <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >Correo Electrónico</label
+            >
             <input
               v-model="createUserForm.email"
               type="email"
@@ -130,7 +162,11 @@
           </div>
           <!-- Contraseña -->
           <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700"
+              >Contraseña</label
+            >
             <input
               v-model="createUserForm.password"
               type="password"
@@ -142,7 +178,11 @@
           </div>
           <!-- Confirmar Contraseña -->
           <div class="mb-6">
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+            <label
+              for="confirmPassword"
+              class="block text-sm font-medium text-gray-700"
+              >Confirmar Contraseña</label
+            >
             <input
               v-model="createUserForm.confirmPassword"
               type="password"
@@ -178,12 +218,40 @@
           <!-- Foto de Perfil -->
           <div class="mb-4">
             <label for="fotoPerfil" class="block text-sm font-medium text-gray-700">Foto de Perfil</label>
+            <div class="mt-1 flex items-center justify-center">
+              <div class="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-300">
+                <!-- Mostrar la imagen seleccionada o el ícono predeterminado -->
+                <img
+                  v-if="createUserForm.fotoPerfil"
+                  :src="imagePreview"
+                  alt="Foto de perfil"
+                  class="w-full h-full object-cover"
+                />
+                <div v-else class="w-full h-full flex items-center justify-center bg-gray-200">
+                  <!-- Ícono de perfil predeterminado de Heroicons -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-12 w-12 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
             <input
               type="file"
               id="fotoPerfil"
               name="fotoPerfil"
               @change="handleFileUpload"
-              class="mt-1 p-2 w-full border border-gray-300 rounded-md"
+              class="mt-4 p-2 w-full border border-gray-300 rounded-md"
             />
           </div>
           <!-- Botón para crear usuario -->
@@ -246,6 +314,9 @@ const createUserForm = ref({
   fotoPerfil: null,
 });
 
+// Estado para la vista previa de la imagen
+const imagePreview = ref(null);x
+
 // Estado para el mensaje de éxito
 const successMessage = ref("");
 
@@ -264,7 +335,12 @@ const prevStep = () => {
 
 // Función para manejar la subida de archivos
 const handleFileUpload = (event) => {
-  createUserForm.value.fotoPerfil = event.target.files[0];
+  const file = event.target.files[0];
+  if (file) {
+    createUserForm.value.fotoPerfil = file;
+    // Crear una URL temporal para la vista previa de la imagen
+    imagePreview.value = URL.createObjectURL(file);
+  }
 };
 
 // Función para manejar la creación de usuario
@@ -318,3 +394,4 @@ const handleCreateUser = async () => {
   }
 };
 </script>
+

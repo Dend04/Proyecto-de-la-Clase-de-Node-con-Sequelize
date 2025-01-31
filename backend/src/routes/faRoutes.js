@@ -1,6 +1,6 @@
 import express from 'express';
 import { verificarToken } from '../middleware/middleware.js';
-import { deshabilitar2FA, estado2FA, habilitar2FA, verificar2FA } from '../controllers/2FAController.js';
+import { deshabilitar2FA, estado2FA, habilitar2FA, verificar2FA } from '../controllers/2faController.js';
  // Asegúrate de importar el controlador correcto
 
 const router = express.Router();
