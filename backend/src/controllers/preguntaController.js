@@ -1,4 +1,5 @@
 import Pregunta from '../models/pregunta_model.js';
+import Respuesta from '../models/respuesta_model.js';
 import Test from '../models/test_model.js';
 
 // Obtener todas las preguntas
@@ -43,4 +44,26 @@ export const getPreguntasByTestId = async (testId) => {
     const test = await Test.findOne({ where: { name: testName } });
     if (!test) throw new Error('Test no encontrado');
     return await Pregunta.findAll({ where: { testId: test.id } });
+  };
+
+  export const getPreguntasConRespuestasByTestId = async (testId) => {
+    try {
+      const preguntas = await Pregunta.findAll({
+        where: { testId },
+        include: [{ model: Respuesta }], // Incluir las respuestas relacionadas
+      });
+  
+      const preguntasConEstado = preguntas.map((pregunta) => {
+        const tieneRespuestas = pregunta.Respuesta && pregunta.Respuesta.length > 0; // Usar "Respuesta" en lugar de "Respuestas"
+        return {
+          ...pregunta.toJSON(), // Convertir a un objeto plano
+          completa: tieneRespuestas, // Indicador de si la pregunta está completa
+        };
+      });
+  
+      return preguntasConEstado;
+    } catch (error) {
+      console.error("Error en getPreguntasConRespuestasByTestId:", error);
+      throw new Error("Error al obtener las preguntas y respuestas del test");
+    }
   };

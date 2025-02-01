@@ -7,6 +7,7 @@ import {
   deletePregunta,
   getPreguntasByTestId,
   getPreguntasByTestName,
+  getPreguntasConRespuestasByTestId,
 } from "../controllers/preguntaController.js";
 import { verificarToken } from "../middleware/middleware.js";
 
@@ -483,6 +484,16 @@ router.post('/preguntas/test/id/:testId',verificarToken, async (req, res) => {
     res.status(201).json(nuevaPregunta);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+router.get("/preguntas-con-respuestas/test/:testId", async (req, res) => {
+  try {
+    const preguntasConEstado = await getPreguntasConRespuestasByTestId(req.params.testId);
+    res.json(preguntasConEstado);
+  } catch (error) {
+    console.error("Error en /preguntas-con-respuestas/test/:testId:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 

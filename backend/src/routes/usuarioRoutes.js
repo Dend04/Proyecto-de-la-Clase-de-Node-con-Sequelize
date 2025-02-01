@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario } from '../controllers/usuarioController.js';
+import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario, cambiarContrasena } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
 import { iniciarSesion } from "../controllers/usuarioController.js"; // Asegúrate de que la ruta sea correcta
 import { generateUniqueUsername } from '../models/usuario_model.js';
@@ -548,5 +548,21 @@ router.post('/generarNombreUsuario', async (req, res) => {
   }
 });
 
+router.put('/usuario/:id/cambiar-contrasena', verificarToken, async (req, res) => {
+  try {
+    const { contrasenaActual, nuevaContrasena } = req.body;
+    const { id } = req.params;
+
+    if (!contrasenaActual || !nuevaContrasena) {
+      return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    }
+
+    const resultado = await cambiarContrasena(id, contrasenaActual, nuevaContrasena);
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error("Error en la ruta cambiar-contrasena:", error);
+    res.status(400).json({ error: error.message });
+  }
+});
 
 export default router;

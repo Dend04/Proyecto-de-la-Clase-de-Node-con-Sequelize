@@ -187,8 +187,17 @@ const fetchRespuestas = async () => {
       throw new Error('El parámetro id es undefined');
     }
 
-    // Hacer la solicitud al backend
-    const response = await $fetch(`${apiBaseUrl}/respuestas/pregunta/${preguntaId}`);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      throw new Error('No se encontró el token de acceso');
+    }
+
+    // Hacer la solicitud al backend con el token de autorización
+    const response = await $fetch(`${apiBaseUrl}/respuestas/pregunta/${preguntaId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     // Verificar si no hay respuestas
     if (response.length === 0) {

@@ -223,6 +223,38 @@ const storage = multer.diskStorage({
   }
 });
 
+export const cambiarContrasena = async (id, contrasenaActual, nuevaContrasena) => {
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) throw new Error("Usuario no encontrado");
+
+    // Verificar que la contraseña actual sea correcta
+    const contrasenaValida = await bcrypt.compare(contrasenaActual, usuario.password);
+    if (!contrasenaValida) throw new Error("Contraseña actual incorrecta");
+
+    // Validar la nueva contraseña
+    if (nuevaContrasena.length < 8) {
+      throw new Error("La nueva contraseña debe tener al menos 8 caracteres");
+    }
+
+    // Guardar la nueva contraseña en texto plano (el hook beforeUpdate la hasheará)
+    usuario.password = nuevaContrasena;
+    await usuario.save();
+
+    // Verificar si la contraseña se actualizó correctamente
+    const usuarioActualizado = await Usuario.findByPk(id);
+    console.log("Contraseña actualizada en la base de datos:", usuarioActualizado.password);
+
+    return {
+      success: true,
+      message: "Contraseña actualizada exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en cambiarContrasena:", error);
+    throw error;
+  }
+};
+
 const upload = multer({ storage: storage });
 
 // Middleware para subir la imagen

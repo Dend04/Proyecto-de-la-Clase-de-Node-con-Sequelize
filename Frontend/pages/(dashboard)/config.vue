@@ -75,6 +75,125 @@
             </button>
           </div>
         </div>
+
+        <!-- Sección de Cambiar Contraseña -->
+        <div class="space-y-6 mt-8">
+          <h2 class="text-xl font-semibold text-gray-700">
+            Cambiar Contraseña
+          </h2>
+
+          <!-- Estado actual del cambio de contraseña -->
+          <div class="flex items-center justify-between">
+            <p class="text-gray-600">
+              {{
+                mostrarCambiarContrasena
+                  ? "Cambiar contraseña activado"
+                  : "Cambiar contraseña desactivado"
+              }}
+            </p>
+            <!-- Toggle Switch -->
+            <button
+              @click="toggleCambiarContrasena"
+              :class="{
+                'bg-blue-500': mostrarCambiarContrasena,
+                'bg-gray-300': !mostrarCambiarContrasena,
+              }"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <span
+                :class="{
+                  'translate-x-6': mostrarCambiarContrasena,
+                  'translate-x-1': !mostrarCambiarContrasena,
+                }"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+              />
+            </button>
+          </div>
+
+          <!-- Campos para cambiar contraseña -->
+          <div v-if="mostrarCambiarContrasena" class="mt-4 space-y-4">
+            <!-- Contraseña actual -->
+            <div class="relative">
+              <input
+                v-model="contrasenaActual"
+                :type="mostrarContrasenaActual ? 'text' : 'password'"
+                placeholder="Contraseña actual"
+                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                @click="mostrarContrasenaActual = !mostrarContrasenaActual"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                <component
+                  :is="mostrarContrasenaActual ? EyeOffIcon : EyeIcon"
+                  class="h-5 w-5"
+                />
+              </button>
+            </div>
+
+            <!-- Nueva contraseña -->
+            <div class="relative">
+              <input
+                v-model="nuevaContrasena"
+                :type="mostrarNuevaContrasena ? 'text' : 'password'"
+                placeholder="Nueva contraseña"
+                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                @click="mostrarNuevaContrasena = !mostrarNuevaContrasena"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                <component
+                  :is="mostrarNuevaContrasena ? EyeOffIcon : EyeIcon"
+                  class="h-5 w-5"
+                />
+              </button>
+            </div>
+
+            <!-- Confirmar nueva contraseña -->
+            <div class="relative">
+              <input
+                v-model="confirmarContrasena"
+                :type="mostrarConfirmarContrasena ? 'text' : 'password'"
+                placeholder="Confirmar nueva contraseña"
+                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                @click="
+                  mostrarConfirmarContrasena = !mostrarConfirmarContrasena
+                "
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                <component
+                  :is="mostrarConfirmarContrasena ? EyeOffIcon : EyeIcon"
+                  class="h-5 w-5"
+                />
+              </button>
+            </div>
+            <div class="mt-2">
+              <p
+                :class="{
+                  'text-green-500': contrasenaValida,
+                  'text-red-500': !contrasenaValida,
+                }"
+              >
+                {{
+                  contrasenaValida
+                    ? "La contraseña es válida"
+                    : "La contraseña debe tener al menos 8 caracteres"
+                }}
+              </p>
+            </div>
+
+           
+            <button
+              @click="cambiarContrasena"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              Cambiar Contraseña
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -82,15 +201,37 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { jwtDecode } from "jwt-decode"; // Importar jwt-decode para decodificar el token
+import { EyeIcon, EyeOffIcon } from "@heroicons/vue/outline";
 
 // Estado del componente
 const qrCodeUrl = ref("");
 const secret2FA = ref("");
 const otp = ref("");
 const is2FAEnabled = ref(false);
+const mostrarCambiarContrasena = ref(false); // Estado para mostrar/ocultar campos de cambio de contraseña
+const contrasenaActual = ref("");
+const nuevaContrasena = ref("");
+const confirmarContrasena = ref("");
 const accessToken = ref(null); // Token de acceso
 const runtimeConfig = useRuntimeConfig();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+const cambiandoContrasena = ref(false); // Estado para deshabilitar el botón
+const mostrarContrasenaActual = ref(false); // Estado para contraseña actual
+const mostrarNuevaContrasena = ref(false); // Estado para nueva contraseña
+const mostrarConfirmarContrasena = ref(false); // Estado para confirmar contraseña // Estado para mostrar/ocultar contraseña
+
+// Función para decodificar el token y obtener el userId
+const obtenerUserIdDesdeToken = () => {
+  if (!accessToken.value) return null;
+  try {
+    const decodedToken = jwtDecode(accessToken.value); // Decodificar el token
+    return decodedToken.id; // Extraer el userId del payload del token
+  } catch (error) {
+    console.error("Error al decodificar el token:", error);
+    return null;
+  }
+};
 
 // Verificar el token al cargar la página
 onMounted(() => {
@@ -147,7 +288,11 @@ const verificar2FA = async () => {
     if (!response.ok) {
       const errorData = await response.json(); // Lee el cuerpo de la respuesta
       console.error("Error del servidor:", errorData);
-      alert(`Error: ${errorData.message || "No tienes permisos para realizar esta acción."}`);
+      alert(
+        `Error: ${
+          errorData.message || "No tienes permisos para realizar esta acción."
+        }`
+      );
       return;
     }
 
@@ -162,6 +307,7 @@ const verificar2FA = async () => {
     console.error("Error al verificar 2FA:", error);
   }
 };
+
 // Función para deshabilitar 2FA
 const deshabilitar2FA = async () => {
   if (!accessToken.value) {
@@ -181,7 +327,11 @@ const deshabilitar2FA = async () => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Error del servidor:", errorData);
-      alert(`Error: ${errorData.message || "No tienes permisos para realizar esta acción."}`);
+      alert(
+        `Error: ${
+          errorData.message || "No tienes permisos para realizar esta acción."
+        }`
+      );
       return;
     }
 
@@ -211,7 +361,11 @@ const verificarEstado2FA = async () => {
     if (!response.ok) {
       const errorData = await response.json(); // Lee el cuerpo de la respuesta
       console.error("Error del servidor:", errorData);
-      alert(`Error: ${errorData.message || "No tienes permisos para realizar esta acción."}`);
+      alert(
+        `Error: ${
+          errorData.message || "No tienes permisos para realizar esta acción."
+        }`
+      );
       return;
     }
 
@@ -219,6 +373,87 @@ const verificarEstado2FA = async () => {
     is2FAEnabled.value = data.is2FAEnabled;
   } catch (error) {
     console.error("Error al verificar el estado del 2FA:", error);
+  }
+};
+
+// Función para mostrar/ocultar campos de cambio de contraseña
+const toggleCambiarContrasena = () => {
+  mostrarCambiarContrasena.value = !mostrarCambiarContrasena.value;
+};
+
+// Función para cambiar la contraseña
+const cambiarContrasena = async () => {
+  const userId = obtenerUserIdDesdeToken();
+  if (cambiandoContrasena.value) return; // Evitar múltiples solicitudes
+  cambiandoContrasena.value = true;
+
+  if (!userId) {
+    alert(
+      "No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente."
+    );
+    return;
+  }
+
+  if (
+    !contrasenaActual.value ||
+    !nuevaContrasena.value ||
+    !confirmarContrasena.value
+  ) {
+    alert("Todos los campos son obligatorios");
+    return;
+  }
+
+  if (nuevaContrasena.value !== confirmarContrasena.value) {
+    alert("Las contraseñas no coinciden");
+    return;
+  }
+
+  if (nuevaContrasena.value.length < 8) {
+    alert("La nueva contraseña debe tener al menos 8 caracteres");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${apiBaseUrl}/usuario/${userId}/cambiar-contrasena`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken.value}`,
+        },
+        body: JSON.stringify({
+          contrasenaActual: contrasenaActual.value,
+          nuevaContrasena: nuevaContrasena.value,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del servidor:", errorData);
+      alert(
+        `Error: ${
+          errorData.message || "No tienes permisos para realizar esta acción."
+        }`
+      );
+      return;
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      alert("Contraseña cambiada exitosamente");
+      contrasenaActual.value = "";
+      nuevaContrasena.value = "";
+      confirmarContrasena.value = "";
+      mostrarCambiarContrasena.value = false;
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error("Error al cambiar la contraseña:", error);
+  } finally {
+    cambiandoContrasena.value = false;
   }
 };
 </script>
