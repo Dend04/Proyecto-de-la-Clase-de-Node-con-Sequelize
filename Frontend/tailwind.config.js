@@ -1,7 +1,5 @@
-import { defineConfig } from 'tailwindcss';
-
 /** @type {import('tailwindcss').Config} */
-export default defineConfig({
+module.exports = {
   content: [
     './components/**/*.{js,vue,ts}',
     './layouts/**/*.vue',
@@ -13,4 +11,4 @@ export default defineConfig({
     extend: {},
   },
   plugins: [],
-});
+};
