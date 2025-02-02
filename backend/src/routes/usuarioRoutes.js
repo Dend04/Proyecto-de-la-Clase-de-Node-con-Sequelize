@@ -68,7 +68,7 @@ const router = express.Router();
  *             example:
  *               error: "El email ya está registrado"
  */
-router.post('/crearUsuario', uploadFotoPerfil,  async (req, res) => {
+router.post('/crearUsuario', uploadFotoPerfil, async (req, res) => {
   try {
     const { nombre, segundoNombre, apellidos, nombreUsuario, email, password, peso, altura, enfermedadCronica, estadoFisicoActual } = req.body;
 
@@ -90,8 +90,6 @@ router.post('/crearUsuario', uploadFotoPerfil,  async (req, res) => {
     };
 
     const usuario = await crearUsuario(userData);
-    // Ruta de la imagen de perfil (si se subió)
-   
     res.status(201).json(usuario);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -116,7 +114,7 @@ router.post('/crearUsuario', uploadFotoPerfil,  async (req, res) => {
  *       500:
  *         description: Error del servidor
  */
-router.get('/usuarios',verificarToken, async (req, res) => {
+router.get('/usuarios', verificarToken, async (req, res) => {
   try {
     const usuarios = await obtenerUsuarios();
     res.status(200).json(usuarios);
@@ -350,18 +348,14 @@ router.post('/login', async (req, res) => {
   try {
     const { nombreUsuario, password } = req.body;
 
-    console.log("Datos recibidos en /api/login:", { nombreUsuario, password });
+    if (!nombreUsuario || !password) {
+      return res.status(400).json({ error: "Nombre de usuario y contraseña son obligatorios" });
+    }
 
-    // Llamar al controlador iniciarSesion
     const { accessToken, refreshToken, requiere2FA } = await iniciarSesion(nombreUsuario, password);
-
-    console.log("Tokens devueltos por iniciarSesion:", { accessToken, refreshToken, requiere2FA });
-
-    // Enviar la respuesta al cliente
     res.status(200).json({ accessToken, refreshToken, requiere2FA });
   } catch (error) {
-    console.error("Error en /api/login:", error.message);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 });
 /**
@@ -464,22 +458,13 @@ router.post('/registro', verificarToken, async (req, res) => {
  */
 router.get('/perfil', verificarToken, async (req, res) => {
   try {
-    const usuario = await obtenerPerfil(req, res);
-    
-    // Asegúrate de que obtenerPerfil devuelva el usuario sin enviar una respuesta
+    const usuario = await obtenerPerfil(req);
     if (!usuario) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    
-    // Envía la respuesta solo si obtenerPerfil no lo hace
-    return res.status(200).json(usuario);
+    res.status(200).json(usuario);
   } catch (error) {
-    // Maneja el error solo si no se ha enviado una respuesta
-    if (!res.headersSent) {
-      return res.status(500).json({ error: error.message });
-    } else {
-      console.error("Error después de enviar la respuesta:", error);
-    }
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -574,6 +559,10 @@ router.put('/usuario/:id/cambiar-contrasena', verificarToken, async (req, res) =
     const { contrasenaActual, nuevaContrasena } = req.body;
     const { id } = req.params;
 
+    if (req.usuario.id !== parseInt(id)) {
+      return res.status(403).json({ error: "No tienes permiso para cambiar la contraseña de este usuario" });
+    }
+
     if (!contrasenaActual || !nuevaContrasena) {
       return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
@@ -581,7 +570,6 @@ router.put('/usuario/:id/cambiar-contrasena', verificarToken, async (req, res) =
     const resultado = await cambiarContrasena(id, contrasenaActual, nuevaContrasena);
     res.status(200).json(resultado);
   } catch (error) {
-    console.error("Error en la ruta cambiar-contrasena:", error);
     res.status(400).json({ error: error.message });
   }
 });

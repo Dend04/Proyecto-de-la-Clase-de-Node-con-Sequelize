@@ -4,6 +4,19 @@ import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Crear la ruta al directorio en la raíz del proyecto
+const uploadDir = path.resolve(process.cwd(), 'uploads/fotosPerfil');
+
+// Crear la carpeta si no existe
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
@@ -50,30 +63,30 @@ export const obtenerUsuarioPorId = async (id) => {
 };
 
 // Obtener perfil del usuario autenticado
-export const obtenerPerfil = async (req) => {
-  try {
-    const usuario = await Usuario.findByPk(req.usuario.id, {
-      attributes: [
-        "id",
-        "nombreUsuario",
-        "rol",
-        "peso",
-        "altura",
-        "email",
-        "nombre",
-        "segundoNombre",
-        "apellidos",
-        "enfermedadCronica",
-        "estadoFisicoActual",
-        "fotoPerfil",
-      ],
-    });
-
-    return usuario || null;
-  } catch (error) {
-    throw new Error("Error al obtener perfil del usuario");
-  }
-};
+  export const obtenerPerfil = async (req) => {
+    try {
+      const usuario = await Usuario.findByPk(req.usuario.id, {
+        attributes: [
+          "id",
+          "nombreUsuario",
+          "rol",
+          "peso",
+          "altura",
+          "email",
+          "nombre",
+          "segundoNombre",
+          "apellidos",
+          "enfermedadCronica",
+          "estadoFisicoActual",
+          "fotoPerfil",
+        ],
+      });
+  
+      return usuario || null;
+    } catch (error) {
+      throw new Error("Error al obtener perfil del usuario");
+    }
+  };
 
 // Actualizar un usuario
 export const actualizarUsuario = async (id, userData) => {
@@ -279,7 +292,16 @@ export const cambiarContrasena = async (
   }
 };
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten imágenes'), false);
+    }
+  },
+});
 
 // Middleware para subir la imagen
 export const uploadFotoPerfil = upload.single("fotoPerfil");
