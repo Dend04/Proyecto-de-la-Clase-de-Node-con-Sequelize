@@ -1,9 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
-import cors from './config/cors.js'; // Asegúrate de importar la configuración de CORS correctamente
+import cors from './config/cors.js';
 import sequelize from "./config/database.js";
-import swaggerSetup from './config/swagger.js'; // Asegúrate de que la ruta sea correcta
+import swaggerSetup from './config/swagger.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import preguntaRoutes from './routes/preguntaRoutes.js';
 import testRoutes from './routes/testRoutes.js';
@@ -21,6 +21,7 @@ import Resultado from "./models/resultado_model.js";
 import Rutina from "./models/rutina_model.js";
 import faRoutes from './routes/faRoutes.js';
 import path from "path";
+import fs from 'fs';
 
 dotenv.config();
 
@@ -37,10 +38,14 @@ Resultado.belongsTo(Usuario, { foreignKey: "usuarioId" });
 Resultado.hasOne(Rutina, { foreignKey: "resultadoId" });
 Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
 
-
-
 const app = express();
-const __dirname = path.resolve()
+const __dirname = path.resolve();
+
+// Crear la carpeta uploads/fotosPerfil si no existe
+const uploadDir = path.resolve(__dirname, 'uploads/fotosPerfil');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Usa Morgan con el stream de Winston
 app.use(morgan('informacion_combinada', { stream: logger.stream }));
@@ -53,13 +58,6 @@ swaggerSetup(app);
 // Usa el middleware
 app.use(middleware);
 
-// Logger
-/* logger.info('Información de inicio'); */
-/* logger.error('Error detectado'); */ // Para probar el funcionamiento de detección de errores
-
-// Morgan
-/* app.use(morgan('combined', { stream: logger.stream })); */
-
 // CORS
 app.use(cors);
 
@@ -71,7 +69,9 @@ app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
 app.use('/api', faRoutes);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Servir archivos estáticos desde uploads/fotosPerfil
+app.use('/uploads/fotosPerfil', express.static(uploadDir));
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);
@@ -87,7 +87,6 @@ sequelize
   });
 
 app.listen(process.env.PORT, () => {
-  // Cambiar el color del texto a azul
   const blueColor = '\x1b[34m';
   const resetColor = '\x1b[0m';
   console.log(`${blueColor}Servidor corriendo en http://localhost:${process.env.PORT}${resetColor}`);

@@ -4,14 +4,17 @@ import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
-import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const rootDir = path.resolve(__dirname, '..');
+
 // Crear la carpeta si no existe
-const uploadDir = path.join(__dirname, 'uploads/fotosPerfil');
+const uploadDir = path.resolve(rootDir, 'uploads/fotosPerfil');
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -232,16 +235,14 @@ export const obtenerEstadoUsuario = async (req, res) => {
 };
 
 // Configuración de Multer para guardar imágenes en la carpeta "uploads"
+// Configuración de Multer
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Define la carpeta de destino basada en el tipo de archivo
-    const folder = file.fieldname === "fotoPerfil" ? "uploads/fotosPerfil" : "uploads/";
-    cb(null, folder);
+  destination: function (req, file, cb) {
+    const uploadDir = path.resolve(__dirname, '..', 'uploads/fotosPerfil'); // Ruta correcta
+    cb(null, uploadDir); // Carpeta donde se guardarán las imágenes
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname); // Obtener la extensión del archivo
-    cb(null, uniqueSuffix + ext); // Nombre único para evitar colisiones
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nombre del archivo
   },
 });
 

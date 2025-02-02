@@ -15,7 +15,7 @@
     </div>
     <!-- Usuarios e iconos -->
     <div class="flex items-center gap-6 ml-auto">
-      <div
+      <!-- <div
         class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
       >
         <ChatIcon class="h-5 w-5 text-gray-500" />
@@ -29,7 +29,7 @@
         >
           1
         </div>
-      </div>
+      </div> -->
       <!-- Botón de cerrar sesión -->
       <button
         v-if="userName !== 'Inicio'"

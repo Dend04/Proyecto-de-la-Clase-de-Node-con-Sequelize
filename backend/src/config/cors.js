@@ -6,7 +6,9 @@ dotenv.config(); // Cargar variables de entorno desde el archivo .env
 // Lista de orígenes permitidos
 const allowedOrigins = [
   process.env.ALLOWED_ORIGIN_1 || 'http://localhost:3000', // Permite solicitudes desde el puerto 3000
-  process.env.ALLOWED_ORIGIN_2 || 'http://localhost:3001', // Permite solicitudes desde el puerto 3001
+  process.env.ALLOWED_ORIGIN_2 || 'http://localhost:3001',
+  'https://pagina-de-realizacion-de-test-frontend.onrender.com',
+  'http://localhost:3000/api-docs/' // Permite solicitudes desde el puerto 3001
   // Agrega otros orígenes permitidos según sea necesario
 ];
 
