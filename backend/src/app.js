@@ -71,7 +71,7 @@ app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
 app.use('/api', faRoutes);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);

@@ -30,7 +30,11 @@ export default defineNuxtConfig({
       NUXT_SUPABASE_KEY: process.env.NUXT_SUPABASE_KEY,
       host: '0.0.0.0',
     },
-  }
+  },
+  image: {
+    dir: `/uploads/fotosPerfil`, // Directorio donde se encuentran las imágenes
+    domains: ['localhost'], // Dominios permitidos para cargar imágenes
+  },
   
 
   /* auth: {
@@ -62,7 +66,7 @@ export default defineNuxtConfig({
         },
       },
     },
-  }, */,
+  }, */
 
   compatibilityDate: '2025-01-24'
 });

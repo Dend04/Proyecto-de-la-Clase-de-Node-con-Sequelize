@@ -69,7 +69,7 @@
       <!-- Mostrar foto de perfil si está disponible, de lo contrario mostrar la imagen por defecto -->
       <NuxtImg
         v-else
-        :src="userProfile.fotoPerfil || '/avatar.png'"
+        :src="userProfile.fotoPerfil ? `${backendUrl}/uploads/fotosPerfil/${userProfile.fotoPerfil}` : '/avatar.png'"
         alt="Avatar"
         width="36"
         height="36"

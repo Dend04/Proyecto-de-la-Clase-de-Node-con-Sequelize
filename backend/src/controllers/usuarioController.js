@@ -220,15 +220,22 @@ export const obtenerEstadoUsuario = async (req, res) => {
   }
 };
 
-// Configuración de multer para almacenar las imágenes
+// Configuración de Multer para guardar imágenes en la carpeta "uploads"
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Carpeta donde se guardarán las imágenes
+  destination: (req, file, cb) => {
+    // Define la carpeta de destino basada en el tipo de archivo
+    const folder = file.fieldname === "fotoPerfil" ? "uploads/fotosPerfil" : "uploads/";
+    cb(null, folder);
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Nombre del archivo
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname); // Obtener la extensión del archivo
+    cb(null, uniqueSuffix + ext); // Nombre único para evitar colisiones
   },
 });
+
+
+
 
 export const cambiarContrasena = async (
   id,

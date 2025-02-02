@@ -70,7 +70,28 @@ const router = express.Router();
  */
 router.post('/crearUsuario', uploadFotoPerfil,  async (req, res) => {
   try {
-    const usuario = await crearUsuario(req.body);
+    const { nombre, segundoNombre, apellidos, nombreUsuario, email, password, peso, altura, enfermedadCronica, estadoFisicoActual } = req.body;
+
+    // Ruta de la imagen de perfil (si se subió)
+    const fotoPerfilPath = req.file ? `/uploads/fotosPerfil/${req.file.filename}` : null;
+
+    const userData = {
+      nombre,
+      segundoNombre,
+      apellidos,
+      nombreUsuario,
+      email,
+      password,
+      peso,
+      altura,
+      enfermedadCronica,
+      estadoFisicoActual,
+      fotoPerfil: fotoPerfilPath,
+    };
+
+    const usuario = await crearUsuario(userData);
+    // Ruta de la imagen de perfil (si se subió)
+   
     res.status(201).json(usuario);
   } catch (error) {
     res.status(400).json({ error: error.message });
