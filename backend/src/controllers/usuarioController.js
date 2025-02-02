@@ -10,10 +10,8 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Crear la ruta al directorio en la raíz del proyecto
-const uploadDir = path.resolve(process.cwd(), 'uploads/fotosPerfil');
-
 // Crear la carpeta si no existe
+const uploadDir = path.join(__dirname, 'uploads/fotosPerfil');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
