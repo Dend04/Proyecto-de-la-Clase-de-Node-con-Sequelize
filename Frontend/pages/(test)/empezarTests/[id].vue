@@ -141,7 +141,7 @@ const fetchTest = async () => {
         return {
           id: respuesta.id,
           tipo: respuesta.tipo,
-          respuesta: respuestaValue, // Puede ser string, número, array, objeto, etc.
+          respuesta: respuestaValue,
         };
       });
     }
