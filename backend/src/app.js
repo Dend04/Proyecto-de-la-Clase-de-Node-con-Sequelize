@@ -20,6 +20,7 @@ import Respuesta from "./models/respuesta_model.js";
 import Resultado from "./models/resultado_model.js";
 import Rutina from "./models/rutina_model.js";
 import faRoutes from './routes/faRoutes.js';
+import path from "path";
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
 
 
 const app = express();
+const __dirname = path.resolve()
 
 // Usa Morgan con el stream de Winston
 app.use(morgan('informacion_combinada', { stream: logger.stream }));
@@ -69,6 +71,7 @@ app.use('/api', resultadoRoutes);
 app.use('/api', rutinaRoutes);
 app.use('/api', respuestaRoutes);
 app.use('/api', faRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);

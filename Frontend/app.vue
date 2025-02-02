@@ -25,6 +25,6 @@ import { useRoute } from '#app'; // Importa useRoute de Nuxt
 
 const route = useRoute();
 const isAuthPage = computed(() => {
-  return route.path === '/login' || route.path === '/crearUsuario';
+  return route.path === '/login' || route.path === '/crearUsuario' || route.path === '/verificar-2fa';
 });
 </script>

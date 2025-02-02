@@ -79,14 +79,21 @@ const handleLogin = async () => {
       throw new Error("Error en la autenticación");
     }
 
-    const { accessToken, refreshToken } = await response.json();
+    const { accessToken, refreshToken, requiere2FA } = await response.json();
+    console.log("Respuesta del backend:", { accessToken, refreshToken, requiere2FA });
 
     // Guardar los tokens en localStorage
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
 
-    // Redirigir al usuario a la página principal y recargar la página
-    navigateTo("/", { reload: true });
+    // Verificar si el usuario requiere 2FA
+    if (requiere2FA) {
+      console.log("Redirigiendo a /verificar-2fa");
+      navigateTo("/verificar-2fa");
+    } else {
+      console.log("Redirigiendo a /");
+      navigateTo("/", { reload: true });
+    }
   } catch (error) {
     console.error("Error:", error.message);
     alert(error.message);

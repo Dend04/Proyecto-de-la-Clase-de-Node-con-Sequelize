@@ -332,12 +332,12 @@ router.post('/login', async (req, res) => {
     console.log("Datos recibidos en /api/login:", { nombreUsuario, password });
 
     // Llamar al controlador iniciarSesion
-    const { accessToken, refreshToken } = await iniciarSesion(nombreUsuario, password);
+    const { accessToken, refreshToken, requiere2FA } = await iniciarSesion(nombreUsuario, password);
 
-    console.log("Tokens devueltos por iniciarSesion:", { accessToken, refreshToken });
+    console.log("Tokens devueltos por iniciarSesion:", { accessToken, refreshToken, requiere2FA });
 
     // Enviar la respuesta al cliente
-    res.status(200).json({ accessToken, refreshToken });
+    res.status(200).json({ accessToken, refreshToken, requiere2FA });
   } catch (error) {
     console.error("Error en /api/login:", error.message);
     res.status(400).json({ message: error.message });

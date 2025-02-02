@@ -2,8 +2,8 @@ import Usuario from "../models/usuario_model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
-import multer from 'multer';
-import path from 'path';
+import multer from "multer";
+import path from "path";
 
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
@@ -65,6 +65,7 @@ export const obtenerPerfil = async (req) => {
         "apellidos",
         "enfermedadCronica",
         "estadoFisicoActual",
+        "fotoPerfil",
       ],
     });
 
@@ -119,13 +120,16 @@ export const buscarUsuarios = async (query) => {
 // Iniciar sesión
 export async function iniciarSesion(nombreUsuario, password) {
   try {
+    // Buscar al usuario por nombre de usuario
     const usuario = await Usuario.findOne({ where: { nombreUsuario } });
 
     if (!usuario) throw new Error("Usuario no encontrado");
 
+    // Verificar la contraseña
     const contrasenaValida = await bcrypt.compare(password, usuario.password);
     if (!contrasenaValida) throw new Error("Contraseña incorrecta");
 
+    // Generar tokens
     const accessToken = jwt.sign(
       {
         id: usuario.id,
@@ -143,7 +147,10 @@ export async function iniciarSesion(nombreUsuario, password) {
       { expiresIn: "7d" }
     );
 
-    return { accessToken, refreshToken };
+    // Verificar si el usuario tiene 2FA activado
+    const requiere2FA = usuario.estaVerificado2FA; // Usar estaVerificado2FA en lugar de secret2FA
+
+    return { accessToken, refreshToken, requiere2FA };
   } catch (error) {
     throw error;
   }
@@ -216,20 +223,27 @@ export const obtenerEstadoUsuario = async (req, res) => {
 // Configuración de multer para almacenar las imágenes
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
+    cb(null, "uploads/"); // Carpeta donde se guardarán las imágenes
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // Nombre del archivo
-  }
+  },
 });
 
-export const cambiarContrasena = async (id, contrasenaActual, nuevaContrasena) => {
+export const cambiarContrasena = async (
+  id,
+  contrasenaActual,
+  nuevaContrasena
+) => {
   try {
     const usuario = await Usuario.findByPk(id);
     if (!usuario) throw new Error("Usuario no encontrado");
 
     // Verificar que la contraseña actual sea correcta
-    const contrasenaValida = await bcrypt.compare(contrasenaActual, usuario.password);
+    const contrasenaValida = await bcrypt.compare(
+      contrasenaActual,
+      usuario.password
+    );
     if (!contrasenaValida) throw new Error("Contraseña actual incorrecta");
 
     // Validar la nueva contraseña
@@ -243,7 +257,10 @@ export const cambiarContrasena = async (id, contrasenaActual, nuevaContrasena) =
 
     // Verificar si la contraseña se actualizó correctamente
     const usuarioActualizado = await Usuario.findByPk(id);
-    console.log("Contraseña actualizada en la base de datos:", usuarioActualizado.password);
+    console.log(
+      "Contraseña actualizada en la base de datos:",
+      usuarioActualizado.password
+    );
 
     return {
       success: true,
@@ -258,4 +275,4 @@ export const cambiarContrasena = async (id, contrasenaActual, nuevaContrasena) =
 const upload = multer({ storage: storage });
 
 // Middleware para subir la imagen
-export const uploadFotoPerfil = upload.single('fotoPerfil');
+export const uploadFotoPerfil = upload.single("fotoPerfil");

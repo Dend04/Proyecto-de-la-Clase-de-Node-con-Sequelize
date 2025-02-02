@@ -1,23 +1,27 @@
-module.exports = {
-  development: {
-    username: "postgres",
-    password: " ", // Asegúrate de que la contraseña sea correcta
-    database: "Pruebas de tests",
-    host: "127.0.0.1",
-    dialect: "postgres", // Asegúrate de que esto sea una cadena de texto
-  },
-  test: {
-    username: "postgres",
-    password: " ",
-    database: "Pruebas de tests",
-    host: "127.0.0.1",
-    dialect: "postgres",
-  },
-  production: {
-    username: "postgres",
-    password: " ",
-    database: "Pruebas de tests",
-    host: "127.0.0.1",
-    dialect: "postgres",
-  },
-};
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+
+// Cargar las variables de entorno según el entorno
+const env = process.env.NODE_ENV || "development"; // Usar 'development' por defecto
+const envFile = `.env.${env}`; // Cargar el archivo .env correspondiente
+dotenv.config({ path: envFile });
+
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.HOST || process.env.DB_HOST, // Usar DB_HOST si HOST no está definido
+    port: process.env.DB_PORT || 5432, // Puerto por defecto para PostgreSQL
+    dialect: process.env.DB_DIALECT,
+    logging: false, // Desactiva el registro de SQL en la consola
+    dialectOptions: env === "production" ? {
+      ssl: {
+        require: true, // Requerido para Supabase
+        rejectUnauthorized: false, // Necesario para Supabase
+      },
+    } : {}, // Solo agregar SSL en producción
+  }
+);
+
+export default sequelize;
