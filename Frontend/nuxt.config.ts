@@ -29,13 +29,9 @@ export default defineNuxtConfig({
       NUXT_SUPABASE_URL: process.env.NUXT_SUPABASE_URL,
       NUXT_SUPABASE_KEY: process.env.NUXT_SUPABASE_KEY,
       host: '0.0.0.0',
+      port: process.env.PORT
     },
   },
-  image: {
-    dir: `/uploads/fotosPerfil`, // Directorio donde se encuentran las imágenes
-    domains: ['localhost'], // Dominios permitidos para cargar imágenes
-  },
-  
 
   /* auth: {
     baseURL: process.env.BACKEND_URL || 'http://localhost:3000/api',
