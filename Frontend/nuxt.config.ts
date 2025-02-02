@@ -3,12 +3,6 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@nuxt/image", /* "@sidebase/nuxt-auth" */],
   css: ["@/assets/css/tailwind.css"],
 
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
   app: {
     head: {
       title: "Pagina de Realización de Test", // Título global
