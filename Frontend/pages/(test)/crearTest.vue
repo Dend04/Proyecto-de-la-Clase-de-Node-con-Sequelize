@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 py-8 pl-20 md:pl-52">
     <h1 class="text-4xl font-bold text-gray-800 mb-8">Crear Nuevo Test</h1>
     <form @submit.prevent="submitForm" class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
       <div class="mb-4">

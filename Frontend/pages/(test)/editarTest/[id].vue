@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 pl-24 md:pl-24 lg:pl-52">
     <h1 class="text-4xl font-bold text-gray-800 mb-8">Editar Test</h1>
     <form
       @submit.prevent="submitForm"

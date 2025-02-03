@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-tr from-[#aab2b5] to-[#eaebef] py-8">
+  <div class="min-h-screen bg-gradient-to-tr from-[#aab2b5] to-[#eaebef] py-8 pl-20 md:pl-52">
     <!-- Contenedor principal -->
     <div
       class="max-w-2xl mx-4 md:mx-auto bg-white p-6 rounded-lg shadow-md mt-10 md:mt-20"
