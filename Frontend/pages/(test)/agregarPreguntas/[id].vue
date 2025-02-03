@@ -1,65 +1,75 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
-    <h1 class="text-4xl font-bold text-gray-800 mb-8">
-      Agregar Preguntas al Test
-    </h1>
-    <div v-if="error" class="bg-red-100 text-red-700 p-4 rounded-lg shadow-lg">
+  <div class="min-h-screen bg-gray-50 flex flex-col items-center p-6">
+    <!-- Título -->
+    <h1 class="text-4xl font-bold text-gray-800 mb-8">Agregar Preguntas al Test</h1>
+
+    <!-- Mensaje de error -->
+    <div
+      v-if="error"
+      class="bg-red-50 text-red-600 p-4 rounded-lg shadow-sm mb-6"
+    >
       {{ error }}
     </div>
-    <div v-else>
+
+    <!-- Formulario para agregar pregunta -->
+    <div class="w-full max-w-4xl">
       <form
         @submit.prevent="submitPregunta"
-        class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg"
+        class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
       >
         <div class="mb-4">
           <label
-            class="block text-gray-700 text-sm font-bold mb-2"
+            class="block text-gray-700 text-sm font-medium mb-2"
             for="pregunta"
           >
             Pregunta
           </label>
           <input
             v-model="pregunta"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
             id="pregunta"
             type="text"
             placeholder="Escribe la pregunta"
           />
         </div>
-        <div class="flex items-center justify-between">
+        <div class="flex justify-end">
           <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             type="submit"
           >
             Agregar Pregunta
           </button>
         </div>
       </form>
+
+      <!-- Mensaje de éxito o error -->
       <div
         v-if="mensaje"
         :class="mensajeClase"
-        class="mt-4 p-4 rounded-lg shadow-lg flex items-center"
+        class="mt-4 p-4 rounded-lg shadow-sm flex items-center"
       >
         <CheckCircleIcon
-          v-if="mensajeClase === 'bg-green-100 text-green-700'"
+          v-if="mensajeClase === 'bg-green-50 text-green-600'"
           class="h-6 w-6 mr-2"
         />
         <ExclamationCircleIcon
-          v-if="mensajeClase === 'bg-red-100 text-red-700'"
+          v-if="mensajeClase === 'bg-red-50 text-red-600'"
           class="h-6 w-6 mr-2"
         />
         <span>{{ mensaje }}</span>
       </div>
+
+      <!-- Botones adicionales -->
       <div class="mt-4 flex space-x-4">
         <button
           @click="agregarOtraPregunta"
-          class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Agregar Otra Pregunta
         </button>
         <NuxtLink
           to="/test"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Volver a Tests
         </NuxtLink>
@@ -84,7 +94,7 @@ const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 const submitPregunta = async () => {
   if (!pregunta.value) {
     mensaje.value = "Por favor, escribe una pregunta.";
-    mensajeClase.value = "bg-red-100 text-red-700";
+    mensajeClase.value = "bg-red-50 text-red-600";
     return;
   }
 
@@ -92,22 +102,19 @@ const submitPregunta = async () => {
     await $fetch(`${apiBaseUrl}/preguntas/test/id/${route.params.id}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
-      },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Enviar el token
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       body: {
         texto: pregunta.value,
       },
     });
     mensaje.value = "Pregunta agregada con éxito.";
-    mensajeClase.value = "bg-green-100 text-green-700";
+    mensajeClase.value = "bg-green-50 text-green-600";
     pregunta.value = ""; // Limpiar el campo de la pregunta
-  } catch (error) {
+  } catch (err) {
     mensaje.value = "Algo salió mal al agregar la pregunta.";
-    mensajeClase.value = "bg-red-100 text-red-700";
-    console.error("Error al agregar la pregunta:", error);
+    mensajeClase.value = "bg-red-50 text-red-600";
+    console.error("Error al agregar la pregunta:", err);
   }
 };
 
@@ -119,5 +126,5 @@ const agregarOtraPregunta = () => {
 </script>
 
 <style scoped>
-/* Puedes agregar estilos personalizados aquí */
+/* Estilos personalizados */
 </style>

@@ -60,7 +60,16 @@
                 </svg>
               </span>
               <p class="text-gray-600">
-                Respuestas Incorrectas: <span class="font-semibold">{{ resultadoDetalles.resultado.respuestasIncorrectas || "Ninguna" }}</span>
+                Respuestas Incorrectas:
+                <span v-if="resultadoDetalles.resultado.respuestasIncorrectas.length > 0">
+                  <ul class="list-disc ml-6">
+                    <!-- Dividir la cadena de texto en un array y mostrar cada pregunta -->
+                    <li v-for="(pregunta, index) in resultadoDetalles.resultado.respuestasIncorrectas.split(', ')" :key="index">
+                      {{ pregunta }}
+                    </li>
+                  </ul>
+                </span>
+                <span v-else class="font-semibold">Ninguna</span>
               </p>
             </div>
   
