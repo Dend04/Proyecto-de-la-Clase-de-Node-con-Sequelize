@@ -16,6 +16,10 @@ const Respuesta = sequelize.define('Respuesta', {
     type: DataTypes.JSON,
     allowNull: false,
   },
+  correcta: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false, 
+  },
   preguntaId: {
     type: DataTypes.INTEGER,
     references: {

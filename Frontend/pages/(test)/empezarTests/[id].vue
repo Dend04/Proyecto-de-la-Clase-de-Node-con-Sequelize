@@ -202,12 +202,16 @@ const nextQuestion = () => {
 
 // Finalizar test
 const finishTest = async () => {
+  // Guardar la última respuesta seleccionada
   answers.value.push({
     preguntaId: currentQuestion.value.id,
     respuestaId: respuestaSeleccionada.value.id,
   });
 
+  console.log("Respuestas a enviar:", answers.value); // Verificar las respuestas
+
   try {
+    // Enviar las respuestas al backend
     const resultado = await $fetch(
       `${apiBaseUrl}/test/${testId.value}/resultados`,
       {
@@ -216,10 +220,12 @@ const finishTest = async () => {
       }
     );
 
+    console.log("Respuesta del backend:", resultado); // Verificar la respuesta del backend
+
+    // Redirigir a la página de resultados dinámica
     router.push({
-      name: "resultados-test",
-      params: { id: testId.value },
-      query: { resultado: resultado.id },
+      path: `/resultadoTest/${testId.value}`, // Usa la ruta dinámica con el ID del test
+      query: { resultado: resultado.id }, // Pasa el ID del resultado como query
     });
   } catch (error) {
     console.error("Error al enviar respuestas:", error);

@@ -1,6 +1,7 @@
 import Resultado from '../models/resultado_model.js';
 import Test from '../models/test_model.js';
 import Usuario from '../models/usuario_model.js';
+import { getNumeroPreguntasByTestId } from './testController.js';
 
 // Obtener todos los resultados
 export const getResultados = async () => {
@@ -25,37 +26,64 @@ export const getResultadosByUsuarioId = async (usuarioId) => {
 };
 
 // Crear un nuevo resultado
+// Crear un nuevo resultado
 export const createResultadoFromTest = async (resultadoData) => {
   try {
     const { usuarioId, testId, respuestas } = resultadoData;
 
+    // Verificar que el usuario y el test existan
     const usuario = await Usuario.findByPk(usuarioId);
     if (!usuario) throw new Error('Usuario no encontrado');
 
     const test = await Test.findByPk(testId);
     if (!test) throw new Error('Test no encontrado');
 
-    let estado, deficiencias;
+    // Obtener el número total de preguntas del test
+    const numeroTotalPreguntas = await getNumeroPreguntasByTestId(testId);
 
-    if (test.tipo === 'salud') {
-      const resultadoSalud = determinarEstadoFisicoYDeficiencias(respuestas);
-      estado = resultadoSalud.estado;
-      deficiencias = resultadoSalud.deficiencias;
-    } else if (test.tipo === 'conocimiento') {
-      const resultadoConocimiento = determinarResultadoConocimiento(respuestas);
-      estado = resultadoConocimiento.estado;
-      deficiencias = resultadoConocimiento.deficiencias;
-    } else {
-      estado = 'Resultado generado';
-      deficiencias = null;
+    // Obtener las respuestas correctas del test
+    const respuestasCorrectasTest = await Respuesta.findAll({
+      where: { correcta: true },
+      include: [{ model: Pregunta, where: { testId } }],
+    });
+
+    // Calcular el número de respuestas correctas del usuario
+    let respuestasCorrectas = 0;
+    const respuestasIncorrectas = [];
+
+    for (const respuesta of respuestas) {
+      const esCorrecta = respuestasCorrectasTest.some(
+        r => r.preguntaId === respuesta.preguntaId && r.id === respuesta.respuestaId
+      );
+      if (esCorrecta) {
+        respuestasCorrectas++;
+      } else {
+        respuestasIncorrectas.push(`Pregunta ${respuesta.preguntaId}`);
+      }
     }
 
+    // Calcular el porcentaje de aciertos
+    const porcentajeCorrectas = (respuestasCorrectas / numeroTotalPreguntas) * 100;
+
+    // Determinar el estado basado en el porcentaje
+    let estado;
+    if (porcentajeCorrectas >= 90) estado = 'Excelente conocimiento';
+    else if (porcentajeCorrectas >= 70) estado = 'Buen conocimiento';
+    else if (porcentajeCorrectas >= 50) estado = 'Conocimiento regular';
+    else if (porcentajeCorrectas >= 30) estado = 'Conocimiento básico';
+    else estado = 'Conocimiento insuficiente';
+
+    // Guardar el resultado en la base de datos
     const resultado = await Resultado.create({
       usuarioId,
       testId,
-      resultado: respuestas,
+      resultado: {
+        respuestasCorrectas,
+        respuestasIncorrectas: respuestasIncorrectas.join(', '),
+        porcentajeCorrectas,
+      },
       estado,
-      deficiencias: deficiencias ? deficiencias.join(', ') : null,
+      deficiencias: respuestasIncorrectas.join(', '),
     });
 
     return resultado;
@@ -65,6 +93,67 @@ export const createResultadoFromTest = async (resultadoData) => {
   }
 };
 
+export const saveTestResults = async (testId, respuestas) => {
+  try {
+    // Verificar si el test existe
+    const test = await Test.findByPk(testId);
+    if (!test) {
+      throw new Error('Test no encontrado');
+    }
+
+    // Obtener el número total de preguntas del test
+    const numeroTotalPreguntas = await getNumeroPreguntasByTestId(testId);
+
+    // Obtener las respuestas correctas del test
+    const respuestasCorrectasTest = await Respuesta.findAll({
+      where: { correcta: true },
+      include: [{ model: Pregunta, where: { testId } }],
+    });
+
+    // Calcular el número de respuestas correctas del usuario
+    let respuestasCorrectas = 0;
+    const respuestasIncorrectas = [];
+
+    for (const respuesta of respuestas) {
+      const esCorrecta = respuestasCorrectasTest.some(
+        r => r.preguntaId === respuesta.preguntaId && r.id === respuesta.respuestaId
+      );
+      if (esCorrecta) {
+        respuestasCorrectas++;
+      } else {
+        respuestasIncorrectas.push(`Pregunta ${respuesta.preguntaId}`);
+      }
+    }
+
+    // Calcular el porcentaje de aciertos
+    const porcentajeCorrectas = (respuestasCorrectas / numeroTotalPreguntas) * 100;
+
+    // Determinar el estado basado en el porcentaje
+    let estado;
+    if (porcentajeCorrectas >= 90) estado = 'Excelente conocimiento';
+    else if (porcentajeCorrectas >= 70) estado = 'Buen conocimiento';
+    else if (porcentajeCorrectas >= 50) estado = 'Conocimiento regular';
+    else if (porcentajeCorrectas >= 30) estado = 'Conocimiento básico';
+    else estado = 'Conocimiento insuficiente';
+
+    // Guardar el resultado en la base de datos
+    const resultado = await Resultado.create({
+      testId,
+      resultado: {
+        respuestasCorrectas,
+        respuestasIncorrectas: respuestasIncorrectas.join(', '),
+        porcentajeCorrectas,
+      },
+      estado,
+      deficiencias: respuestasIncorrectas.join(', '),
+    });
+
+    return resultado;
+  } catch (error) {
+    console.error('Error al guardar resultados:', error);
+    throw new Error('Error interno del servidor');
+  }
+};
 // Función auxiliar para determinar estado físico
 const determinarEstadoFisicoYDeficiencias = (respuestas) => {
   let puntaje = 0;

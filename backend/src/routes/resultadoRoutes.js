@@ -2,7 +2,8 @@ import express from 'express';
 import {
   getResultados,
   getResultadoById,
-  getResultadosByUsuarioId
+  getResultadosByUsuarioId,
+  saveTestResults
 } from '../controllers/resultadoController.js';
 
 const router = express.Router();
@@ -110,8 +111,9 @@ router.get('/rutina/asignar/:usuarioId', async (req, res) => {
  *             example:
  *               error: "Resultado no encontrado"
  */
-router.get('/resultado/:id', async (req, res) => {
+router.get('/resultados/:id', async (req, res) => {
   try {
+    console.log("ID del resultado recibido:", req.params.id); // Depuración
     const resultado = await getResultadoById(req.params.id);
     if (!resultado) {
       return res.status(404).json({ error: 'Resultado no encontrado' });

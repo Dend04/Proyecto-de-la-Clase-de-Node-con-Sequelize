@@ -19,7 +19,6 @@ export const createPregunta = async (testId, data) => {
   if (!data.texto) throw new Error('El campo "texto" es obligatorio');
   return await Pregunta.create({ ...data, testId });
 };
-
 // Actualizar una pregunta existente
 export const updatePregunta = async (id, preguntaData) => {
   const [updated] = await Pregunta.update(preguntaData, { where: { id } });

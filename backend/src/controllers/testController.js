@@ -24,6 +24,23 @@ export const createTest = async (testData) => {
   return await Test.create(testData);
 };
 
+// Obtener el número de preguntas de un test por ID
+export const getNumeroPreguntasByTestId = async (testId) => {
+  const test = await Test.findByPk(testId, {
+    include: [{
+      model: Pregunta,
+    }],
+  });
+
+  if (!test) throw new Error('Test no encontrado');
+
+  // Verifica que test.Preguntas esté definido y sea un array
+  if (!test.Preguntas || !Array.isArray(test.Preguntas)) {
+    throw new Error('No se encontraron preguntas para este test');
+  }
+
+  return test.Preguntas.length; // Retorna el número de preguntas
+};
 // Actualizar un test existente
 export const updateTest = async (id, testData) => {
   const [updated] = await Test.update(testData, {

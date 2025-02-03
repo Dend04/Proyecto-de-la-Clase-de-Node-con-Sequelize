@@ -43,8 +43,9 @@ export const createRespuesta = async (data) => {
 
     // Crear la respuesta
     return await Respuesta.create({
-      tipo: data.tipo, // El tipo está en el nivel superior
-      respuesta: data.respuesta, // El valor de la respuesta
+      tipo: data.tipo,
+      respuesta: data.respuesta,
+      correcta: data.correcta, // Asegúrate de que este campo esté presente
       preguntaId: data.preguntaId,
     });
   } catch (error) {

@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
     <!-- Contenido principal centrado -->
-    <div class="flex-grow flex flex-col items-center justify-start mt-4 relative">
-      <div class="relative w-full max-w-4xl mx-auto px-6 py-12">
+    <div class="flex-grow flex flex-col items-center justify-start mt-8 relative">
+      <div class="relative w-full max-w-6xl mx-auto px-6 py-12">
         <!-- Contenido principal -->
         <div class="relative z-20 text-center">
-          <h1 class="text-4xl font-bold text-gray-800 mb-12 tracking-tight">
+          <h1 class="text-5xl font-bold text-gray-800 mb-12 tracking-tight">
             Tests Disponibles
           </h1>
 
@@ -26,7 +26,7 @@
                 v-for="test in tests"
                 :key="test.id"
                 :class="[
-                  'bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative',
+                  'bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative border border-gray-100',
                   test.incompleto ? 'border-2 border-red-500' : ''
                 ]"
               >
@@ -50,7 +50,7 @@
 
                 <!-- Información del test -->
                 <div class="flex flex-col h-full space-y-4">
-                  <h2 class="text-xl font-semibold text-gray-800">
+                  <h2 class="text-2xl font-semibold text-gray-800">
                     {{ test.titulo }}
                   </h2>
                   <p v-if="test.descripcion" class="text-gray-600 flex-grow">
@@ -76,7 +76,7 @@
                   </div>
                   <NuxtLink
                     :to="`/empezarTests/${test.id}`"
-                    class="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 hover:bg-blue-700"
+                    class="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 hover:bg-blue-700 hover:shadow-md"
                   >
                     Comenzar Test
                   </NuxtLink>
@@ -89,7 +89,7 @@
     </div>
     <NuxtLink
       to="/crearTest"
-      class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg focus:outline-none focus:shadow-outline"
+      class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-full shadow-lg transition-all duration-300 hover:shadow -lg focus:outline-none focus:shadow-outline"
     >
       <PlusIcon class="h-6 w-6" />
     </NuxtLink>

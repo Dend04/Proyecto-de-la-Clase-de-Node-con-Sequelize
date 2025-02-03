@@ -164,9 +164,10 @@ router.get("/pregunta/:id",verificarToken, async (req, res, next) => {
  *             example:
  *               error: "El campo 'texto' es obligatorio"
  */
-router.post("/crearPregunta",verificarToken, async (req, res, next) => {
+router.post("/crearPregunta", verificarToken, async (req, res) => {
   try {
-    const nuevaPregunta = await createPregunta(req.body);
+    const { testId, texto } = req.body; // Asegúrate de que testId esté en el cuerpo
+    const nuevaPregunta = await createPregunta(testId, { texto });
     res.status(201).json(nuevaPregunta);
   } catch (error) {
     res.status(400).json({ error: error.message });
