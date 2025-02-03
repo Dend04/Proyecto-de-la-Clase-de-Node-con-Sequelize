@@ -212,6 +212,7 @@ const finishTest = async () => {
 
   try {
     // Enviar las respuestas al backend
+    console.log("Enviando respuestas al backend...");
     const resultado = await $fetch(
       `${apiBaseUrl}/test/${testId.value}/resultados`,
       {
@@ -223,6 +224,7 @@ const finishTest = async () => {
     console.log("Respuesta del backend:", resultado); // Verificar la respuesta del backend
 
     // Redirigir a la página de resultados dinámica
+    console.log("Redirigiendo a la página de resultados...");
     router.push({
       path: `/resultadoTest/${testId.value}`, // Usa la ruta dinámica con el ID del test
       query: { resultado: resultado.id }, // Pasa el ID del resultado como query

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTests, getTestById, createTest, updateTest, deleteTest } from '../controllers/testController.js';
+import { getTests, getTestById, createTest, updateTest, deleteTest, getNumeroPreguntasByTestId } from '../controllers/testController.js';
 import { verificarToken } from '../middleware/middleware.js';
 
 const router = express.Router();
@@ -252,6 +252,56 @@ router.delete('/test/:id',verificarToken, async (req, res) => {
     res.status(200).json({ message: "Test eliminado satisfactoriamente" });
   } catch (error) {
     if (error.message === "Test no encontrado") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /api/test/{id}/numero-preguntas:
+ *   get:
+ *     summary: Obtiene el número de preguntas de un test por ID
+ *     tags: [Tests]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del test
+ *     responses:
+ *       200:
+ *         description: Número de preguntas del test
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 numeroPreguntas:
+ *                   type: integer
+ *                   description: Número de preguntas del test
+ *                   example: 10
+ *       404:
+ *         description: Test no encontrado o no tiene preguntas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: "Test no encontrado o no tiene preguntas"
+ */
+router.get('/test/:id/numero-preguntas', async (req, res) => {
+  try {
+    const numeroPreguntas = await getNumeroPreguntasByTestId(req.params.id);
+    res.status(200).json({ numeroPreguntas });
+  } catch (error) {
+    if (error.message === 'Test no encontrado' || error.message === 'No se encontraron preguntas para este test') {
       res.status(404).json({ error: error.message });
     } else {
       res.status(500).json({ error: error.message });

@@ -24,4 +24,9 @@ const Pregunta = sequelize.define('Pregunta', {
   tableName: 'Pregunta',
 });
 
+// Definir la relación entre Test y Pregunta
+Test.hasMany(Pregunta, { foreignKey: 'testId', as: 'Preguntas' }); // Un Test tiene muchas Preguntas
+Pregunta.belongsTo(Test, { foreignKey: 'testId' }); // Una Pregunta pertenece a un Test
+
+
 export default Pregunta;

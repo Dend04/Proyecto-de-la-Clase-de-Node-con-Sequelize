@@ -2,11 +2,13 @@ import Test from '../models/test_model.js';
 import Pregunta from '../models/pregunta_model.js';
 
 // Obtener todos los tests
+// Obtener todos los tests
 export const getTests = async () => {
   return await Test.findAll({
     include: [{
-      model: Pregunta
-    }]
+      model: Pregunta,
+      as: 'Preguntas', 
+    }],
   });
 };
 
@@ -14,7 +16,8 @@ export const getTests = async () => {
 export const getTestById = async (id) => {
   return await Test.findByPk(id, {
     include: [{
-      model: Pregunta
+      model: Pregunta,
+      as: 'Preguntas',
     }]
   });
 };
@@ -26,20 +29,28 @@ export const createTest = async (testData) => {
 
 // Obtener el número de preguntas de un test por ID
 export const getNumeroPreguntasByTestId = async (testId) => {
+  console.log(`Buscando test con ID: ${testId}`);
   const test = await Test.findByPk(testId, {
     include: [{
       model: Pregunta,
+      as: 'Preguntas',
     }],
   });
 
-  if (!test) throw new Error('Test no encontrado');
+  if (!test) {
+    console.log('Test no encontrado');
+    throw new Error('Test no encontrado');
+  }
 
-  // Verifica que test.Preguntas esté definido y sea un array
+  console.log('Test encontrado:', test);
+  console.log('Preguntas asociadas:', test.Preguntas);
+
   if (!test.Preguntas || !Array.isArray(test.Preguntas)) {
+    console.log('No se encontraron preguntas para este test');
     throw new Error('No se encontraron preguntas para este test');
   }
 
-  return test.Preguntas.length; // Retorna el número de preguntas
+  return test.Preguntas.length;
 };
 // Actualizar un test existente
 export const updateTest = async (id, testData) => {

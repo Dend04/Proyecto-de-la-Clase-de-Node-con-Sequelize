@@ -1,3 +1,5 @@
+import Pregunta from '../models/pregunta_model.js';
+import Respuesta from '../models/respuesta_model.js';
 import Resultado from '../models/resultado_model.js';
 import Test from '../models/test_model.js';
 import Usuario from '../models/usuario_model.js';
@@ -95,6 +97,8 @@ export const createResultadoFromTest = async (resultadoData) => {
 
 export const saveTestResults = async (testId, respuestas) => {
   try {
+    console.log("Recibiendo respuestas:", respuestas); // Verificar las respuestas recibidas
+
     // Verificar si el test existe
     const test = await Test.findByPk(testId);
     if (!test) {
@@ -103,12 +107,14 @@ export const saveTestResults = async (testId, respuestas) => {
 
     // Obtener el número total de preguntas del test
     const numeroTotalPreguntas = await getNumeroPreguntasByTestId(testId);
+    console.log("Número total de preguntas:", numeroTotalPreguntas); // Verificar el número de preguntas
 
     // Obtener las respuestas correctas del test
     const respuestasCorrectasTest = await Respuesta.findAll({
       where: { correcta: true },
       include: [{ model: Pregunta, where: { testId } }],
     });
+    console.log("Respuestas correctas del test:", respuestasCorrectasTest); // Verificar las respuestas correctas
 
     // Calcular el número de respuestas correctas del usuario
     let respuestasCorrectas = 0;
@@ -125,8 +131,12 @@ export const saveTestResults = async (testId, respuestas) => {
       }
     }
 
+    console.log("Respuestas correctas del usuario:", respuestasCorrectas); // Verificar las respuestas correctas del usuario
+    console.log("Respuestas incorrectas del usuario:", respuestasIncorrectas); // Verificar las respuestas incorrectas del usuario
+
     // Calcular el porcentaje de aciertos
     const porcentajeCorrectas = (respuestasCorrectas / numeroTotalPreguntas) * 100;
+    console.log("Porcentaje de aciertos:", porcentajeCorrectas); // Verificar el porcentaje de aciertos
 
     // Determinar el estado basado en el porcentaje
     let estado;
@@ -135,6 +145,8 @@ export const saveTestResults = async (testId, respuestas) => {
     else if (porcentajeCorrectas >= 50) estado = 'Conocimiento regular';
     else if (porcentajeCorrectas >= 30) estado = 'Conocimiento básico';
     else estado = 'Conocimiento insuficiente';
+
+    console.log("Estado del resultado:", estado); // Verificar el estado del resultado
 
     // Guardar el resultado en la base de datos
     const resultado = await Resultado.create({
@@ -147,6 +159,8 @@ export const saveTestResults = async (testId, respuestas) => {
       estado,
       deficiencias: respuestasIncorrectas.join(', '),
     });
+
+    console.log("Resultado guardado:", resultado); // Verificar el resultado guardado
 
     return resultado;
   } catch (error) {

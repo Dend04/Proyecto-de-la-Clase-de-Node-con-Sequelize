@@ -26,8 +26,6 @@ import fs from 'fs';
 dotenv.config();
 
 // Relaciones
-Test.hasMany(Pregunta, { foreignKey: "testId" });
-Pregunta.belongsTo(Test, { foreignKey: "testId" });
 
 Pregunta.hasMany(Respuesta, { foreignKey: "preguntaId" });
 Respuesta.belongsTo(Pregunta, { foreignKey: "preguntaId" });
