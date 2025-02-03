@@ -244,6 +244,7 @@ const pregunta = ref({ texto: "" });
 const respuesta = ref({ respuesta: "", correcta: false, preguntaId: null });
 const runtimeConfig = useRuntimeConfig();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+const preguntasDesplegadas = ref({});
 
 // Funciones para cargar preguntas y respuestas
 const fetchPreguntas = async () => {
@@ -257,7 +258,7 @@ const fetchPreguntas = async () => {
     );
     preguntas.value = response.map((p) => ({
       ...p,
-      mostrarRespuestas: false,
+      mostrarRespuestas: preguntasDesplegadas.value[p.id] || false,
       respuestas: [],
     }));
   } catch (err) {
@@ -274,6 +275,7 @@ const toggleRespuestas = async (preguntaId) => {
       pregunta.respuestas = respuestas;
     }
     pregunta.mostrarRespuestas = !pregunta.mostrarRespuestas;
+    preguntasDesplegadas.value[preguntaId] = pregunta.mostrarRespuestas;
   }
 };
 
@@ -315,28 +317,25 @@ const eliminarPregunta = async (preguntaId) => {
 
 const submitPregunta = async () => {
   try {
-    // Extrae el testId de la ruta
     const testId = route.params.id;
 
-    // Verifica que el testId esté presente
     if (!testId) {
       throw new Error("El ID del test es requerido.");
     }
 
-    // Envía la solicitud al backend
     await $fetch(`${apiBaseUrl}/crearPregunta`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       body: {
-        testId, // Incluye el testId en el cuerpo de la solicitud
+        testId,
         texto: pregunta.value.texto,
       },
     });
 
     // Recarga las preguntas y cierra el modal
-    fetchPreguntas();
+    await fetchPreguntas();
     cerrarModalPregunta();
   } catch (error) {
     console.error("Error al guardar la pregunta:", error);
@@ -379,13 +378,11 @@ const eliminarRespuesta = async (respuestaId) => {
 
 const submitRespuesta = async () => {
   try {
-    // Verifica que los campos requeridos estén presentes
     if (!respuesta.value.respuesta || !respuesta.value.preguntaId) {
       throw new Error("Todos los campos son obligatorios.");
     }
     respuesta.value.tipo = "texto";
 
-    // Envía la solicitud al backend
     await $fetch(`${apiBaseUrl}/crearRespuesta`, {
       method: "POST",
       headers: {
@@ -396,15 +393,19 @@ const submitRespuesta = async () => {
         respuesta: respuesta.value.respuesta,
         correcta: respuesta.value.correcta,
         preguntaId: respuesta.value.preguntaId,
-      }, // Envía un objeto de respuesta individual
+      },
     });
 
-    // Recarga las preguntas y cierra el modal
-    fetchPreguntas();
+    // Actualiza las respuestas de la pregunta correspondiente
+    const preguntaIndex = preguntas.value.findIndex(p => p.id === respuesta.value.preguntaId);
+    if (preguntaIndex !== -1) {
+      preguntas.value[preguntaIndex].respuestas = await fetchRespuestas(respuesta.value.preguntaId);
+    }
+
     cerrarModalRespuesta();
   } catch (error) {
     console.error("Error al guardar la respuesta:", error);
-    alert("Error al guardar la respuesta: " + error.message); // Muestra un mensaje de error al usuario
+    alert("Error al guardar la respuesta: " + error.message);
   }
 };
 

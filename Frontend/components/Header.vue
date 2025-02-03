@@ -1,81 +1,61 @@
 <template>
   <div
-    class="fixed top-0 right-0 w-[calc(100%-5rem)] md:w-[calc(100%-13rem)] flex items-center justify-between p-4 bg-gradient-to-r from-[#eaebef] to-[#aab2b5] shadow-md z-30 transition-all duration-300"
+    class="fixed top-0 right-0 w-[calc(100%-5rem)] md:w-[calc(100%-13rem)] flex items-center justify-between p-4 bg-white shadow-sm z-30"
   >
     <!-- Barra de búsqueda -->
     <div
-      class="hidden md:flex items-center gap-2 text-xs rounded-full ring-1.5 ring-gray-300 px-2 ml-auto"
+      class="hidden md:flex items-center gap-2 text-sm rounded-lg bg-gray-50 px-3 py-2 ring-1 ring-gray-200 focus-within:ring-2 focus-within:ring-blue-500 transition-all"
     >
-      <SearchIcon class="h-5 w-5 text-gray-500" />
+      <SearchIcon class="h-5 w-5 text-gray-400" />
       <input
         type="text"
         placeholder="Buscar..."
-        class="w-48 p-2 bg-transparent outline-none"
+        class="w-48 bg-transparent outline-none placeholder:text-gray-400"
       />
     </div>
+
     <!-- Usuarios e iconos -->
-    <div class="flex items-center gap-6 ml-auto">
-      <!-- <div
-        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer"
-      >
-        <ChatIcon class="h-5 w-5 text-gray-500" />
-      </div>
-      <div
-        class="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative"
-      >
-        <BellIcon class="h-5 w-5 text-gray-500" />
-        <div
-          class="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-teal-700 text-white rounded-full text-xs"
-        >
-          1
-        </div>
-      </div> -->
+    <div class="flex items-center gap-4">
       <!-- Botón de cerrar sesión -->
       <button
         v-if="userName !== 'Inicio'"
         @click="handleLogout"
-        class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+        class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors"
       >
-        <LogoutIcon class="h-4 w-4" />
+        <LogoutIcon class="h-5 w-5" />
         <span>Cerrar sesión</span>
       </button>
+
       <!-- Nombre del usuario o botón de inicio -->
       <NuxtLink
         v-if="!accessToken"
         to="/login"
-        class="flex flex-col cursor-pointer hover:underline"
-        @click="redirectToLogin"
+        class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-500 transition-colors"
       >
-        <span class="text-xs leading-3 font-medium">Iniciar o</span>
-        <span class="text-[10px] text-gray-500 text-right">Crear sesión</span>
+        <UserIcon class="h-5 w-5" />
+        <span>Iniciar sesión</span>
       </NuxtLink>
+
+      <!-- Perfil del usuario -->
       <button
         v-else
         @click="showProfileModal = true"
-        class="flex flex-col cursor-pointer hover:underline"
+        class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-500 transition-colors"
       >
-        <span class="text-xs leading-3 font-medium">{{ userName }}</span>
-        <span class="text-[10px] text-gray-500 text-right">{{ userRole }}</span>
+        <NuxtImg
+          :src="
+            userProfile.fotoPerfil
+              ? `${backendUrl}/uploads/fotosPerfil/${userProfile.fotoPerfil}`
+              : '/avatar.png'
+          "
+          alt="Avatar"
+          width="32"
+          height="32"
+          class="rounded-full"
+          format="webp"
+        />
+        <span>{{ userName }}</span>
       </button>
-      <!-- Avatar o botón de login -->
-      <NuxtLink
-        v-if="!accessToken"
-        to="/login"
-        class="cursor-pointer"
-        @click="redirectToLogin"
-      >
-        <UserIcon class="h-7 w-7 text-gray-500 hover:text-gray-700" />
-      </NuxtLink>
-      <!-- Mostrar foto de perfil si está disponible, de lo contrario mostrar la imagen por defecto -->
-      <NuxtImg
-        v-else
-        :src="userProfile.fotoPerfil ? `${backendUrl}/uploads/fotosPerfil/${userProfile.fotoPerfil}` : '/avatar.png'"
-        alt="Avatar"
-        width="36"
-        height="36"
-        class="rounded-full"
-        format="webp"
-      />
     </div>
 
     <!-- Modal del perfil -->
@@ -85,7 +65,7 @@
       @click.self="showProfileModal = false"
     >
       <div
-        class="fixed top-16 right-4 bg-white p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto z-50"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto"
       >
         <button
           @click="showProfileModal = false"
@@ -169,23 +149,15 @@
 import { ref, onMounted } from "vue";
 import {
   SearchIcon,
-  BellIcon,
-  ChatIcon,
   UserIcon,
   LogoutIcon,
   XIcon,
 } from "@heroicons/vue/outline";
 import { navigateTo } from "#app";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const runtimeConfig = useRuntimeConfig();
 const backendUrl = runtimeConfig.public.BACKEND_URL;
-const props = defineProps({
-  redirectToLogin: {
-    type: Boolean,
-    default: false,
-  },
-});
 const userName = ref("Inicio");
 const userRole = ref("Admin");
 const userProfile = ref({
@@ -198,10 +170,9 @@ const userProfile = ref({
   altura: "",
   enfermedadCronica: "",
   estadoFisicoActual: "",
-  fotoPerfil: "", // Añadimos el campo fotoPerfil
+  fotoPerfil: "",
 });
 const accessToken = ref(null);
-const refreshToken = ref(null);
 const showProfileModal = ref(false);
 
 const isTokenExpired = (token) => {
@@ -291,3 +262,7 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+/* Estilos personalizados */
+</style>

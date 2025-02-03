@@ -3,62 +3,62 @@
     <!-- Navbar Desplegable -->
     <div
       :class="[
-        'bg-[#3c9a7d] h-screen fixed top-0 left-0 flex flex-col items-center p-5 transition-all duration-300 z-20',
-        isNavbarOpen ? 'w-20 md:w-52' : 'w-5 md:w-13',
+        'bg-white h-screen fixed top-0 left-0 flex flex-col items-center p-5 transition-all duration-300 z-20 shadow-lg',
+        isNavbarOpen ? 'w-20 md:w-52' : 'w-16',
       ]"
     >
-      <!-- Botón de Toggle: Cambia entre mostrar el título y el icono de menú -->
+      <!-- Botón de Toggle -->
       <button
         @click="toggleNavbar"
-        class="text-black text-xl mb-5 cursor-pointer"
+        class="text-gray-700 hover:text-gray-900 transition-colors mb-8"
       >
-        <span v-if="isNavbarOpen">Health Testing</span>
-        <MenuIcon v-else class="h-6 w-6" />
+        <MenuIcon v-if="!isNavbarOpen" class="h-6 w-6" />
+        <span v-else class="text-xl font-semibold text-gray-800"
+          >Health Testing</span
+        >
       </button>
+
       <!-- Lista de enlaces del Navbar -->
-      <ul class="flex flex-col space-y-5">
+      <ul class="flex flex-col space-y-4 w-full">
         <!-- Enlace a Home -->
         <li>
           <NuxtLink
             to="/"
-            class="text-black no-underline flex items-center"
-            title="Home"
+            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            :title="isNavbarOpen ? 'Home' : ''"
           >
-            <HomeIcon class="h-5 w-5 mr-2" />
-            <span v-if="isNavbarOpen" class="hidden md:inline">Home</span>
+            <HomeIcon class="h-6 w-6" />
+            <span v-if="isNavbarOpen" class="ml-2 text-sm">Home</span>
           </NuxtLink>
         </li>
-        <!-- Enlace a Test -->
         <li>
           <NuxtLink
             to="/test"
-            class="text-black no-underline flex items-center"
-            title="Test"
+            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            :title="isNavbarOpen ? 'Test' : ''"
           >
-            <BeakerIcon class="h-5 w-5 mr-2" />
-            <span v-if="isNavbarOpen" class="hidden md:inline">Test</span>
+            <BeakerIcon class="h-6 w-6" />
+            <span v-if="isNavbarOpen" class="ml-2 text-sm">Test</span>
           </NuxtLink>
         </li>
-        <!-- Enlace a Usuarios -->
         <li>
           <NuxtLink
             to="/usuarios"
-            class="text-black no-underline flex items-center"
-            title="Usuarios"
+            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            :title="isNavbarOpen ? 'Usuarios' : ''"
           >
-            <UserIcon class="h-5 w-5 mr-2" />
-            <span v-if="isNavbarOpen" class="hidden md:inline">Usuarios</span>
+            <UserIcon class="h-6 w-6" />
+            <span v-if="isNavbarOpen" class="ml-2 text-sm">Usuarios</span>
           </NuxtLink>
         </li>
-        <!-- Enlace a Config -->
         <li>
           <NuxtLink
             to="/config"
-            class="text-black no-underline flex items-center"
-            title="Config"
+            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            :title="isNavbarOpen ? 'Config' : ''"
           >
-            <CogIcon class="h-5 w-5 mr-2" />
-            <span v-if="isNavbarOpen" class="hidden md:inline">Config</span>
+            <CogIcon class="h-6 w-6" />
+            <span v-if="isNavbarOpen" class="ml-2 text-sm">Config</span>
           </NuxtLink>
         </li>
       </ul>
@@ -97,3 +97,7 @@ onMounted(() => {
   updateNavbarVisibility();
 });
 </script>
+
+<style scoped>
+/* Estilos personalizados */
+</style>
