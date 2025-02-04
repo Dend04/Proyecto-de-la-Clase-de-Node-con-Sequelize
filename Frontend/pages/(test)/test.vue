@@ -174,6 +174,15 @@ const borrarTest = async (id) => {
 onMounted(() => {
   fetchTests();
 });
+useHead({
+  title: "Lista de test - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Lista de todos los test para realizar.",
+    },
+  ],
+});
 </script>
 
 <style scoped>

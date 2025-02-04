@@ -13,7 +13,7 @@
     <NuxtImg
       v-if="!isAuthPage && !isTestPage && !isAddQuestionPage"
       class="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] object-contain opacity-20 z-0 pointer-events-none"
-      src="/logo.jpg"
+      src="/logo.png"
       alt="Logo de fondo"
       format="webp"
     />

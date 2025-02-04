@@ -14,7 +14,7 @@
       >
         <MenuIcon v-if="!isNavbarOpen" class="h-6 w-6" />
         <span v-else class="text-xl font-semibold text-gray-800"
-          >Health Testing</span
+          >TestMaster</span
         >
       </button>
 

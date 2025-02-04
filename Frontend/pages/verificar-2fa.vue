@@ -57,4 +57,13 @@ const verificarOTP = async () => {
     alert(error.message);
   }
 };
+useHead({
+  title: "Verificar'2fa - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "verificacion de 2fa.",
+    },
+  ],
+});
 </script>

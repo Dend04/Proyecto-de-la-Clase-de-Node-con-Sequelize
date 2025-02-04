@@ -5,15 +5,23 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      title: "Pagina de Realización de Test", // Título global
+      title: "TestMaster - Tests de Conocimiento, Idiomas y Salud",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
+          hid: "description",
           name: "description",
-          content: "Esta pagina tiene como objetivo, brindarle a los usuarios, test de todo tipo que pueden realizar", // Meta descripción global
+          content: "Realiza tests de conocimiento, idiomas y salud en línea con TestMaster. Evalúa tus habilidades y mejora tu bienestar.",
         },
+        { name: "keywords", content: "tests de conocimiento, tests de idiomas, tests de salud, evaluación de habilidades" },
+        { name: "author", content: "Dairon Enamorado" },
+        { property: "og:title", content: "TestMaster - Tests de Conocimiento, Idiomas y Salud" },
+        { property: "og:description", content: "Realiza tests de conocimiento, idiomas y salud en línea con TestMaster. Evalúa tus habilidades y mejora tu bienestar." },
+        { property: "og:image", content: "/logo.png" }, // Ruta de tu logo
+        { property: "og:url", content: "https://pagina-de-realizacion-de-test-frontend.onrender.com" }, // URL de tu sitio
       ],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },
   },
 
