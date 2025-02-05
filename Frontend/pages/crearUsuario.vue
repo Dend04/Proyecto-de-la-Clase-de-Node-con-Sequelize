@@ -160,38 +160,55 @@
               required
             />
           </div>
-          <!-- Contraseña -->
-          <div class="mb-4">
-            <label
-              for="password"
-              class="block text-sm font-medium text-gray-700"
-              >Contraseña</label
-            >
-            <input
-              v-model="createUserForm.password"
-              type="password"
-              id="password"
-              class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-              placeholder="Ej: password123"
-              required
-            />
-          </div>
-          <!-- Confirmar Contraseña -->
-          <div class="mb-6">
-            <label
-              for="confirmPassword"
-              class="block text-sm font-medium text-gray-700"
-              >Confirmar Contraseña</label
-            >
-            <input
-              v-model="createUserForm.confirmPassword"
-              type="password"
-              id="confirmPassword"
-              class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-              placeholder="Ej: password123"
-              required
-            />
-          </div>
+         <!-- Campo de Contraseña -->
+  <div class="mb-4 relative">
+    <label for="password" class="block text-sm font-medium text-gray-700">
+      Contraseña
+    </label>
+    <div class="relative">
+      <input
+        v-model="createUserForm.password"
+        :type="showPassword ? 'text' : 'password'"
+        id="password"
+        class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
+        placeholder="Ej: password123"
+        required
+      />
+      <button
+        type="button"
+        @click="togglePasswordVisibility"
+        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+      >
+        <EyeIcon v-if="showPassword" class="h-5 w-5 text-gray-500" />
+        <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Campo de Confirmar Contraseña -->
+  <div class="mb-6 relative">
+    <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+      Confirmar Contraseña
+    </label>
+    <div class="relative">
+      <input
+        v-model="createUserForm.confirmPassword"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        id="confirmPassword"
+        class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
+        placeholder="Ej: password123"
+        required
+      />
+      <button
+        type="button"
+        @click="toggleConfirmPasswordVisibility"
+        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+      >
+        <EyeIcon v-if="showConfirmPassword" class="h-5 w-5 text-gray-500" />
+        <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
+      </button>
+    </div>
+  </div>
           <!-- Botón para avanzar al siguiente paso -->
           <div class="flex justify-between">
             <button
@@ -293,10 +310,24 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { EyeIcon, EyeOffIcon } from "@heroicons/vue/solid"; // Importa los íconos
+
 
 const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
+
+// Función para alternar la visibilidad de la confirmación de contraseña
+const toggleConfirmPasswordVisibility = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
 
 // Estado para el formulario de creación de usuario
 const createUserForm = ref({

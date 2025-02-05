@@ -52,8 +52,8 @@
               <p class="text-gray-600">
                 Valores de las respuestas:
                 <ul class="list-disc ml-6">
-                  <li v-for="(valor, preguntaId) in resultadoDetalles.resultado.valores" :key="preguntaId">
-                    Pregunta {{ preguntaId }}: {{ valor }}
+                  <li v-for="(valor, nombre) in resultadoDetalles.resultado.valores" :key="nombre">
+                    {{ nombre }}: {{ valor }}
                   </li>
                 </ul>
               </p>
@@ -107,7 +107,7 @@
               </span>
               <p class="text-gray-600">
                 Respuestas Incorrectas:
-                <span v-if="resultadoDetalles.resultado.respuestasIncorrectas.length > 0">
+                <span v-if="resultadoDetalles.resultado.respuestasIncorrectas?.length > 0">
                   <ul class="list-disc ml-6">
                     <li v-for="(pregunta, index) in resultadoDetalles.resultado.respuestasIncorrectas.split(', ')" :key="index">
                       {{ pregunta }}
@@ -158,18 +158,66 @@
   </div>
 </template>
   
-  <script setup>
-  import { ref, onMounted } from "vue";
-  import { useRoute } from "vue-router";
-  import { $fetch } from "ofetch";
-  
-  const route = useRoute();
-  const testId = route.query.testId; // Obtén el ID del parámetro de la ruta
-  const resultado = route.params.id; // Accede al query "resultado"
-  
-  const resultadoDetalles = ref(null);
-  
-  const fetchResultadoDetalles = async () => {
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { $fetch } from "ofetch";
+
+const route = useRoute();
+const testId = route.query.testId; // Obtén el ID del test desde los query parameters
+const resultado = route.params.id; // Obtén el ID del resultado desde los parámetros de la ruta
+
+const resultadoDetalles = ref(null);
+const testEtiqueta = ref(""); // Define testEtiqueta como una referencia reactiva
+
+// Función para determinar el estado físico y las deficiencias
+const determinarEstadoFisicoYDeficiencias = (respuestas) => {
+  let puntaje = 0;
+  let deficiencias = [];
+  const {
+    planchas = 0,
+    abdominales = 0,
+    flexibilidad = 0,
+    velocidad = 0,
+    resistencia = 0,
+    tiempoDescanso = 0,
+  } = respuestas;
+
+  if (planchas >= 30) puntaje += 2;
+  else if (planchas >= 20) puntaje += 1;
+  else deficiencias.push("planchas");
+
+  if (abdominales >= 50) puntaje += 2;
+  else if (abdominales >= 30) puntaje += 1;
+  else deficiencias.push("abdominales");
+
+  if (flexibilidad >= 9) puntaje += 2;
+  else if (flexibilidad >= 7) puntaje += 1;
+  else deficiencias.push("flexibilidad");
+
+  if (velocidad >= 9) puntaje += 2;
+  else if (velocidad >= 7) puntaje += 1;
+  else deficiencias.push("velocidad");
+
+  if (resistencia >= 9) puntaje += 2;
+  else if (resistencia >= 7) puntaje += 1;
+  else deficiencias.push("resistencia");
+
+  if (tiempoDescanso >= 9) puntaje += 2;
+  else if (tiempoDescanso >= 8) puntaje += 1;
+  else deficiencias.push("tiempo de descanso");
+
+  let estado;
+  if (puntaje >= 10) estado = "Excelente estado físico";
+  else if (puntaje >= 7) estado = "Buen estado físico";
+  else if (puntaje >= 4) estado = "Saludable";
+  else if (puntaje >= 2) estado = "Estado normal";
+  else estado = "Poco saludable";
+
+  return { estado, deficiencias };
+};
+
+const fetchResultadoDetalles = async () => {
   try {
     const config = useRuntimeConfig(); // Accede a las variables de entorno
 
@@ -177,29 +225,68 @@
       throw new Error("No se encontró el ID del test.");
     }
 
-    // Verificar si el resultado es para un test de "Salud"
+    // Obtener los detalles del test para determinar su etiqueta
     const testResponse = await $fetch(`${config.public.BACKEND_URL}/test/${testId}`);
-    const isSaludTest = testResponse.etiqueta === 'Salud';
+    testEtiqueta.value = testResponse.etiqueta; // Asignar la etiqueta del test
+
+    // Obtener las preguntas del test
+    const preguntasResponse = await $fetch(`${config.public.BACKEND_URL}/preguntas/test/id/${testId}`);
+    const mapeoPreguntas = {}; // Objeto para mapear IDs de preguntas a nombres descriptivos
+
+    // Crear el mapeo de IDs a nombres descriptivos
+    preguntasResponse.forEach(pregunta => {
+      if (pregunta.texto.toLowerCase().includes("planchas")) {
+        mapeoPreguntas[pregunta.id] = "planchas";
+      } else if (pregunta.texto.toLowerCase().includes("abdominales")) {
+        mapeoPreguntas[pregunta.id] = "abdominales";
+      } else if (pregunta.texto.toLowerCase().includes("flexibilidad")) {
+        mapeoPreguntas[pregunta.id] = "flexibilidad";
+      } else if (pregunta.texto.toLowerCase().includes("velocidad")) {
+        mapeoPreguntas[pregunta.id] = "velocidad";
+      } else if (pregunta.texto.toLowerCase().includes("resistencia")) {
+        mapeoPreguntas[pregunta.id] = "resistencia";
+      } else if (pregunta.texto.toLowerCase().includes("tiempo de descanso")) {
+        mapeoPreguntas[pregunta.id] = "tiempo de descanso";
+      }
+    });
 
     let response;
-    if (isSaludTest) {
+    if (testEtiqueta.value === 'Salud') {
       // Lógica específica para tests de "Salud"
       response = await $fetch(`${config.public.BACKEND_URL}/resultados/${resultado}`);
+      console.log("Respuesta del backend (Salud):", response); // Verifica la respuesta
+
+      // Mapear los valores de las respuestas a nombres descriptivos
+      const valoresMapeados = {};
+      for (const [idPregunta, valor] of Object.entries(response.resultado.valores)) {
+        const nombreDescriptivo = mapeoPreguntas[idPregunta] || `Pregunta ${idPregunta}`;
+        valoresMapeados[nombreDescriptivo] = valor;
+      }
+
+      // Calcular el estado físico y las deficiencias
+      const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(valoresMapeados);
+
       resultadoDetalles.value = {
         resultado: {
-          respuestasCorrectas: "N/A", // No aplica para salud
-          respuestasIncorrectas: "N/A", // No aplica para salud
-          porcentajeCorrectas: "N/A", // No aplica para salud
-          valores: response.resultado.valores, // Respuestas numéricas
-          estado: response.estado, // Estado físico
-          deficiencias: response.deficiencias, // Deficiencias
+          valores: valoresMapeados, // Valores mapeados a nombres descriptivos
+          estado: estado, // Estado físico calculado
+          deficiencias: deficiencias.join(", "), // Deficiencias calculadas
         },
-        estado: response.estado,
+        estado: estado,
       };
     } else {
       // Lógica para otros tests
       response = await $fetch(`${config.public.BACKEND_URL}/resultados/${resultado}`);
-      resultadoDetalles.value = response;
+      console.log("Respuesta del backend (Otros):", response); // Verifica la respuesta
+
+      resultadoDetalles.value = {
+        resultado: {
+          respuestasCorrectas: response.resultado.respuestasCorrectas || 0,
+          respuestasIncorrectas: response.resultado.respuestasIncorrectas || "", // Valor por defecto
+          porcentajeCorrectas: response.resultado.porcentajeCorrectas || 0,
+        },
+        estado: response.estado,
+      };
     }
 
     console.log("Detalles del resultado:", resultadoDetalles.value); // Verifica la respuesta
@@ -208,8 +295,8 @@
     alert("Hubo un error al cargar los resultados. Inténtalo de nuevo.");
   }
 };
-  
-  onMounted(() => {
-    fetchResultadoDetalles();
-  });
-  </script>
+
+onMounted(() => {
+  fetchResultadoDetalles();
+});
+</script>
