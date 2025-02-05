@@ -54,7 +54,7 @@
           </NuxtLink>
         </li>
            <!-- Enlace a Rutinas -->
-           <li>
+          <!--  <li>
           <NuxtLink
             to="/rutinas"
             class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
@@ -63,7 +63,7 @@
             <ClipboardListIcon class="h-6 w-6" />
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Rutinas</span>
           </NuxtLink>
-        </li>
+        </li> -->
         <!-- Enlace a Config -->
         <li>
           <NuxtLink

@@ -21,20 +21,32 @@
 
         <!-- Respuestas -->
         <div class="space-y-3">
-          <button
-            v-for="respuesta in currentQuestion.respuestas"
-            :key="respuesta.id"
-            @click="selectAnswer(respuesta)"
-            class="w-full p-4 text-left rounded-lg border border-gray-200 transition-all"
-            :class="{
-              'bg-blue-500 text-white border-blue-500':
-                respuestaSeleccionada?.id === respuesta.id,
-              'hover:border-blue-300 hover:bg-gray-50':
-                respuestaSeleccionada?.id !== respuesta.id,
-            }"
-          >
-            {{ respuesta.respuesta }} <!-- Cambia 'texto' por 'respuesta' -->
-          </button>
+          <template v-if="test.etiqueta === 'Salud'">
+            <input
+              v-model="respuestaNumerica"
+              type="number"
+              min="0"
+              class="w-full p-4 border rounded-lg"
+              :placeholder="placeholderSalud"
+              @keyup.enter="handleSaludAnswer"
+            />
+          </template>
+          <template v-else>
+            <button
+              v-for="respuesta in currentQuestion.respuestas"
+              :key="respuesta.id"
+              @click="selectAnswer(respuesta)"
+              class="w-full p-4 text-left rounded-lg border border-gray-200 transition-all"
+              :class="{
+                'bg-blue-500 text-white border-blue-500':
+                  respuestaSeleccionada?.id === respuesta.id,
+                'hover:border-blue-300 hover:bg-gray-50':
+                  respuestaSeleccionada?.id !== respuesta.id,
+              }"
+            >
+              {{ respuesta.respuesta }}
+            </button>
+          </template>
         </div>
 
         <!-- Botones de navegación -->
@@ -42,7 +54,11 @@
           <button
             v-if="currentQuestionIndex < totalQuestions - 1"
             @click="nextQuestion"
-            :disabled="!respuestaSeleccionada"
+            :disabled="
+              test.etiqueta === 'Salud'
+                ? !respuestaNumerica
+                : !respuestaSeleccionada
+            "
             class="px-6 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
             Siguiente →
@@ -51,7 +67,11 @@
           <button
             v-if="currentQuestionIndex === totalQuestions - 1"
             @click="finishTest"
-            :disabled="!respuestaSeleccionada"
+            :disabled="
+              test.etiqueta === 'Salud'
+                ? !respuestaNumerica
+                : !respuestaSeleccionada
+            "
             class="px-6 py-2 bg-green-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
           >
             Finalizar Test
@@ -63,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -80,90 +100,79 @@ const answers = ref([]);
 const respuestaSeleccionada = ref(null);
 const runtimeConfig = useRuntimeConfig();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
+const respuestaNumerica = ref("");
+const respuestasSalud = ref({});
+
+const placeholderSalud = computed(() => {
+  if (!currentQuestion.value) return "Ingresa un número";
+  return `Ingresa ${currentQuestion.value.texto.toLowerCase()}`;
+});
+
+const handleSaludAnswer = () => {
+  if (!respuestaNumerica.value) return;
+  nextQuestion();
+};
 
 // Función para obtener el test
 const fetchTest = async () => {
   try {
     loading.value = true;
-
-    // Obtener el token desde el localStorage
     const token = localStorage.getItem("accessToken");
-    if (!token) {
-      throw new Error("No se encontró un token de autenticación");
-    }
+    if (!token) throw new Error("No se encontró token de autenticación");
 
-    // 1. Obtener el test básico
+    // Obtener test básico
     const testResponse = await $fetch(
       `http://localhost:3000/api/test/${testId.value}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     test.value = testResponse;
 
-    // 2. Obtener las preguntas del test
-    const preguntasResponse = await $fetch(
-      `${apiBaseUrl}/preguntas/test/id/${testId.value}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    test.value.preguntas = preguntasResponse;
-
-    // 3. Obtener las respuestas para cada pregunta
-    for (const pregunta of test.value.preguntas) {
-      const respuestasResponse = await $fetch(
-        `${apiBaseUrl}/respuestas/pregunta/${pregunta.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+    if (testResponse.etiqueta === "Salud") {
+      // Configurar preguntas predefinidas para salud
+      const preguntasResponse = await $fetch(
+        `${apiBaseUrl}/preguntas/test/id/${testId.value}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      test.value.preguntas = preguntasResponse;
+      totalQuestions.value = test.value.preguntas?.length || 0;
+    } else {
+      // Lógica normal para otros tests
+      const preguntasResponse = await $fetch(
+        `${apiBaseUrl}/preguntas/test/id/${testId.value}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      test.value.preguntas = preguntasResponse;
 
-      // Parsear respuestas si es necesario
-      pregunta.respuestas = respuestasResponse.map((respuesta) => {
-        let respuestaValue = respuesta.respuesta;
-
-        // Si la respuesta es un string que parece un JSON, intentar parsearlo
-        if (typeof respuestaValue === "string") {
-          try {
-            respuestaValue = JSON.parse(respuestaValue);
-          } catch (error) {
-            console.warn("La respuesta no es un JSON válido, se usará como texto:", respuestaValue);
-          }
-        }
-
-        return {
+      // Obtener respuestas para cada pregunta
+      for (const pregunta of test.value.preguntas) {
+        const respuestasResponse = await $fetch(
+          `${apiBaseUrl}/respuestas/pregunta/${pregunta.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        pregunta.respuestas = respuestasResponse.map((respuesta) => ({
           id: respuesta.id,
           tipo: respuesta.tipo,
-          respuesta: respuestaValue,
-        };
-      });
+          respuesta: tryParseJSON(respuesta.respuesta),
+        }));
+      }
+      totalQuestions.value = test.value.preguntas?.length || 0;
     }
 
-    // Verificar si hay preguntas
-    totalQuestions.value = test.value.preguntas?.length || 0;
-    if (totalQuestions.value === 0) {
-      throw new Error("El test no tiene preguntas");
-    }
-
-    // Mostrar la primera pregunta
     currentQuestion.value = test.value.preguntas[currentQuestionIndex.value];
     loading.value = false;
   } catch (error) {
     console.error("Error:", error);
     test.value = { titulo: "Error", descripcion: error.message };
     loading.value = false;
+    if (error.response?.status === 401) router.push("/login");
+  }
+};
 
-    // Si el error es 401, redirigir al usuario a la página de inicio de sesión
-    if (error.response?.status === 401) {
-      router.push("/login");
-    }
+const tryParseJSON = (str) => {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return str;
   }
 };
 
@@ -179,14 +188,29 @@ watch(
   { immediate: true }
 );
 
-// Selección de respuesta
+// Selección de respuesta para tests normales
 const selectAnswer = (respuesta) => {
   respuestaSeleccionada.value = respuesta;
 };
 
-// Siguiente pregunta
+// Navegación entre preguntas
 const nextQuestion = () => {
-  if (respuestaSeleccionada.value) {
+  if (test.value.etiqueta === "Salud") {
+    if (!respuestaNumerica.value) return;
+
+    // Guardar respuesta y reiniciar input
+    respuestasSalud.value[currentQuestion.value.id] = parseInt(
+      respuestaNumerica.value
+    );
+    respuestaNumerica.value = "";
+
+    if (currentQuestionIndex.value < totalQuestions.value - 1) {
+      currentQuestionIndex.value++;
+      currentQuestion.value = test.value.preguntas[currentQuestionIndex.value];
+    }
+  } else {
+    if (!respuestaSeleccionada.value) return;
+
     answers.value.push({
       preguntaId: currentQuestion.value.id,
       respuestaId: respuestaSeleccionada.value.id,
@@ -202,36 +226,87 @@ const nextQuestion = () => {
 
 // Finalizar test
 const finishTest = async () => {
-  // Guardar la última respuesta seleccionada
-  answers.value.push({
-    preguntaId: currentQuestion.value.id,
-    respuestaId: respuestaSeleccionada.value.id,
-  });
-
-  console.log("Respuestas a enviar:", answers.value); // Verificar las respuestas
-
   try {
-    // Enviar las respuestas al backend
-    console.log("Enviando respuestas al backend...");
-    const resultado = await $fetch(
-      `${apiBaseUrl}/test/${testId.value}/resultados`,
-      {
-        method: "POST",
-        body: { respuestas: answers.value },
+    if (test.value.etiqueta === "Salud") {
+      // Guardar última respuesta si existe
+      if (respuestaNumerica.value) {
+        respuestasSalud.value[currentQuestion.value.id] = parseInt(
+          respuestaNumerica.value
+        );
       }
-    );
 
-    console.log("Respuesta del backend:", resultado); // Verificar la respuesta del backend
+      const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(
+        respuestasSalud.value
+      );
+      const resultado = await $fetch(
+        `${apiBaseUrl}/test/${testId.value}/resultados`,
+        {
+          method: "POST",
+          body: {
+            respuestas: respuestasSalud.value,
+            estado,
+            deficiencias,
+          },
+        }
+      );
+      router.push({
+        path: `/resultadoTest/${resultado.id}`,
+        query: { testId: testId.value },
+      });
+    } else {
+      if (respuestaSeleccionada.value) {
+        answers.value.push({
+          preguntaId: currentQuestion.value.id,
+          respuestaId: respuestaSeleccionada.value.id,
+        });
+      }
 
-    // Redirigir a la página de resultados dinámica
-    console.log("Redirigiendo a la página de resultados...");
-    router.push({
-      path: `/resultadoTest/${testId.value}`, // Usa la ruta dinámica con el ID del test
-      query: { resultado: resultado.id }, // Pasa el ID del resultado como query
-    });
+      const resultado = await $fetch(
+        `${apiBaseUrl}/test/${testId.value}/resultados`,
+        { method: "POST", body: { respuestas: answers.value } }
+      );
+      router.push({
+        path: `/resultadoTest/${testId.value}`, // Usa la ruta dinámica con el ID del test
+        query: { resultado: resultado.id }, // Pasa el ID del resultado como query
+      });
+    }
   } catch (error) {
     console.error("Error al enviar respuestas:", error);
     alert("Error al enviar respuestas. Inténtalo de nuevo.");
   }
+};
+
+// Función de evaluación para salud
+const determinarEstadoFisicoYDeficiencias = (respuestas) => {
+  const valores = {
+    planchas: respuestas[1] || 0,
+    abdominales: respuestas[2] || 0,
+    resistencia: respuestas[3] || 0,
+  };
+
+  let puntaje = 0;
+  let deficiencias = [];
+
+  // Lógica de puntuación
+  if (valores.planchas >= 30) puntaje += 2;
+  else if (valores.planchas >= 20) puntaje += 1;
+  else deficiencias.push("planchas");
+
+  if (valores.abdominales >= 50) puntaje += 2;
+  else if (valores.abdominales >= 30) puntaje += 1;
+  else deficiencias.push("abdominales");
+
+  if (valores.resistencia >= 30) puntaje += 2;
+  else if (valores.resistencia >= 15) puntaje += 1;
+  else deficiencias.push("resistencia");
+
+  // Determinar estado final
+  let estado;
+  if (puntaje >= 6) estado = "Excelente estado físico";
+  else if (puntaje >= 4) estado = "Buen estado físico";
+  else if (puntaje >= 2) estado = "Estado regular";
+  else estado = "Necesita mejorar";
+
+  return { estado, deficiencias: deficiencias.join(", ") };
 };
 </script>

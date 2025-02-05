@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 py-8 pl-20 md:pl-52">
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pl-20 md:pl-52">
       <div class="max-w-3xl w-full bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Encabezado -->
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">

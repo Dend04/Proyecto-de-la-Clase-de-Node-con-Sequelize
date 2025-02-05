@@ -121,24 +121,21 @@ export const saveTestResults = async (testId, respuestas) => {
     }
 
     // Verificar la etiqueta del test
-    if (test.etiqueta === 'salud') {
-      // Lógica para tests de salud
-      console.log('Test de salud detectado. Procesando de manera diferente.');
-
-      // Aquí puedes definir cómo deseas manejar los resultados para los tests de salud
-      const resultadoSalud = await Resultado.create({
+     if (test.etiqueta === 'Salud') {
+      // Para tests de salud, usar la lógica del frontend
+      const resultado = await Resultado.create({
+        usuarioId: body.usuarioId,
         testId,
         resultado: {
-          respuestasCorrectas: 0, // O cualquier lógica que desees
-          respuestasIncorrectas: 'No aplicable para tests de salud',
-          porcentajeCorrectas: 0, // O cualquier lógica que desees
+          valores: body.respuestas,
+          estado: body.estado,
+          deficiencias: body.deficiencias
         },
-        estado: 'Resultado no aplicable para tests de salud',
-        deficiencias: 'No aplicable para tests de salud',
+        estado: body.estado,
+        deficiencias: body.deficiencias
       });
-
-      console.log('Resultado guardado para test de salud:', resultadoSalud);
-      return resultadoSalud;
+      
+      return resultado;
     }
 
     // Obtener el número total de preguntas del test
