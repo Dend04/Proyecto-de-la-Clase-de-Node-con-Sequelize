@@ -227,28 +227,23 @@ const nextQuestion = () => {
 // Finalizar test
 const finishTest = async () => {
   try {
-    if (test.value.etiqueta === "Salud") {
+    if (test.value.etiqueta === 'Salud') {
       // Guardar última respuesta si existe
       if (respuestaNumerica.value) {
-        respuestasSalud.value[currentQuestion.value.id] = parseInt(
-          respuestaNumerica.value
-        );
+        respuestasSalud.value[currentQuestion.value.id] = parseInt(respuestaNumerica.value);
       }
 
-      const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(
-        respuestasSalud.value
-      );
-      const resultado = await $fetch(
-        `${apiBaseUrl}/test/${testId.value}/resultados`,
-        {
-          method: "POST",
-          body: {
-            respuestas: respuestasSalud.value,
-            estado,
-            deficiencias,
-          },
-        }
-      );
+      const { estado, deficiencias } = determinarEstadoFisicoYDeficiencias(respuestasSalud.value);
+      const resultado = await $fetch(`${apiBaseUrl}/test/${testId.value}/resultados`, {
+        method: 'POST',
+        body: {
+          respuestas: respuestasSalud.value,
+          estado,
+          deficiencias,
+        },
+      });
+
+      // Redirigir con el testId como query parameter
       router.push({
         path: `/resultadoTest/${resultado.id}`,
         query: { testId: testId.value },
@@ -261,13 +256,15 @@ const finishTest = async () => {
         });
       }
 
-      const resultado = await $fetch(
-        `${apiBaseUrl}/test/${testId.value}/resultados`,
-        { method: "POST", body: { respuestas: answers.value } }
-      );
+      const resultado = await $fetch(`${apiBaseUrl}/test/${testId.value}/resultados`, {
+        method: 'POST',
+        body: { respuestas: answers.value },
+      });
+
+      // Redirigir con el testId como query parameter
       router.push({
-        path: `/resultadoTest/${testId.value}`, // Usa la ruta dinámica con el ID del test
-        query: { resultado: resultado.id }, // Pasa el ID del resultado como query
+        path: `/resultadoTest/${resultado.id}`,
+        query: { testId: testId.value },
       });
     }
   } catch (error) {

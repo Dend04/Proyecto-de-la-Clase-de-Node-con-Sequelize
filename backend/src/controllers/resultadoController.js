@@ -121,18 +121,18 @@ export const saveTestResults = async (testId, respuestas) => {
     }
 
     // Verificar la etiqueta del test
-     if (test.etiqueta === 'Salud') {
-      // Para tests de salud, usar la lógica del frontend
+    if (test.etiqueta === 'Salud') {
+      // Para tests de salud, usar la lógica específica
       const resultado = await Resultado.create({
-        usuarioId: body.usuarioId,
+        usuarioId: respuestas.usuarioId, // Asegúrate de que el usuarioId esté presente en las respuestas
         testId,
         resultado: {
-          valores: body.respuestas,
-          estado: body.estado,
-          deficiencias: body.deficiencias
+          valores: respuestas, // Aquí se guardan las respuestas numéricas
+          estado: respuestas.estado, // Asegúrate de que el estado esté presente en las respuestas
+          deficiencias: respuestas.deficiencias // Asegúrate de que las deficiencias estén presentes en las respuestas
         },
-        estado: body.estado,
-        deficiencias: body.deficiencias
+        estado: respuestas.estado,
+        deficiencias: respuestas.deficiencias
       });
       
       return resultado;
