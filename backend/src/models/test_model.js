@@ -32,4 +32,5 @@ const Test = sequelize.define('Test', {
   tableName: 'Test',
 });
 
+
 export default Test;

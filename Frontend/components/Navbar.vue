@@ -31,6 +31,7 @@
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Home</span>
           </NuxtLink>
         </li>
+        <!-- Enlace a Test -->
         <li>
           <NuxtLink
             to="/test"
@@ -41,6 +42,7 @@
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Test</span>
           </NuxtLink>
         </li>
+        <!-- Enlace a Usuarios -->
         <li>
           <NuxtLink
             to="/usuarios"
@@ -51,6 +53,18 @@
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Usuarios</span>
           </NuxtLink>
         </li>
+           <!-- Enlace a Rutinas -->
+           <li>
+          <NuxtLink
+            to="/rutinas"
+            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            :title="isNavbarOpen ? 'Rutinas' : ''"
+          >
+            <ClipboardListIcon class="h-6 w-6" />
+            <span v-if="isNavbarOpen" class="ml-2 text-sm">Rutinas</span>
+          </NuxtLink>
+        </li>
+        <!-- Enlace a Config -->
         <li>
           <NuxtLink
             to="/config"
@@ -60,7 +74,7 @@
             <CogIcon class="h-6 w-6" />
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Config</span>
           </NuxtLink>
-        </li>
+        </li>    
       </ul>
     </div>
   </div>
@@ -74,6 +88,7 @@ import {
   CogIcon,
   MenuIcon,
   UserIcon,
+  ClipboardListIcon, // Nuevo ícono para Rutinas
 } from "@heroicons/vue/outline";
 
 // Estado para controlar la visibilidad del Navbar

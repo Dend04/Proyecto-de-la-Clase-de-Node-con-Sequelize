@@ -33,8 +33,13 @@ Respuesta.belongsTo(Pregunta, { foreignKey: "preguntaId" });
 Usuario.hasMany(Resultado, { foreignKey: "usuarioId" });
 Resultado.belongsTo(Usuario, { foreignKey: "usuarioId" });
 
-Resultado.hasOne(Rutina, { foreignKey: "resultadoId" });
-Rutina.belongsTo(Resultado, { foreignKey: "resultadoId" });
+Resultado.hasMany(Rutina, { foreignKey: "resultadoId" });
+
+Test.hasMany(Resultado, { foreignKey: "testId" });
+Resultado.belongsTo(Test, { foreignKey: "testId" });
+
+Usuario.hasMany(Resultado, { foreignKey: "usuarioId", onDelete: 'CASCADE' });
+Resultado.belongsTo(Usuario, { foreignKey: "usuarioId", onDelete: 'CASCADE' });
 
 const app = express();
 const __dirname = path.resolve();

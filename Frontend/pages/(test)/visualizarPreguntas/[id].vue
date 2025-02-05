@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col items-center p-6">
+  <div class="min-h-screen bg-gray-50 flex flex-col items-center p-6 py-8 pl-20 md:pl-52">
     <!-- Título -->
     <h1 class="text-4xl font-bold text-gray-800 mb-8">Preguntas del Test</h1>
 
