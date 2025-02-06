@@ -22,7 +22,13 @@ if (!fs.existsSync(uploadDir)) {
 // Crear un nuevo usuario
 export const crearUsuario = async (userData) => {
   try {
-    const nuevoUsuario = await Usuario.create(userData);
+    const nuevoUsuario = await Usuario.create({
+      ...userData,
+      rol: userData.rol || 'usuario',
+    });
+
+    console.log("Usuario creado:", nuevoUsuario); // Verifica el rol del usuario creado
+
     return {
       success: true,
       message: "Usuario creado exitosamente",

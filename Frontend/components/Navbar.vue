@@ -42,8 +42,8 @@
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Test</span>
           </NuxtLink>
         </li>
-        <!-- Enlace a Usuarios -->
-        <li>
+        <!-- Enlace a Usuarios (solo para administradores) -->
+        <li v-if="userRole === 'administrador'">
           <NuxtLink
             to="/usuarios"
             class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
@@ -53,28 +53,18 @@
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Usuarios</span>
           </NuxtLink>
         </li>
-           <!-- Enlace a Rutinas -->
-          <!--  <li>
-          <NuxtLink
-            to="/rutinas"
-            class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-            :title="isNavbarOpen ? 'Rutinas' : ''"
-          >
-            <ClipboardListIcon class="h-6 w-6" />
-            <span v-if="isNavbarOpen" class="ml-2 text-sm">Rutinas</span>
-          </NuxtLink>
-        </li> -->
         <!-- Enlace a Config -->
         <li>
           <NuxtLink
             to="/config"
             class="flex items-center p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
             :title="isNavbarOpen ? 'Config' : ''"
+            @click="handleConfigClick"
           >
             <CogIcon class="h-6 w-6" />
             <span v-if="isNavbarOpen" class="ml-2 text-sm">Config</span>
           </NuxtLink>
-        </li>    
+        </li>
       </ul>
     </div>
   </div>
@@ -82,22 +72,49 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { jwtDecode } from "jwt-decode";
 import {
   HomeIcon,
   BeakerIcon,
   CogIcon,
   MenuIcon,
   UserIcon,
-  ClipboardListIcon, // Nuevo ícono para Rutinas
 } from "@heroicons/vue/outline";
 
 // Estado para controlar la visibilidad del Navbar
 const isNavbarOpen = ref(true);
+const userRole = ref(""); // Rol del usuario
 
 // Función para alternar la visibilidad del Navbar
 function toggleNavbar() {
   isNavbarOpen.value = !isNavbarOpen.value;
 }
+
+// Obtener el rol del usuario desde el token
+const getUserRole = () => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    const decoded = jwtDecode(token);
+    userRole.value = decoded.rol; // Asignar el rol del usuario
+  }
+};
+
+// Función para manejar el clic en el enlace de Config
+const handleConfigClick = () => {
+  const last2FATime = localStorage.getItem("last2FATime");
+  const currentTime = Date.now();
+
+  // Verificar si el 2FA está activado y si han pasado más de 30 segundos
+  if (userRole.value.estaVerificado2FA) {
+    if (!last2FATime || currentTime - last2FATime > 10000) {
+      navigateTo("/verificar-2fa");
+    } else {
+      navigateTo("/config");
+    }
+  } else {
+    navigateTo("/config");
+  }
+};
 
 // Ajustar la visibilidad del Navbar según el tamaño de la pantalla
 onMounted(() => {
@@ -110,6 +127,9 @@ onMounted(() => {
   };
   window.addEventListener("resize", updateNavbarVisibility);
   updateNavbarVisibility();
+
+  // Obtener el rol del usuario al cargar el componente
+  getUserRole();
 });
 </script>
 

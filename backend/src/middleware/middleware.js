@@ -5,7 +5,7 @@ export const middleware = (req, res, next) => {
   next(); // Pasa el control al siguiente middleware
 };
 
-export const verificarToken = (rolRequerido) => {
+export const verificarToken = (...rolesRequeridos) => {
   return (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
@@ -14,9 +14,11 @@ export const verificarToken = (rolRequerido) => {
       if (err) return res.status(401).json({ error: 'Token no válido o expirado' });
       req.usuario = decoded;
 
-      // Verificar el rol del usuario
-      if (rolRequerido && req.usuario.rol !== rolRequerido) {
-        return res.status(403).json({ error: 'Acceso denegado. Rol no autorizado.' });
+      // Verificar si el rol del usuario está entre los requeridos
+      if (rolesRequeridos.length > 0 && !rolesRequeridos.includes(req.usuario.rol)) {
+        return res.status(403).json({ 
+          error: `Acceso denegado. Rol ${req.usuario.rol} no autorizado.`
+        });
       }
 
       next();

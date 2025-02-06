@@ -145,7 +145,7 @@ router.get('/test/:id', async (req, res) => {
  *             example:
  *               error: "El título del test es obligatorio"
  */
-router.post('/crearTest',verificarToken('usuario'), async (req, res) => {
+router.post('/crearTest',verificarToken('administrador'), async (req, res) => {
   try {
     const test = await createTest(req.body);
     res.status(201).json(test);
@@ -201,7 +201,7 @@ router.post('/crearTest',verificarToken('usuario'), async (req, res) => {
  *             example:
  *               error: "Test no encontrado"
  */
-router.put('/test/:id',verificarToken('usuario'), async (req, res) => {
+router.put('/test/:id',verificarToken('administrador'), async (req, res) => {
   try {
     const test = await updateTest(req.params.id, req.body);
     res.status(200).json(test);
@@ -246,7 +246,7 @@ router.put('/test/:id',verificarToken('usuario'), async (req, res) => {
  *             example:
  *               error: "Test no encontrado"
  */
-router.delete('/test/:id',verificarToken('usuario'), async (req, res) => {
+router.delete('/test/:id',verificarToken('administrador'), async (req, res) => {
   try {
     await deleteTest(req.params.id);
     res.status(200).json({ message: "Test eliminado satisfactoriamente" });

@@ -87,6 +87,7 @@ router.post('/crearUsuario', uploadFotoPerfil, async (req, res) => {
       enfermedadCronica,
       estadoFisicoActual,
       fotoPerfil: fotoPerfilPath,
+      rol: req.body.rol || "usuario"
     };
 
     const usuario = await crearUsuario(userData);
@@ -114,7 +115,7 @@ router.post('/crearUsuario', uploadFotoPerfil, async (req, res) => {
  *       500:
  *         description: Error del servidor
  */
-router.get('/usuarios', verificarToken('usuario'), async (req, res) => {
+router.get('/usuarios', verificarToken('administrador'), async (req, res) => {
   try {
     const usuarios = await obtenerUsuarios();
     res.status(200).json(usuarios);
@@ -146,7 +147,7 @@ router.get('/usuarios', verificarToken('usuario'), async (req, res) => {
  *       404:
  *         description: Usuario no encontrado
  */
-router.get('/usuario/:id', verificarToken('usuario'), async (req, res) => {
+router.get('/usuario/:id', verificarToken('administrador'), async (req, res) => {
   try {
     const usuario = await obtenerUsuarioPorId(req.params.id);
     res.status(200).json(usuario);
@@ -184,7 +185,7 @@ router.get('/usuario/:id', verificarToken('usuario'), async (req, res) => {
  *       400:
  *         description: Error en la actualización del usuario
  */
-router.put('/usuario/:id', verificarToken('usuario'), async (req, res) => {
+router.put('/usuario/:id', verificarToken('usuario','administrador'), async (req, res) => {
   try {
     const usuario = await actualizarUsuario(req.params.id, req.body);
     res.status(200).json(usuario);
@@ -212,7 +213,7 @@ router.put('/usuario/:id', verificarToken('usuario'), async (req, res) => {
  *       400:
  *         description: Error en la eliminación del usuario
  */
-router.delete('/usuario/:id',verificarToken('usuario'), async (req, res) => {
+router.delete('/usuario/:id',verificarToken('administrador'), async (req, res) => {
   try {
     await borrarUsuario(req.params.id);
     res.status(204).send();
@@ -254,7 +255,7 @@ router.delete('/usuario/:id',verificarToken('usuario'), async (req, res) => {
  *       400:
  *         description: Error en la actualización del nombre de usuario
  */
-router.put('/usuario/:id/username',verificarToken('usuario'), async (req, res) => {
+router.put('/usuario/:id/username',verificarToken('administrador'), async (req, res) => {
   try {
     const usuario = await actualizarNombreUsuario(req.params.id, req.body.username);
     res.status(200).json(usuario);
@@ -288,7 +289,7 @@ router.put('/usuario/:id/username',verificarToken('usuario'), async (req, res) =
  *       400:
  *         description: Error en la búsqueda de usuarios
  */
-router.get('/usuarios/buscar/:query',verificarToken('usuario'), async (req, res) => {
+router.get('/usuarios/buscar/:query',verificarToken('administrador'), async (req, res) => {
   try {
     const usuarios = await buscarUsuarios(req.params.query);
     res.status(200).json(usuarios);
@@ -413,7 +414,7 @@ router.post('/login', async (req, res) => {
  *             example:
  *               error: "El email ya está registrado"
  */
-router.post('/registro', verificarToken('usuario'), async (req, res) => {
+router.post('/registro', verificarToken('administrador'), async (req, res) => {
   try {
     const usuario = await crearUsuario(req.body);
     res.status(201).json(usuario);
@@ -456,7 +457,7 @@ router.post('/registro', verificarToken('usuario'), async (req, res) => {
  *       500:
  *         description: Error al obtener perfil del usuario
  */
-router.get('/perfil', verificarToken('usuario'), async (req, res) => {
+router.get('/perfil', verificarToken('usuario','administrador'), async (req, res) => {
   try {
     const usuario = await obtenerPerfil(req);
     if (!usuario) {
@@ -517,7 +518,7 @@ router.post('/refrescarToken', async (req, res) => {
   }
 });
 
-router.post('/cerrarSesion',verificarToken('usuario') , async (req, res) => {
+router.post('/cerrarSesion',verificarToken('usuario','administrador') , async (req, res) => {
   try {
     await cerrarSesion(req);
     res.status(200).json({ message: 'Logout successful' });
@@ -526,7 +527,7 @@ router.post('/cerrarSesion',verificarToken('usuario') , async (req, res) => {
   }
 });
 
-router.get('/auth/estado', verificarToken('usuario'), async (req, res) => {
+router.get('/auth/estado', verificarToken('usuario','administrador'), async (req, res) => {
   try {
     const usuario = await obtenerEstadoUsuario(req);
     res.status(200).json({ usuario });
@@ -554,7 +555,7 @@ router.post('/generarNombreUsuario', async (req, res) => {
   }
 });
 
-router.put('/usuario/:id/cambiar-contrasena', verificarToken('usuario'), async (req, res) => {
+router.put('/usuario/:id/cambiar-contrasena', verificarToken('usuario','administrador'), async (req, res) => {
   try {
     const { contrasenaActual, nuevaContrasena } = req.body;
     const { id } = req.params;
