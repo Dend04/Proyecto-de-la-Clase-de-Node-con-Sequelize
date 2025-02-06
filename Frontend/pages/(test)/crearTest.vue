@@ -137,6 +137,15 @@ const submitForm = async () => {
     console.error('Error al crear el test:', error);
   }
 };
+useHead({
+  title: "Crear Test - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Crear los test para realizar.",
+    },
+  ],
+});
 </script>
 
 <style scoped>

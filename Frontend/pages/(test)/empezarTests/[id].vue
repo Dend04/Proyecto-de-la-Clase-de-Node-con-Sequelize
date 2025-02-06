@@ -306,4 +306,13 @@ const determinarEstadoFisicoYDeficiencias = (respuestas) => {
 
   return { estado, deficiencias: deficiencias.join(", ") };
 };
+useHead({
+  title: "Empezar Test - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Comenzar los test.",
+    },
+  ],
+});
 </script>

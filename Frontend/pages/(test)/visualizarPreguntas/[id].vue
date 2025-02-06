@@ -418,6 +418,15 @@ const cerrarModalRespuesta = () => {
 onMounted(() => {
   fetchPreguntas();
 });
+useHead({
+  title: "Visualizar preguntas - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Visualizar las preguntas por un id de los test para realizar.",
+    },
+  ],
+});
 </script>
 
 <style scoped>

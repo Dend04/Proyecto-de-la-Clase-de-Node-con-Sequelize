@@ -326,6 +326,15 @@ const cerrarModalRespuesta = () => {
   respuesta.value = { texto: "", correcta: false, preguntaIndex: null };
   editandoRespuesta.value = false;
 };
+useHead({
+  title: "Agregar Preguntas al test - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Agregar preguntas a los test",
+    },
+  ],
+});
 </script>
 <style scoped>
 /* Estilos personalizados */

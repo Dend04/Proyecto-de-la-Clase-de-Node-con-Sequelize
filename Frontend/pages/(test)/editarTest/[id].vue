@@ -188,6 +188,15 @@ const submitForm = async () => {
 onMounted(() => {
   fetchTest();
 });
+useHead({
+  title: "Editar Test - TestMaster",
+  meta: [
+    {
+      name: "description",
+      content: "Editar los test para realizar.",
+    },
+  ],
+});
 </script>
 
 <style scoped>
