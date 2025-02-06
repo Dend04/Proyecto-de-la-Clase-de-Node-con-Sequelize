@@ -87,14 +87,19 @@
               class="block text-sm font-medium text-gray-700"
               >Enfermedad Crónica</label
             >
-            <input
+            <select
               v-model="createUserForm.enfermedadCronica"
-              type="text"
               id="enfermedadCronica"
               class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-              placeholder="Ej: Ninguna"
               required
-            />
+            >
+              <option value="Ninguna">Ninguna</option>
+              <option value="Diabetes">Diabetes</option>
+              <option value="Hipertensión">Hipertensión</option>
+              <option value="Asma">Asma</option>
+              <option value="Artritis">Artritis</option>
+              <option value="Enfermedad cardíaca">Enfermedad cardíaca</option>
+            </select>
           </div>
           <!-- Estado Físico Actual -->
           <div class="mb-6">
@@ -103,14 +108,17 @@
               class="block text-sm font-medium text-gray-700"
               >Estado Físico Actual</label
             >
-            <input
+            <select
               v-model="createUserForm.estadoFisicoActual"
-              type="text"
               id="estadoFisicoActual"
               class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-              placeholder="Ej: Activo"
               required
-            />
+            >
+              <option value="Poco saludable">Poco saludable</option>
+              <option value="Saludable">Saludable</option>
+              <option value="Muy saludable">Muy saludable</option>
+              <option value="Atleta">Atleta</option>
+            </select>
           </div>
           <!-- Botón para avanzar al siguiente paso -->
           <div class="flex justify-end">
@@ -160,55 +168,73 @@
               required
             />
           </div>
-         <!-- Campo de Contraseña -->
-  <div class="mb-4 relative">
-    <label for="password" class="block text-sm font-medium text-gray-700">
-      Contraseña
-    </label>
-    <div class="relative">
-      <input
-        v-model="createUserForm.password"
-        :type="showPassword ? 'text' : 'password'"
-        id="password"
-        class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
-        placeholder="Ej: password123"
-        required
-      />
-      <button
-        type="button"
-        @click="togglePasswordVisibility"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-      >
-        <EyeIcon v-if="showPassword" class="h-5 w-5 text-gray-500" />
-        <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
-      </button>
-    </div>
-  </div>
-
-  <!-- Campo de Confirmar Contraseña -->
-  <div class="mb-6 relative">
-    <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
-      Confirmar Contraseña
-    </label>
-    <div class="relative">
-      <input
-        v-model="createUserForm.confirmPassword"
-        :type="showConfirmPassword ? 'text' : 'password'"
-        id="confirmPassword"
-        class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
-        placeholder="Ej: password123"
-        required
-      />
-      <button
-        type="button"
-        @click="toggleConfirmPasswordVisibility"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-      >
-        <EyeIcon v-if="showConfirmPassword" class="h-5 w-5 text-gray-500" />
-        <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
-      </button>
-    </div>
-  </div>
+          <!-- Campo de Contraseña -->
+          <div class="mb-4 relative">
+            <label for="password" class="block text-sm font-medium text-gray-700">
+              Contraseña
+            </label>
+            <div class="relative">
+              <input
+                v-model="createUserForm.password"
+                :type="showPassword ? 'text' : 'password'"
+                id="password"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
+                placeholder="Ej: password123"
+                required
+                @input="validatePassword"
+              />
+              <button
+                type="button"
+                @click="togglePasswordVisibility"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+              >
+                <EyeIcon v-if="showPassword" class="h-5 w-5 text-gray-500" />
+                <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <!-- Advertencia de contraseña corta -->
+            <p
+              v-if="passwordError && createUserForm.password.length > 0"
+              class="text-sm text-red-500 mt-1"
+            >
+              La contraseña debe tener al menos 8 caracteres.
+            </p>
+          </div>
+          <!-- Campo de Confirmar Contraseña -->
+          <div class="mb-6 relative">
+            <label
+              for="confirmPassword"
+              class="block text-sm font-medium text-gray-700"
+            >
+              Confirmar Contraseña
+            </label>
+            <div class="relative">
+              <input
+                v-model="createUserForm.confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
+                placeholder="Ej: password123"
+                required
+                @input="validatePasswordMatch"
+              />
+              <button
+                type="button"
+                @click="toggleConfirmPasswordVisibility"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+              >
+                <EyeIcon v-if="showConfirmPassword" class="h-5 w-5 text-gray-500" />
+                <EyeOffIcon v-else class="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <!-- Advertencia de contraseñas no coincidentes -->
+            <p
+              v-if="passwordMatchError && createUserForm.confirmPassword.length > 0"
+              class="text-sm text-red-500 mt-1"
+            >
+              Las contraseñas no coinciden.
+            </p>
+          </div>
           <!-- Botón para avanzar al siguiente paso -->
           <div class="flex justify-between">
             <button
@@ -312,14 +338,15 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { EyeIcon, EyeOffIcon } from "@heroicons/vue/solid"; // Importa los íconos
 
-
 const runtimeConfig = useRuntimeConfig();
 const router = useRouter();
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const passwordError = ref(false); // Estado para la advertencia de contraseña corta
+const passwordMatchError = ref(false); // Estado para la advertencia de contraseñas no coincidentes
 
-
+// Función para alternar la visibilidad de la contraseña
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
@@ -327,6 +354,17 @@ const togglePasswordVisibility = () => {
 // Función para alternar la visibilidad de la confirmación de contraseña
 const toggleConfirmPasswordVisibility = () => {
   showConfirmPassword.value = !showConfirmPassword.value;
+};
+
+// Función para validar la longitud de la contraseña
+const validatePassword = () => {
+  passwordError.value = createUserForm.value.password.length < 8;
+};
+
+// Función para validar que las contraseñas coincidan
+const validatePasswordMatch = () => {
+  passwordMatchError.value =
+    createUserForm.value.password !== createUserForm.value.confirmPassword;
 };
 
 // Estado para el formulario de creación de usuario
@@ -340,8 +378,8 @@ const createUserForm = ref({
   confirmPassword: "",
   peso: null,
   altura: null,
-  enfermedadCronica: "",
-  estadoFisicoActual: "",
+  enfermedadCronica: "Ninguna", // Valor predeterminado
+  estadoFisicoActual: "Poco saludable", // Valor predeterminado
   fotoPerfil: null,
 });
 
@@ -380,6 +418,11 @@ const handleCreateUser = async () => {
     // Validar que las contraseñas coincidan
     if (createUserForm.value.password !== createUserForm.value.confirmPassword) {
       throw new Error("Las contraseñas no coinciden");
+    }
+
+    // Validar la longitud de la contraseña
+    if (createUserForm.value.password.length < 8) {
+      throw new Error("La contraseña debe tener al menos 8 caracteres");
     }
 
     // Crear un FormData para enviar los datos del formulario
@@ -425,4 +468,3 @@ const handleCreateUser = async () => {
   }
 };
 </script>
-

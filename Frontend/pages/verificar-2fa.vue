@@ -50,6 +50,9 @@ const verificarOTP = async () => {
       throw new Error("Código OTP no válido");
     }
 
+    // Guardar el tiempo de la última verificación 2FA
+    localStorage.setItem("last2FATime", Date.now());
+
     // Redirigir al usuario a la página principal
     navigateTo("/", { reload: true });
   } catch (error) {
@@ -57,13 +60,4 @@ const verificarOTP = async () => {
     alert(error.message);
   }
 };
-useHead({
-  title: "Verificar'2fa - TestMaster",
-  meta: [
-    {
-      name: "description",
-      content: "verificacion de 2fa.",
-    },
-  ],
-});
 </script>

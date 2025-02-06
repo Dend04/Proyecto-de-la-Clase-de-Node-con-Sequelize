@@ -106,7 +106,7 @@ router.get('/respuestas', async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.get('/respuesta/:id',verificarToken, async (req, res) => {
+router.get('/respuesta/:id',verificarToken('usuario'), async (req, res) => {
   try {
     const { id } = req.params;
     const respuesta = await getRespuestaById(id);
@@ -173,7 +173,7 @@ router.get('/respuesta/:id',verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.post('/crearRespuesta', verificarToken, async (req, res) => {
+router.post('/crearRespuesta', verificarToken('usuario'), async (req, res) => {
   try {
     const respuesta = await createRespuesta(req.body);
     res.status(201).json(respuesta);
@@ -242,7 +242,7 @@ router.post('/crearRespuesta', verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.put('/respuesta/:id', verificarToken, async (req, res) => {
+router.put('/respuesta/:id', verificarToken('usuario'), async (req, res) => {
   try {
     const { id } = req.params;
     const respuesta = await updateRespuesta(id, req.body);
@@ -278,7 +278,7 @@ router.put('/respuesta/:id', verificarToken, async (req, res) => {
  *                 error:
  *                   type: string
  */
-router.delete('/borrarRespuesta/:id', verificarToken, async (req, res) => {
+router.delete('/borrarRespuesta/:id', verificarToken('usuario'), async (req, res) => {
   try {
     const { id } = req.params;
     await deleteRespuesta(id);

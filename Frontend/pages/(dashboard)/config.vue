@@ -1,9 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-tr from-[#aab2b5] to-[#eaebef] py-8 pl-20 md:pl-52">
     <!-- Contenedor principal -->
-    <div
-      class="max-w-2xl mx-4 md:mx-auto bg-white p-6 rounded-lg shadow-md mt-10 md:mt-20"
-    >
+    <div class="max-w-2xl mx-4 md:mx-auto bg-white p-6 rounded-lg shadow-md mt-10 md:mt-20">
       <!-- Mensaje si no hay token -->
       <div v-if="!accessToken" class="text-center">
         <p class="text-red-500 text-lg font-semibold">
@@ -125,7 +123,7 @@
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
               >
                 <component
-                  :is="mostrarContrasenaActual ? EyeOffIcon : EyeIcon"
+                  :is="mostrarContrasenaActual ? EyeIcon : EyeOffIcon"
                   class="h-5 w-5"
                 />
               </button>
@@ -144,7 +142,7 @@
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
               >
                 <component
-                  :is="mostrarNuevaContrasena ? EyeOffIcon : EyeIcon"
+                  :is="mostrarNuevaContrasena ? EyeIcon : EyeOffIcon"
                   class="h-5 w-5"
                 />
               </button>
@@ -159,39 +157,50 @@
                 class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-                @click="
-                  mostrarConfirmarContrasena = !mostrarConfirmarContrasena
-                "
+                @click="mostrarConfirmarContrasena = !mostrarConfirmarContrasena"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
               >
                 <component
-                  :is="mostrarConfirmarContrasena ? EyeOffIcon : EyeIcon"
+                  :is="mostrarConfirmarContrasena ? EyeIcon : EyeOffIcon"
                   class="h-5 w-5"
                 />
               </button>
             </div>
-            <div class="mt-2">
+
+            <!-- Advertencias de contraseña -->
+            <div class="mt-2 space-y-2">
               <p
-                :class="{
-                  'text-green-500': contrasenaValida,
-                  'text-red-500': !contrasenaValida,
-                }"
+                v-if="nuevaContrasena.length > 0 && nuevaContrasena.length < 8"
+                class="text-red-500 text-sm"
               >
-                {{
-                  contrasenaValida
-                    ? "La contraseña es válida"
-                    : "La contraseña debe tener al menos 8 caracteres"
-                }}
+                La contraseña debe tener al menos 8 caracteres.
+              </p>
+              <p
+                v-if="
+                  confirmarContrasena.length > 0 &&
+                  nuevaContrasena !== confirmarContrasena
+                "
+                class="text-red-500 text-sm"
+              >
+                Las contraseñas no coinciden.
               </p>
             </div>
 
-           
+            <!-- Botón para cambiar contraseña -->
             <button
               @click="cambiarContrasena"
               class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
               Cambiar Contraseña
             </button>
+
+            <!-- Mensaje de éxito -->
+            <div
+              v-if="mensajeExito"
+              class="mt-4 p-4 bg-green-100 text-green-700 rounded-md text-center"
+            >
+              {{ mensajeExito }}
+            </div>
           </div>
         </div>
       </div>
@@ -219,7 +228,8 @@ const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 const cambiandoContrasena = ref(false); // Estado para deshabilitar el botón
 const mostrarContrasenaActual = ref(false); // Estado para contraseña actual
 const mostrarNuevaContrasena = ref(false); // Estado para nueva contraseña
-const mostrarConfirmarContrasena = ref(false); // Estado para confirmar contraseña // Estado para mostrar/ocultar contraseña
+const mostrarConfirmarContrasena = ref(false); // Estado para confirmar contraseña
+const mensajeExito = ref(""); // Estado para el mensaje de éxito
 
 // Función para decodificar el token y obtener el userId
 const obtenerUserIdDesdeToken = () => {
@@ -442,11 +452,10 @@ const cambiarContrasena = async () => {
 
     const data = await response.json();
     if (data.success) {
-      alert("Contraseña cambiada exitosamente");
+      mensajeExito.value = "Contraseña cambiada exitosamente";
       contrasenaActual.value = "";
       nuevaContrasena.value = "";
       confirmarContrasena.value = "";
-      mostrarCambiarContrasena.value = false;
     } else {
       alert(data.message);
     }

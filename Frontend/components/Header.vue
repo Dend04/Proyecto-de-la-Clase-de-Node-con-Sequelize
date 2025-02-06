@@ -45,7 +45,7 @@
         <NuxtImg
           :src="
             userProfile.fotoPerfil
-              ? `${backendUrl}/uploads/fotosPerfil/${userProfile.fotoPerfil}`
+              ? `/uploads/fotosPerfil/${userProfile.fotoPerfil}`
               : '/avatar.png'
           "
           alt="Avatar"

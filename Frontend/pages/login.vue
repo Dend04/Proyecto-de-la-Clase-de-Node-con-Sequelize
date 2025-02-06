@@ -26,7 +26,7 @@
         <div class="flex justify-between">
           <!-- Botón "Cancelar" -->
           <NuxtLink
-            to="/"
+            to="/login"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
           >
             Cancelar
@@ -80,8 +80,7 @@ const handleLogin = async () => {
     }
 
     const { accessToken, refreshToken, requiere2FA } = await response.json();
-    console.log("Respuesta del backend:", { accessToken, refreshToken, requiere2FA });
-
+   
     // Guardar los tokens en localStorage
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
