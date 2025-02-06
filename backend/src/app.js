@@ -62,7 +62,7 @@ swaggerSetup(app);
 app.use(middleware);
 
 // CORS
-/* app.use(cors); */
+app.use(cors);
 
 // Rutas
 app.use('/api', usuarioRoutes);
