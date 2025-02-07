@@ -15,12 +15,12 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT || 5432, // Puerto por defecto para PostgreSQL
     dialect: process.env.DB_DIALECT,
     logging: false, // Desactiva el registro de SQL en la consola
-    dialectOptions: env === "production" ? {
+    dialectOptions:{
       ssl: {
         require: true, // Requerido para Supabase
         rejectUnauthorized: false, // Necesario para Supabase
       },
-    } : {}, // Solo agregar SSL en producción
+    }
   }
 );
 
