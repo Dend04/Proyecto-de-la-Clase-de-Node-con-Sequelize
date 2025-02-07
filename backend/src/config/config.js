@@ -23,5 +23,6 @@ const sequelize = new Sequelize(
     }
   }
 );
+logging: console.log
 
 export default sequelize;
