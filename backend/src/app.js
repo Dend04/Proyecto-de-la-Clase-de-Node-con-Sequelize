@@ -30,12 +30,12 @@ dotenv.config();
 Pregunta.hasMany(Respuesta, { foreignKey: "preguntaId" });
 Respuesta.belongsTo(Pregunta, { foreignKey: "preguntaId" });
 
-Usuario.hasMany(Resultado, { foreignKey: "usuarioId" });
-Resultado.belongsTo(Usuario, { foreignKey: "usuarioId" });
+Usuario.hasMany(Resultado, { foreignKey: "usuarioId", onDelete: 'CASCADE' });
+Resultado.belongsTo(Usuario, { foreignKey: "usuarioId", onDelete: 'CASCADE' });
 
 Resultado.hasMany(Rutina, { foreignKey: "resultadoId" });
 
-Test.hasMany(Resultado, { foreignKey: "testId" });
+Test.hasMany(Resultado, {foreignKey: "testId", onDelete: 'CASCADE',});
 Resultado.belongsTo(Test, { foreignKey: "testId" });
 
 Usuario.hasMany(Resultado, { foreignKey: "usuarioId", onDelete: 'CASCADE' });

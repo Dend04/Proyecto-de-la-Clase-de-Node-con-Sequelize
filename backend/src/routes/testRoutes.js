@@ -246,7 +246,7 @@ router.put('/test/:id',verificarToken('administrador'), async (req, res) => {
  *             example:
  *               error: "Test no encontrado"
  */
-router.delete('/test/:id',verificarToken('administrador'), async (req, res) => {
+router.delete('/test/:id', verificarToken('administrador'), async (req, res) => {
   try {
     await deleteTest(req.params.id);
     res.status(200).json({ message: "Test eliminado satisfactoriamente" });

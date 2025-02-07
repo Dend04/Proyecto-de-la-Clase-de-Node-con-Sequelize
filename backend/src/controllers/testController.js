@@ -1,5 +1,6 @@
 import Test from '../models/test_model.js';
 import Pregunta from '../models/pregunta_model.js';
+import Resultado from '../models/resultado_model.js';
 
 // Obtener todos los tests
 // Obtener todos los tests
@@ -65,9 +66,24 @@ export const updateTest = async (id, testData) => {
 
 // Eliminar un test
 export const deleteTest = async (id) => {
-  const deleted = await Test.destroy({
-    where: { id }
-  });
-  
-  if (!deleted) throw new Error('Test no encontrado');
+  try {
+    // Verificar si el test existe
+    const test = await Test.findByPk(id);
+    if (!test) {
+      throw new Error('Test no encontrado');
+    }
+
+    // Eliminar los resultados asociados al test
+    await Resultado.destroy({
+      where: { testId: id }
+    });
+
+    // Eliminar el test
+    await test.destroy();
+
+    console.log(`Test con ID: ${id} eliminado correctamente`);
+  } catch (error) {
+    console.error("Error al eliminar el test:", error);
+    throw new Error("No se pudo eliminar el test debido a un error interno.");
+  }
 };
