@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
   process.env.DB_USER,
   process.env.DB_PASSWORD,
   {
-    host: process.env.HOST || process.env.DB_HOST, // Usar DB_HOST si HOST no está definido
+    host: process.env.HOST,
     port: process.env.DB_PORT || 5432, // Puerto por defecto para PostgreSQL
     dialect: process.env.DB_DIALECT,
     logging: false, // Desactiva el registro de SQL en la consola
