@@ -1,19 +1,41 @@
-import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+// config.js
+require('dotenv').config(); // Cargar variables de entorno
 
-// Cargar las variables de entorno
-dotenv.config();
-
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.HOST,
+module.exports = {
+  development: {
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'tu_contraseña_local',
+    database: process.env.DB_NAME || 'nombre_bd_local',
+    host: process.env.HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    dialect: process.env.DB_DIALECT, // Especifica que estás usando PostgreSQL u otra base de datos
-    logging: true, // Desactiva el registro de SQL en la consola
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: false // SSL desactivado en desarrollo
+    },
+    logging: console.log // Muestra queries SQL en consola
+  },
+  test: {
+    username: 'postgres',
+    password: 'contraseña_test',
+    database: 'bd_test',
+    host: 'localhost',
+    port: 5432,
+    dialect: 'postgres',
+    logging: false
+  },
+  production: {
+    username: process.env.DB_USER, // Debe coincidir con tu usuario de Supabase
+    password: process.env.DB_PASSWORD, // Contraseña de Supabase
+    database: process.env.DB_NAME || 'postgres', // postgres por defecto en Supabase
+    host: process.env.HOST, // Formato: db.[id-proyecto].supabase.co
+    port: process.env.DB_PORT || 5432,
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: { // Obligatorio para Supabase
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+    logging: false
   }
-);
-
-export default sequelize;
+};
