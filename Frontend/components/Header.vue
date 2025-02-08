@@ -45,7 +45,7 @@
         <NuxtImg
           :src="
             userProfile.fotoPerfil
-              ? `/uploads/fotosPerfil/${userProfile.fotoPerfil}`
+              ? `${backendSinApi}${userProfile.fotoPerfil}`
               : '/avatar.png'
           "
           alt="Avatar"
@@ -158,6 +158,7 @@ import { jwtDecode } from "jwt-decode";
 
 const runtimeConfig = useRuntimeConfig();
 const backendUrl = runtimeConfig.public.BACKEND_URL;
+const backendSinApi = runtimeConfig.public.BACKEND_URL_SIN_API;
 const userName = ref("Inicio");
 const userRole = ref("Admin");
 const userProfile = ref({

@@ -27,13 +27,15 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      BACKEND_URL: process.env.BACKEND_URL || "http://localhost:10000/api", // Variable de entorno para el backend
+      BACKEND_URL: process.env.BACKEND_URL || "http://localhost:3000/api", // Variable de entorno para el backend
       NUXT_SUPABASE_URL: process.env.NUXT_SUPABASE_URL,
       NUXT_SUPABASE_KEY: process.env.NUXT_SUPABASE_KEY,
+      BACKEND_URL_SIN_API:process.env.BACKEND_URL_SIN_API,
       host: '0.0.0.0',
       port: process.env.PORT
     },
   },
+  
 
   /* auth: {
     baseURL: process.env.BACKEND_URL || 'http://localhost:3000/api',

@@ -74,7 +74,8 @@ app.use('/api', respuestaRoutes);
 app.use('/api', faRoutes);
 
 // Servir archivos estáticos desde uploads/fotosPerfil
-app.use('/uploads/fotosPerfil', express.static(uploadDir));
+const parentDir = path.resolve(__dirname, '..'); // Ajusta según tu estructura
+app.use('/uploads/fotosPerfil', express.static(path.join(parentDir, 'backend/uploads/fotosPerfil')));
 
 // Usa el middleware de manejo de errores
 app.use(errorMiddleware);

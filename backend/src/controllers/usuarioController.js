@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
 // Crear la carpeta si no existe
-const uploadDir = path.resolve(rootDir, 'uploads/fotosPerfil');
+const uploadDir = path.resolve(rootDir, 'backend/uploads/fotosPerfil');
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
