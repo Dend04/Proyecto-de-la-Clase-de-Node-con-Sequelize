@@ -103,8 +103,9 @@ export const actualizarUsuario = async (id, userData) => {
 };
 
 // Borrar un usuario
-export const borrarUsuario = async (id) => {
+export const borrarUsuario = async (id, usuarioActualId) => {
   const usuario = await Usuario.findByPk(id);
+  if (usuario.id === usuarioActualId) throw new Error("No puedes eliminarte a ti mismo");
   if (!usuario) throw new Error("Usuario no encontrado");
   await usuario.destroy();
 };
@@ -240,7 +241,18 @@ export const obtenerEstadoUsuario = async (req, res) => {
   }
 };
 
-// Configuración de Multer para guardar imágenes en la carpeta "uploads"
+// Cambiar rol de usuario
+export const cambiarRolUsuario = async (id, nuevoRol) => {
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) throw new Error("Usuario no encontrado");
+  
+  if (!['usuario', 'administrador'].includes(nuevoRol)) {
+    throw new Error("Rol no válido");
+  }
+  
+  return await usuario.update({ rol: nuevoRol });
+};
+
 // Configuración de Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

@@ -28,40 +28,83 @@
       No hay usuarios disponibles.
     </div>
 
+    <!-- Notificación de éxito -->
+    <div v-if="showSuccess" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+      ¡Rol cambiado exitosamente!
+    </div>
+
+    <div v-if="deleteError" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+      {{ deleteError }}
+    </div>
+
+     <!-- Modal de cambio de rol -->
+     <div v-if="showRoleChangeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmar cambio de rol</h2>
+        <p class="text-gray-600 mb-6">
+          ¿Estás seguro de cambiar el rol a {{ newRole === 'administrador' ? 'administrador' : 'usuario' }}?
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button 
+            @click="closeRoleChangeModal"
+            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            Cancelar
+          </button>
+          <button 
+            @click="confirmRoleChange"
+            class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Tabla de usuarios -->
-    <div v-else class="overflow-x-auto bg-white rounded-xl shadow-lg ml-8 md:ml-18 lg:ml-24 pl-24 ">
+    <div class="overflow-x-auto bg-white rounded-xl shadow-lg ml-8 md:ml-18 lg:ml-24 pl-24">
       <table class="min-w-full">
         <thead>
           <tr class="bg-gray-50">
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700">Nombre</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font semibold text-gray-700 hidden md:table-cell">Segundo Nombre</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700">Apellidos</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700 hidden md:table-cell">Nombre de Usuario</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700">Email</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700 hidden md:table-cell">Peso</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700 hidden md:table-cell">Altura</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700 hidden md:table-cell">Enfermedad Crónica</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700 hidden md:table-cell">Estado Físico Actual</th>
-            <th class="py-3 px-2 md:px-4 text-left text-sm font-semibold text-gray-700">Acciones</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Nombre</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Apellidos</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Nombre de Usuario</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Email</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Rol</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in paginatedUsers" :key="user.id" class="hover:bg-gray-50 transition">
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700">{{ user.nombre }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.segundoNombre }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700">{{ user.apellidos }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.nombreUsuario }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700">{{ user.email }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.peso }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.altura }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.enfermedadCronica }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 hidden md:table-cell">{{ user.estadoFisicoActual }}</td>
-            <td class="py-3 px-2 md:px-4 border-b text-gray-700 flex space-x-2">
-              <button @click="editUser(user.id)" class="text-blue-500 hover:text-blue-600 transition">
-                <PencilIcon class="h-4 md:h-5 w-4 md:w-5" />
+            <td class="py-3 px-4 border-b text-gray-700">{{ user.nombre }}</td>
+            <td class="py-3 px-4 border-b text-gray-700">{{ user.apellidos }}</td>
+            <td class="py-3 px-4 border-b text-gray-700">{{ user.nombreUsuario }}</td>
+            <td class="py-3 px-4 border-b text-gray-700">{{ user.email }}</td>
+            <td class="py-3 px-4 border-b">
+              <span 
+                class="px-2 py-1 rounded-full text-xs"
+                :class="{
+                  'bg-purple-100 text-purple-800': user.rol === 'administrador',
+                  'bg-blue-100 text-blue-800': user.rol === 'usuario'
+                }"
+              >
+                {{ user.rol }}
+              </span>
+            </td>
+            <td class="py-3 px-4 border-b text-gray-700 flex space-x-2">
+              <!-- Botón de cambiar rol -->
+              <button 
+                @click="openRoleChangeModal(user.id, user.rol)"
+                class="text-purple-500 hover:text-purple-600 transition"
+              >
+                <ShieldCheckIcon class="h-5 w-5" />
               </button>
-              <button @click="openDeleteModal(user.id)" class="text-red-500 hover:text-red-600 transition">
-                <TrashIcon class="h-4 md:h-5 w-4 md:w-5" />
+              <!-- Botón eliminar -->
+              <button 
+                @click="openDeleteModal(user.id)" 
+                class="text-red-500 hover:text-red-600 transition"
+              >
+                <TrashIcon class="h-5 w-5" />
               </button>
             </td>
           </tr>
@@ -102,7 +145,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { PencilIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
+import { ShieldCheckIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
 
 const runtimeConfig = useRuntimeConfig();
 const users = ref([]);
@@ -111,6 +154,11 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const showDeleteModal = ref(false);
 const userIdToDelete = ref(null);
+const deleteError = ref(null);
+const showSuccess = ref(false);
+const showRoleChangeModal = ref(false);
+const userIdToChangeRole = ref(null);
+const newRole = ref('');
 
 const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
@@ -153,10 +201,6 @@ const goToPage = (page) => {
   currentPage.value = page;
 };
 
-const editUser = (id) => {
-  console.log(`Editar usuario con id: ${id}`);
-};
-
 const openDeleteModal = (id) => {
   userIdToDelete.value = id;
   showDeleteModal.value = true;
@@ -171,20 +215,67 @@ const confirmDelete = async () => {
   if (userIdToDelete.value) {
     try {
       const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("No se encontró un token de autenticación.");
-      await $fetch(`${apiBaseUrl}/usuario/${userIdToDelete.value}`, {
+      const response = await $fetch(`${apiBaseUrl}/usuario/${userIdToDelete.value}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchUsers();
+
+      if (response.error) {
+        deleteError.value = response.error;
+        setTimeout(() => deleteError.value = null, 3000);
+        return;
+      }
+
+      await fetchUsers();
     } catch (err) {
-      console.error("Error al eliminar el usuario:", err);
-      error.value = "No se pudo eliminar el usuario. Por favor, inténtalo de nuevo.";
+      deleteError.value = err.data?.message || "Error al eliminar el usuario";
+      setTimeout(() => deleteError.value = null, 3000);
     } finally {
       closeDeleteModal();
     }
   }
 };
+
+
+// Estados nuevos
+
+
+// Métodos nuevos
+const openRoleChangeModal = (id, currentRole) => {
+  userIdToChangeRole.value = id;
+  newRole.value = currentRole === 'administrador' ? 'usuario' : 'administrador';
+  showRoleChangeModal.value = true;
+};
+
+const closeRoleChangeModal = () => {
+  showRoleChangeModal.value = false;
+  userIdToChangeRole.value = null;
+  newRole.value = '';
+};
+
+const confirmRoleChange = async () => {
+  try {
+    const token = localStorage.getItem("accessToken");
+    await $fetch(`${apiBaseUrl}/usuario/${userIdToChangeRole.value}/rol`, {
+      method: "PUT",
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ rol: newRole.value })
+    });
+    
+    await fetchUsers();
+    showSuccess.value = true;
+    setTimeout(() => showSuccess.value = false, 3000); // Oculta después de 3 segundos
+  } catch (err) {
+    console.error("Error al cambiar rol:", err);
+    error.value = "Error al cambiar el rol del usuario";
+  } finally {
+    closeRoleChangeModal();
+  }
+};
+
 
 onMounted(() => {
   fetchUsers();

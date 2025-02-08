@@ -13,16 +13,27 @@
             required
           />
         </div>
-        <div class="mb-6">
-          <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-          <input
-            v-model="loginForm.password"
-            type="password"
-            id="password"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            required
+        <div class="mb-6 relative">
+        <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+        <input
+          v-model="loginForm.password"
+          :type="showPassword ? 'text' : 'password'"
+          id="password"
+          class="mt-1 p-2 w-full border border-gray-300 rounded-md pr-10"
+          required
+        />
+        <button
+          type="button"
+          @click="showPassword = !showPassword"
+          class="absolute inset-y-0 right-0 pr-3 pt-7 flex items-center"
+        >
+          <component 
+            :is="showPassword ? EyeOffIcon : EyeIcon" 
+            class="h-5 w-5 text-gray-500 hover:text-gray-700"
           />
-        </div>
+        </button>
+      </div>
+
         <div class="flex justify-between">
           <!-- Botón "Cancelar" -->
           <NuxtLink
@@ -55,7 +66,9 @@
 
 <script setup>
 import { ref } from "vue";
+import { EyeIcon, EyeOffIcon } from "@heroicons/vue/outline"; // Importar iconos
 
+const showPassword = ref(false);
 const runtimeConfig = useRuntimeConfig();
 // Estado para el formulario de login
 const loginForm = ref({

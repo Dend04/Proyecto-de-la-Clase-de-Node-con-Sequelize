@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@nuxt/image", /* "@sidebase/nuxt-auth" */],
   css: ["@/assets/css/tailwind.css"],
   
+  
   app: {
     head: {
       title: "TestMaster - Tests de Conocimiento, Idiomas y Salud",

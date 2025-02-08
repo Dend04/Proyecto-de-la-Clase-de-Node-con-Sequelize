@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario, cambiarContrasena } from '../controllers/usuarioController.js';
+import { crearUsuario, obtenerUsuarios, obtenerUsuarioPorId, actualizarUsuario, borrarUsuario, buscarUsuarios, obtenerPerfil, refrescarToken, actualizarNombreUsuario, cerrarSesion, obtenerEstadoUsuario, cambiarContrasena, cambiarRolUsuario } from '../controllers/usuarioController.js';
 import { verificarToken } from '../middleware/middleware.js';
 import { iniciarSesion } from "../controllers/usuarioController.js"; // Asegúrate de que la ruta sea correcta
 import { generateUniqueUsername } from '../models/usuario_model.js';
@@ -213,9 +213,9 @@ router.put('/usuario/:id', verificarToken('usuario','administrador'), async (req
  *       400:
  *         description: Error en la eliminación del usuario
  */
-router.delete('/usuario/:id',verificarToken('administrador'), async (req, res) => {
+router.delete('/usuario/:id', verificarToken('administrador'), async (req, res) => {
   try {
-    await borrarUsuario(req.params.id);
+    await borrarUsuario(req.params.id, req.usuario.id); // Pasar ID del usuario autenticado
     res.status(204).send();
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -466,6 +466,43 @@ router.get('/perfil', verificarToken('usuario','administrador'), async (req, res
     res.status(200).json(usuario);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/usuario/{id}/rol:
+ *   put:
+ *     summary: Cambia el rol de un usuario
+ *     tags: [Usuarios]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rol:
+ *                 type: string
+ *                 enum: [usuario, administrador]
+ *     responses:
+ *       200:
+ *         description: Rol actualizado
+ *       400:
+ *         description: Error en la actualización
+ */
+router.put('/usuario/:id/rol', verificarToken('administrador'), async (req, res) => {
+  try {
+    const usuario = await cambiarRolUsuario(req.params.id, req.body.rol);
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
