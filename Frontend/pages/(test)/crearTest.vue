@@ -103,6 +103,8 @@ const etiqueta = ref('');
 const mensaje = ref('');
 const mensajeClase = ref('');
 const testId = ref(null);
+const runtimeConfig = useRuntimeConfig();
+const apiBaseUrl = runtimeConfig.public.BACKEND_URL;
 
 const submitForm = async () => {
   if (!titulo.value || !etiqueta.value) {
@@ -112,7 +114,7 @@ const submitForm = async () => {
   }
 
   try {
-    const response = await $fetch('http://localhost:3000/api/crearTest', {
+    const response = await $fetch(`${apiBaseUrl}/crearTest`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Enviar el token
@@ -122,7 +124,7 @@ const submitForm = async () => {
         descripcion: descripcion.value, 
         duracion: duracion.value || null, 
         dificultad: dificultad.value || null,
-        etiqueta: etiqueta.value
+        etiqueta: etiqueta.value  
       }
     });
     mensaje.value = 'Test creado con éxito.';

@@ -122,7 +122,7 @@ const fetchTest = async () => {
 
     // Obtener test básico
     const testResponse = await $fetch(
-      `http://localhost:3000/api/test/${testId.value}`,
+      `${apiBaseUrl}/test/${testId.value}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     test.value = testResponse;
